@@ -1,0 +1,246 @@
+name: Flashlight Sweep
+
+# Two-phase sweep: discover which repos need updating, then fan out
+# one runner per repo. Each repo gets its own timeout and runs in parallel.
+# Results are committed via PR (not direct to main) so discrepancies can be reviewed.
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: "Single repo to update (e.g. Layr-Labs/d-inference). Leave empty to sweep all."
+        required: false
+        default: ""
+
+jobs:
+  # --------------------------------------------------------------------------
+  # Phase 1: Discover which repos have changed since last analysis
+  # --------------------------------------------------------------------------
+  discover:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 10
+    outputs:
+      matrix: ${{ steps.check.outputs.matrix }}
+      has_repos: ${{ steps.check.outputs.has_repos }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check repos for changes
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PRIVATE_TOKEN: ${{ secrets.FLASHLIGHT_REPO_TOKEN }}
+          INPUT_REPO: ${{ inputs.repo }}
+        run: |
+          pip install pyyaml --quiet
+
+          python3 << 'PYEOF'
+          import yaml, json, os, subprocess
+
+          input_repo = os.environ.get("INPUT_REPO", "")
+          has_private = bool(os.environ.get("PRIVATE_TOKEN", ""))
+
+          with open("tracked-repos.yaml") as f:
+              data = yaml.safe_load(f)
+
+          matrix_entries = []
+
+          for r in data.get("repos", []):
+              repo = r["repo"]
+              artifacts_path = r["artifacts_path"]
+              is_public = r.get("public", False)
+
+              # Filter to single repo if requested
+              if input_repo and repo != input_repo:
+                  continue
+
+              # Skip private repos without token
+              if not is_public and not has_private:
+                  print(f"Skipping private repo {repo} (no token)")
+                  continue
+
+              # Read last analyzed SHA from manifest
+              manifest_path = os.path.join(artifacts_path, "manifest.json")
+              last_sha = ""
+              if os.path.exists(manifest_path):
+                  with open(manifest_path) as f:
+                      manifest = json.load(f)
+                  last_sha = manifest.get("source_commit", "")
+
+              # Get current HEAD from GitHub API
+              result = subprocess.run(
+                  ["gh", "api", f"repos/{repo}/commits?per_page=1", "--jq", ".[0].sha"],
+                  capture_output=True, text=True
+              )
+              head_sha = result.stdout.strip()
+
+              if not head_sha:
+                  print(f"WARNING: Could not fetch HEAD for {repo}. Skipping.")
+                  continue
+
+              print(f"{repo}: last={last_sha or '(never)'} head={head_sha[:12]}", end="")
+
+              if last_sha == head_sha:
+                  print(" — no changes")
+                  continue
+
+              print(" — NEEDS UPDATE")
+              matrix_entries.append({
+                  "repo": repo,
+                  "artifacts_path": artifacts_path,
+                  "head_sha": head_sha,
+                  "last_sha": last_sha,
+                  "public": is_public,
+              })
+
+          # Write outputs
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              if matrix_entries:
+                  f.write(f"matrix={json.dumps({'include': matrix_entries})}\n")
+                  f.write("has_repos=true\n")
+                  print(f"\n{len(matrix_entries)} repo(s) need updating")
+              else:
+                  f.write('matrix={"include":[]}\n')
+                  f.write("has_repos=false\n")
+                  print("\nNo repos need updating.")
+          PYEOF
+
+  # --------------------------------------------------------------------------
+  # Phase 2: Run flashlight for each repo that needs updating (parallel)
+  # Results committed to a branch and a PR is opened for review.
+  # --------------------------------------------------------------------------
+  analyze:
+    needs: discover
+    if: needs.discover.outputs.has_repos == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    timeout-minutes: 120
+    strategy:
+      matrix: ${{ fromJson(needs.discover.outputs.matrix) }}
+      fail-fast: false
+      max-parallel: 4
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Configure git credentials for private repos
+        if: matrix.public == false
+        env:
+          PRIVATE_TOKEN: ${{ secrets.FLASHLIGHT_REPO_TOKEN }}
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.FLASHLIGHT_REPO_TOKEN }}@github.com/Layr-Labs/".insteadOf "https://github.com/Layr-Labs/"
+
+      - name: Install github-flashlight
+        run: pip install git+https://github.com/Layr-Labs/github-flashlight.git
+
+      - name: Clone source repo
+        run: |
+          CLONE_DIR="/tmp/source-repo"
+          LAST_SHA="${{ matrix.last_sha }}"
+
+          if [ -n "$LAST_SHA" ]; then
+            git clone --filter=blob:none \
+              "https://github.com/${{ matrix.repo }}.git" \
+              "$CLONE_DIR"
+          else
+            git clone --depth=1 \
+              "https://github.com/${{ matrix.repo }}.git" \
+              "$CLONE_DIR"
+          fi
+
+      - name: Run flashlight
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+          OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
+        run: |
+          ARGS="--repo /tmp/source-repo"
+          ARGS="$ARGS --output ${{ matrix.artifacts_path }}"
+          ARGS="$ARGS --head-sha ${{ matrix.head_sha }}"
+
+          LAST_SHA="${{ matrix.last_sha }}"
+          if [ -n "$LAST_SHA" ]; then
+            ARGS="$ARGS --last-sha $LAST_SHA"
+          fi
+
+          flashlight $ARGS
+
+      - name: Verify only target artifacts changed
+        id: diff
+        run: |
+          ARTIFACTS_PATH="${{ matrix.artifacts_path }}"
+          CHANGED=$(git diff --name-only)
+          NEW_FILES=$(git ls-files --others --exclude-standard "$ARTIFACTS_PATH/")
+          ALL_CHANGES=$(printf '%s\n%s' "$CHANGED" "$NEW_FILES" | grep -v '^$' || true)
+
+          if [ -z "$ALL_CHANGES" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No artifact changes produced."
+            exit 0
+          fi
+
+          UNEXPECTED=$(echo "$ALL_CHANGES" | grep -v "^${ARTIFACTS_PATH}/" || true)
+          if [ -n "$UNEXPECTED" ]; then
+            echo "::error::Flashlight modified files outside ${ARTIFACTS_PATH}/:"
+            echo "$UNEXPECTED" | while read -r f; do echo "::error::  $f"; done
+            exit 1
+          fi
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Create PR with updated artifacts
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PROJECT_NAME=$(basename "${{ matrix.artifacts_path }}")
+          ARTIFACTS_PATH="${{ matrix.artifacts_path }}"
+          HEAD_SHA="${{ matrix.head_sha }}"
+          LAST_SHA="${{ matrix.last_sha }}"
+          BRANCH="flashlight/update-${PROJECT_NAME}-${HEAD_SHA:0:12}"
+
+          # Create branch and commit
+          git checkout -b "$BRANCH"
+          git add "$ARTIFACTS_PATH/"
+          git config user.name "flashlight-sweep[bot]"
+          git config user.email "flashlight-sweep[bot]@users.noreply.github.com"
+
+          if [ -n "$LAST_SHA" ]; then
+            MODE="incremental (${LAST_SHA:0:12}..${HEAD_SHA:0:12})"
+          else
+            MODE="full"
+          fi
+
+          git commit -m "chore: update $PROJECT_NAME artifacts [flashlight-sweep]
+
+          Source: ${{ matrix.repo }}@${HEAD_SHA:0:12}
+          Mode: $MODE"
+          git push origin "$BRANCH"
+
+          # Create PR
+          gh pr create \
+            --title "flashlight: update $PROJECT_NAME ($MODE)" \
+            --body "Automated knowledge update for **${{ matrix.repo }}**.
+
+          - **Source commit**: \`${HEAD_SHA:0:12}\`
+          - **Mode**: $MODE
+          - **Artifacts**: \`${ARTIFACTS_PATH}/\`
+
+          Review the changed files before merging. Discrepancies will be flagged by the daily temporal validation." \
+            --base main \
+            --head "$BRANCH" \
+            --label "flashlight-sweep"

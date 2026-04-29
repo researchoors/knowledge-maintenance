@@ -1,0 +1,5 @@
+# Repos tracked by flashlight-sweep
+repos:
+  - repo: Layr-Labs/d-inference
+    artifacts_path: artifacts/d-inference
+    public: true
