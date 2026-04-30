@@ -145,6 +145,9 @@ jobs:
       # Download them from the GitHub repo so subagents can find their prompt files.
       - name: Patch missing flashlight assets
         run: |
+          echo "Python: $(which python3)"
+          echo "Python version: $(python3 --version)"
+          python3 -c "import sys; print('sys.path:'); [print(f'  {p}') for p in sys.path]"
           SITE=$(python3 -c "import agent; print(agent.__path__[0])")
           echo "agent package at: $SITE"
           curl -sL "https://github.com/Layr-Labs/github-flashlight/archive/refs/heads/main.tar.gz" | tar xz
