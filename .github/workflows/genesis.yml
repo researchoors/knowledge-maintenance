@@ -143,4 +143,4 @@ jobs:
           Review the generated knowledge graphs and architecture docs before merging." \
             --base main \
             --head "$BRANCH" \
-            --label "flashlight-sweep"
+            --label "flashlight-sweep" || true

@@ -222,4 +222,4 @@ jobs:
           Review the changed files before merging. Discrepancies will be flagged by the daily temporal validation." \
             --base main \
             --head "$BRANCH" \
-            --label "flashlight-sweep"
+            --label "flashlight-sweep" || true
