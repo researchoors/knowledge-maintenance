@@ -31,6 +31,18 @@ jobs:
           pip install git+https://github.com/Layr-Labs/github-flashlight.git
           pip install pyyaml --quiet
 
+      # Workaround: pip wheel omits agent/prompts/ and agent/templates/
+      # Download them from the GitHub repo so subagents can find their prompt files.
+      - name: Patch missing flashlight assets
+        run: |
+          SITE=$(/usr/bin/python3 -c "import agent; print(agent.__path__[0])")
+          echo "agent package at: $SITE"
+          curl -sL "https://github.com/Layr-Labs/github-flashlight/archive/refs/heads/main.tar.gz" | tar xz
+          cp -r github-flashlight-main/agent/prompts  "$SITE/prompts"
+          cp -r github-flashlight-main/agent/templates "$SITE/templates"
+          echo "Patched directories:"
+          ls "$SITE/prompts/" "$SITE/prompts/subagents/" "$SITE/templates/"
+
       - name: Run genesis
         id: genesis
         env:
