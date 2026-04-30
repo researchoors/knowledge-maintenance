@@ -145,7 +145,11 @@ jobs:
       # Download them from the GitHub repo so subagents can find their prompt files.
       - name: Patch missing flashlight assets
         run: |
-          SITE=$(/usr/bin/python3 -c "import agent; print(agent.__path__[0])")
+          SITE=$(python3 -c "import agent; print(agent.__path__[0])" 2>/dev/null || pip show code-analysis-agent --quiet 2>/dev/null | grep Location | awk '{print $2"/agent"}')
+          if [ -z "$SITE" ] || [ ! -d "$SITE" ]; then
+            echo "::error::Could not locate agent package"
+            exit 1
+          fi
           echo "agent package at: $SITE"
           curl -sL "https://github.com/Layr-Labs/github-flashlight/archive/refs/heads/main.tar.gz" | tar xz
           cp -r github-flashlight-main/agent/prompts  "$SITE/prompts"
@@ -169,7 +173,7 @@ jobs:
           fi
 
           echo "Running: flashlight $ARGS"
-          flashlight $ARGS --verbose
+          flashlight $ARGS
 
       - name: Verify only target artifacts changed
         id: diff
