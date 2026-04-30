@@ -36,7 +36,7 @@ jobs:
 
       - name: Install mdBook & mermaid preprocessor
         run: |
-          which mdbook || cargo install mdbook --version 0.4.48
+          which mdbook || cargo install mdbook --version 0.5.2
           which mdbook-mermaid || cargo install mdbook-mermaid --version 0.17.0
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
