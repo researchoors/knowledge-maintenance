@@ -15,9 +15,10 @@ permissions:
   pages: write
   id-token: write
 
+# Allow one deployment at a time
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
