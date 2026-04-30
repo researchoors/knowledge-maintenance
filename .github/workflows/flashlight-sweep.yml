@@ -151,10 +151,10 @@ jobs:
           SITE=$(python3 -c "import agent; print(agent.__path__[0])")
           echo "agent package at: $SITE"
           curl -sL "https://github.com/Layr-Labs/github-flashlight/archive/refs/heads/main.tar.gz" | tar xz
-          cp -r github-flashlight-main/agent/prompts  "$SITE/prompts"
-          cp -r github-flashlight-main/agent/templates "$SITE/templates"
+          cp -r github-flashlight-main/agent/prompts  "$SITE/prompts" 2>/dev/null || echo "No prompts/ dir in repo"
+          cp -r github-flashlight-main/agent/templates "$SITE/templates" 2>/dev/null || echo "No templates/ dir in repo"
           echo "Patched directories:"
-          ls "$SITE/prompts/" "$SITE/prompts/subagents/" "$SITE/templates/"
+          ls "$SITE/prompts/" "$SITE/templates/" 2>/dev/null || true
 
       - name: Run flashlight
         env:
