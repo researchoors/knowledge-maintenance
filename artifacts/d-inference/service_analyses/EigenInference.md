@@ -1,220 +1,175 @@
-# EigenInference Component Analysis
+# EigenInference
 
-## Overview
-
-EigenInference is a macOS menu bar application built with SwiftUI that provides a desktop frontend for the Darkbloom distributed inference network. The application serves as a graphical wrapper around the Rust-based `darkbloom` CLI binary, providing an intuitive interface for running and managing AI inference providers on macOS systems. Despite its name suggesting "EigenInference," the codebase consistently refers to "Darkbloom" throughout the implementation.
+EigenInference is a native macOS SwiftUI application that provides a menu bar interface for the Darkbloom distributed inference platform. The app wraps the Rust `darkbloom` binary, offering a user-friendly graphical interface for managing AI model serving on Apple Silicon hardware.
 
 ## Architecture
 
-The application follows a **Model-View-ViewModel (MVVM)** architecture pattern typical of SwiftUI applications, combined with a **Coordinator Pattern** for managing external process lifecycle. The architecture emphasizes:
+The application follows a **Model-View-ViewModel (MVVM)** architecture pattern built on SwiftUI's reactive framework. The architecture centers around a single `StatusViewModel` that acts as the central state manager, coordinating between multiple specialized managers and the SwiftUI views.
 
-- **Single source of truth**: Configuration is shared between the GUI app and CLI via TOML files
-- **Process management**: The app spawns and monitors the Rust `darkbloom` binary as a subprocess
-- **Real-time updates**: Live polling of system state and backend health
-- **Menu-bar-first design**: Minimal UI that lives in the system menu bar with expandable windows
+Key architectural patterns:
+- **Centralized State Management**: `StatusViewModel` serves as the single source of truth for all application state
+- **Manager Pattern**: Specialized manager classes handle distinct responsibilities (security, models, providers, etc.)
+- **Process Wrapper Pattern**: The app acts as a SwiftUI wrapper around the Rust CLI binary
+- **Configuration Synchronization**: Shared TOML configuration with the CLI ensures consistency
 
-Key architectural decisions:
-- Menu bar app with dynamic activation policy (switches between `.accessory` and `.regular` modes)
-- Shared configuration with CLI tools via TOML files in `~/.darkbloom/`
-- Process lifecycle management with automatic restart and crash recovery
-- Hardware detection and performance monitoring
-- Keychain integration for secure credential storage
+The app operates in two activation modes:
+- **Accessory Mode** (.accessory): Menu bar only, no dock icon
+- **Regular Mode** (.regular): Full application with dock icon and window focus when any window is open
 
 ## Key Components
 
-### 1. **EigenInferenceApp.swift** - Main Application Entry Point
-**Lines 22-230**: SwiftUI `App` struct that defines the application structure with multiple scenes (MenuBar, Settings, Dashboard, Setup, Doctor, Logs). Implements sophisticated activation policy management to behave like a proper macOS application when windows are open while maintaining menu-bar-only mode otherwise.
+### Core Application Components
 
-### 2. **StatusViewModel.swift** - Central State Management
-**Lines 18-627**: ObservableObject that centralizes all application state including provider status, hardware information, wallet/earnings data, and settings. Manages periodic polling, configuration persistence, and coordinates between UI and backend processes.
+**EigenInferenceApp** (`EigenInferenceApp.swift`, lines 23-230): Main application entry point that manages the SwiftUI app lifecycle, menu bar presence, and activation policy switching. Handles telemetry configuration and uncaught exception reporting.
 
-### 3. **ProviderManager.swift** - Process Lifecycle Management
-**Lines 23-283**: Manages the Rust `darkbloom` binary as a subprocess, including spawning, monitoring, crash detection, auto-restart logic, and clean shutdown. Implements exponential backoff for restart attempts and telemetry reporting for crashes.
+**StatusViewModel** (`StatusViewModel.swift`, lines 18-627): Central observable state manager that coordinates all provider operations, hardware detection, wallet management, and periodic tasks. Polls provider status every 5 seconds and manages the application's reactive state.
 
-### 4. **CLIRunner.swift** - Command Execution Interface
-**Lines 24-225**: Centralizes execution of `darkbloom` subcommands with proper environment setup, PATH management, and output capture. Supports both blocking execution and streaming output modes.
+**ProviderManager** (`ProviderManager.swift`, lines 23-283): Manages the Rust `darkbloom` binary subprocess lifecycle including spawning, monitoring, auto-restart on crash (up to 5 attempts with exponential backoff), and clean shutdown via SIGTERM/SIGKILL.
 
-### 5. **ConfigManager.swift** - Configuration Management
-**Lines 48-208**: TOML parser and serializer for the shared `provider.toml` configuration file used by both the GUI app and CLI. Ensures single source of truth for all provider settings.
+**CLIRunner** (`CLIRunner.swift`, lines 24-225): Centralized utility for executing `darkbloom` subcommands with proper PATH setup, environment variables, and output capture. Handles both synchronous and streaming command execution.
 
-### 6. **MenuBarView.swift** - Primary User Interface
-**Lines 8-340**: SwiftUI view for the menu bar dropdown, showing provider status, hardware information, quick controls, and navigation to other windows. Includes adaptive design system with Liquid Glass effects on macOS 14+.
+### User Interface Components
 
-### 7. **DashboardView.swift** - Detailed Status Display
-Comprehensive dashboard showing provider metrics, hardware specifications, trust status, and detailed statistics in a card-based layout.
+**MenuBarView** (`MenuBarView.swift`, lines 8-340): Primary user interface shown when clicking the menu bar icon. Displays real-time provider status, hardware information, earnings, and quick actions for starting/stopping the service.
 
-### 8. **ModelManager.swift** - ML Model Discovery
-**Lines 42-214**: Scans the HuggingFace cache directory for downloaded MLX models, manages model downloads via `huggingface-cli`, and provides model selection interface.
+**SetupWizardView** (`SetupWizardView.swift`, lines 13-664): Comprehensive onboarding wizard that guides users through hardware detection, security verification, MDM enrollment, model selection, and initial provider setup.
 
-### 9. **SecurityManager.swift** - Trust and Security
-Manages hardware attestation, security posture evaluation, and trust level determination for the inference provider.
+**DesignSystem** (`DesignSystem.swift`, lines 1-455): Comprehensive design system with light/dark mode color palettes, typography scales, and reusable UI components matching the Darkbloom brand guidelines.
 
-### 10. **TelemetryReporter.swift** - Error Reporting
-**Lines 52-267**: Lightweight telemetry system that buffers and reports crashes, errors, and diagnostic events to the coordinator backend with debounced network delivery.
+### Management and Configuration
 
-### 11. **DesignSystem.swift** - UI Design Tokens
-**Lines 11-455**: Comprehensive design system with adaptive color palettes, typography scales, and reusable UI components following the Darkbloom brand guidelines.
+**ConfigManager** (`ConfigManager.swift`, lines 48-208): Handles reading and writing the shared `provider.toml` configuration file used by both the app and CLI. Provides TOML parsing/serialization and atomic configuration updates.
 
-### 12. **UpdateManager.swift** - Application Updates
-Checks for and manages application updates from the coordinator backend, with version comparison and update notification logic.
+**SecurityManager** (`SecurityManager.swift`, lines 32-147): Evaluates machine security posture by checking SIP status, Secure Enclave availability, MDM enrollment, and Secure Boot. Determines trust level for coordinator routing decisions.
+
+**ModelManager** (`ModelManager.swift`, lines 42-214): Discovers MLX models in the HuggingFace cache directory, calculates disk usage, manages model downloads via `huggingface-cli`, and validates memory requirements against available hardware.
+
+### System Integration
+
+**LaunchAgentManager** (`LaunchAgentManager.swift`, lines 13-131): Manages macOS LaunchAgent installation for automatic app startup on login. Creates and manages plist files in `~/Library/LaunchAgents/` with proper migration from legacy paths.
+
+**TelemetryReporter** (`TelemetryReporter.swift`, lines 52-267): Ships crash reports and operational telemetry to the coordinator's `/v1/telemetry/events` endpoint with bounded in-memory buffering, debounced network flush, and structured event formatting.
+
+**NotificationManager**: Handles macOS user notifications for provider state changes, earnings milestones, and system alerts with proper authorization handling.
 
 ## Data Flows
 
+The application's data flow follows several key patterns:
+
+```mermaid
+graph TD
+    A[StatusViewModel] --> B[ProviderManager]
+    A --> C[CLIRunner]
+    A --> D[SecurityManager]
+    A --> E[ModelManager]
+    
+    F[MenuBarView] --> A
+    G[SettingsView] --> A
+    H[SetupWizardView] --> A
+    
+    B --> I[darkbloom binary]
+    C --> I
+    
+    J[ConfigManager] --> K[provider.toml]
+    A --> J
+    
+    L[TelemetryReporter] --> M[Coordinator API]
+    
+    N[IdleDetector] --> A
+    O[UpdateManager] --> A
+```
+
 ### Provider Lifecycle Flow
-```mermaid
-graph TD
-    A[User clicks Start] --> B[StatusViewModel.start()]
-    B --> C[CLIRunner.run(start)]
-    C --> D[ProviderManager.spawnProcess()]
-    D --> E[darkbloom serve subprocess]
-    E --> F[stdout/stderr capture]
-    F --> G[StatusViewModel.parseProviderOutput()]
-    G --> H[UI state updates]
-    H --> I[MenuBarView reflects status]
-    
-    E --> J[HTTP health check :8100]
-    J --> K[StatusViewModel.pollProviderStatus()]
-    K --> H
-    
-    E --> L[Process termination]
-    L --> M[Auto-restart logic]
-    M --> D
-```
+1. **Start Request**: User clicks "Go Online" → `StatusViewModel.start()` → `CLIRunner.run(["start"])` → Rust binary spawned
+2. **Status Monitoring**: Timer-based polling every 5s → HTTP health check to port 8100 → Parse JSON response → Update UI state
+3. **Output Parsing**: `ProviderManager` captures stdout → Regex parsing for throughput metrics → Real-time UI updates
+4. **Stop Request**: User action → SIGTERM to process → 5s grace period → SIGKILL if needed
 
-### Configuration Flow
-```mermaid
-graph TD
-    A[User changes setting] --> B[StatusViewModel property]
-    B --> C[ConfigManager.update()]
-    C --> D[TOML serialization]
-    D --> E[~/.darkbloom/provider.toml]
-    E --> F[CLI reads same config]
-    
-    G[App launch] --> H[ConfigManager.load()]
-    H --> I[TOML parsing]
-    I --> J[StatusViewModel initialization]
-```
+### Configuration Synchronization Flow
+1. **Settings Change**: User modifies coordinator URL → `StatusViewModel.coordinatorURL` setter → `ConfigManager.update()` → TOML file written
+2. **CLI Consistency**: Both app and CLI read same `~/Library/Application Support/darkbloom/provider.toml` file
+3. **Schedule Sync**: App-specific schedule settings → `syncScheduleToConfig()` → Merged into shared TOML
 
-### Hardware Detection Flow
-```mermaid
-graph TD
-    A[App initialization] --> B[StatusViewModel.detectHardware()]
-    B --> C[sysctlbyname for memory]
-    B --> D[system_profiler SPHardwareDataType]
-    B --> E[system_profiler SPDisplaysDataType]
-    C --> F[Memory GB calculation]
-    D --> G[Chip name parsing]
-    E --> H[GPU core detection]
-    F --> I[UI state update]
-    G --> I
-    H --> I
-```
+### Security Verification Flow
+1. **Initial Check**: App launch → `SecurityManager.refresh()` → Parallel execution of security checks
+2. **SIP Check**: `csrutil status` shell command → Parse "enabled" status
+3. **Secure Enclave**: `SecureEnclave.isAvailable` CryptoKit API
+4. **MDM Verification**: Multiple methods including profiles list and mdmclient queries
+5. **Trust Level**: Combined evaluation → Hardware trust only if all checks pass
 
 ## External Dependencies
 
-### External Libraries
+### Swift Package Manager Dependencies
 
-The application has **zero external dependencies** according to the Package.swift manifest. All functionality is implemented using Apple's built-in frameworks:
+The application has **zero external Swift package dependencies**, relying entirely on first-party Apple frameworks and the system-provided Rust binary.
 
-- **SwiftUI** (built-in): Primary UI framework for all views, navigation, and state management. Used throughout the application for declarative UI construction.
-- **Foundation** (built-in): Core system services including Process management, FileManager, URLSession, UserDefaults, JSON/TOML parsing, and timer functionality.
-- **Combine** (built-in): Reactive programming framework used in StatusViewModel for @Published properties and ObservableObject conformance.
-- **Security** (built-in): Keychain Services API for secure storage of API keys and credentials.
-- **UserNotifications** (built-in): Local notification delivery for provider status changes and system events.
-- **CryptoKit** (built-in): Used in SecurityManager for cryptographic operations and hardware attestation.
-- **Testing** (built-in): Apple's testing framework used in the test suite with modern @Test syntax.
+### System Dependencies
 
-The deliberate choice to avoid third-party dependencies makes this a self-contained, lightweight application that relies entirely on Apple's stable system frameworks.
+- **darkbloom binary**: The core Rust application that performs inference serving. Located via search order: `~/.darkbloom/bin/darkbloom`, app bundle, or PATH.
+- **huggingface-cli**: Used for model downloads via `huggingface-cli download` subprocess execution.
+- **system_profiler**: macOS system utility for hardware detection (chip type, GPU cores, memory).
+- **launchctl**: macOS service management for LaunchAgent installation/removal.
+- **csrutil**: System Integrity Protection status checking.
+- **pgrep**: Process detection for monitoring `darkbloom serve` instances.
+
+### Apple Frameworks
+
+- **SwiftUI** (iOS 14+/macOS 14+): Primary UI framework for reactive interface construction.
+- **Foundation**: Core system APIs for file management, networking, process execution, and data handling.
+- **Combine**: Reactive programming framework for state management and async operations.
+- **Security**: Keychain Services for API key storage and Secure Enclave availability checking.
+- **CryptoKit**: Secure Enclave detection and cryptographic operations.
+- **UserNotifications**: macOS notification center integration for provider status alerts.
 
 ## API Surface
 
-### Public Interfaces Exposed
+### Public Application Interface
 
-**CLI Integration Points:**
-- Binary resolution: `CLIRunner.resolveBinaryPath()` searches for `darkbloom` binary in standard locations
-- Command execution: `CLIRunner.run(_:)` for running darkbloom subcommands with full output capture
-- Streaming execution: `CLIRunner.stream(_:onLine:)` for real-time log monitoring
+The app exposes its functionality through several user-facing interfaces:
 
-**Configuration Management:**
-- Shared TOML config: `ConfigManager.load()` and `ConfigManager.save(_:)` for provider.toml management
-- Config updates: `ConfigManager.update(_:)` for atomic configuration changes
-- Path resolution: `ConfigManager.configPath` for determining config file location
+**Menu Bar Interface**: Primary interaction point with status indicator, throughput display, and dropdown menu with provider controls and navigation options.
 
-**Process Management:**
-- Provider lifecycle: `ProviderManager.start()`, `ProviderManager.stop()` for subprocess control
-- Status monitoring: `ProviderManager.isRunning` published property
-- Output capture: `ProviderManager.lastOutputLine` for real-time log parsing
+**Window Management**: Multiple scene-based windows including Settings (`Cmd+,`), Dashboard, Setup Wizard, Diagnostics, and Log Viewer, each with proper text selection and focus handling.
 
-**State Management:**
-- Observable state: `StatusViewModel` exposes @Published properties for all UI-bound state
-- Hardware detection: Automatic system profiling and capability detection
-- Metrics tracking: Request counts, token generation, throughput monitoring
+**System Integration**: LaunchAgent for login startup, menu bar status updates, and macOS notification integration.
+
+### Internal Component APIs
+
+**CLIRunner**: Standardized interface for `darkbloom` subcommand execution with environment setup and output capture:
+- `run(_:)`: Async command execution with result capture
+- `stream(_:onLine:)`: Real-time output streaming for long-running commands
+- `resolveBinaryPath()`: Consistent binary resolution across app and manager components
+
+**ConfigManager**: TOML configuration management with atomic updates:
+- `load()`: Read current provider configuration
+- `save(_:)`: Write complete configuration
+- `update(_:)`: Atomic field updates with transformation closure
+
+**StatusViewModel**: Central coordination API for all application state:
+- Provider lifecycle: `start()`, `stop()`, `pauseProvider()`, `resumeProvider()`
+- Status monitoring: Real-time polling with parsed metrics
+- Hardware detection: Automatic chip and memory information gathering
 
 ## External Systems
 
-The application integrates with several external systems and infrastructure components:
+The application integrates with several external systems at runtime:
 
-### Infrastructure Services
+**Darkbloom Coordinator** (`coordinatorURL` configuration): WebSocket connection for provider registration, inference request routing, and earnings tracking. Uses WSS protocol for secure communication with automatic reconnection handling.
 
-1. **Darkbloom Coordinator Backend**
-   - **Connection**: WebSocket and HTTPS endpoints at configurable URLs (default: api.darkbloom.dev)
-   - **Authentication**: Bearer token authentication via keychain-stored API keys
-   - **Health monitoring**: Regular connectivity checks and heartbeat maintenance
-   - **Telemetry**: Error reporting and crash analytics via POST to `/v1/telemetry/events`
+**HuggingFace Hub**: Model repository for MLX model downloads via the `huggingface-cli` tool. Models cached locally in `~/.cache/huggingface/hub/` with identifier parsing and size calculation.
 
-2. **HuggingFace Model Hub**
-   - **Model discovery**: Scans `~/.cache/huggingface/hub/` for downloaded MLX models
-   - **Download integration**: Shells out to `huggingface-cli download` for model acquisition
-   - **Cache management**: Respects HuggingFace caching conventions and directory structure
+**macOS System Services**: Integration with launchd for service management, Security framework for trust evaluation, and system_profiler for hardware detection.
 
-3. **MLX Backend Service**
-   - **Local HTTP server**: Communicates with MLX inference backend on port 8100
-   - **Health checks**: Regular polling of `/health` endpoint for backend status
-   - **Model loading**: Coordinates model selection and loading with MLX runtime
-
-### System Services
-
-1. **macOS Launch Services**
-   - **Auto-start**: LaunchAgent plist management for system startup integration
-   - **Activation policy**: Dynamic switching between menu bar and full app modes
-   - **Process monitoring**: Integration with macOS process lifecycle management
-
-2. **macOS Security Framework**
-   - **Keychain Services**: Secure credential storage and retrieval
-   - **Hardware attestation**: System integrity verification and trust establishment
-   - **Secure enclave**: Hardware-backed security validation when available
-
-3. **File System Integration**
-   - **Shared configuration**: TOML files in Application Support directory
-   - **Model cache**: HuggingFace cache directory scanning and management
-   - **Log aggregation**: Coordination with system logging infrastructure
+**Telemetry Infrastructure**: HTTP-based event reporting to coordinator's `/v1/telemetry/events` endpoint with structured error reporting, crash detection, and operational metrics.
 
 ## Component Interactions
 
-The EigenInference component operates as a standalone desktop application with **no direct interactions** with other components in the d-inference codebase. However, it maintains several important integration patterns:
+The EigenInference app operates as a standalone frontend component with no direct integration with other components in the d-inference codebase. However, it maintains several important external integrations:
 
-### External Component Communication
+**CLI Binary Dependency**: The app wraps and manages the `darkbloom` Rust binary, executing subcommands like `start`, `stop`, `wallet`, `earnings`, and `doctor`. This represents a process-based integration where the app serves as a graphical frontend to the command-line interface.
 
-1. **Darkbloom CLI Binary**
-   - **Type**: Process spawning and command execution
-   - **Protocol**: Command-line interface with argument passing
-   - **Description**: The GUI app wraps and manages the Rust-based darkbloom CLI binary, executing subcommands like `start`, `stop`, `wallet`, `earnings`, and `doctor`. Shared configuration ensures consistency between GUI and CLI operations.
+**Configuration Synchronization**: Both the app and CLI share the same `provider.toml` configuration file, ensuring consistency between graphical and command-line usage. Changes made in the app are immediately available to CLI operations.
 
-2. **Darkbloom Coordinator Service**
-   - **Type**: Network API calls
-   - **Protocol**: HTTPS and WebSocket
-   - **Description**: Connects to the distributed inference coordinator for provider registration, job routing, earnings tracking, and telemetry reporting. Uses configurable coordinator URLs with Bearer token authentication.
+**Coordinator Communication**: The app connects to the same coordinator infrastructure used by other components, participating in the distributed inference network through WebSocket connections and HTTP API calls.
 
-3. **MLX Inference Backend**
-   - **Type**: Local HTTP API
-   - **Protocol**: HTTP REST
-   - **Description**: Monitors and interacts with the local MLX inference server on port 8100, performing health checks and status monitoring to reflect backend state in the GUI.
-
-### Configuration Sharing
-
-The application implements a **shared configuration model** where both the GUI app and CLI tools read/write the same TOML configuration files:
-
-- `~/.darkbloom/provider.toml` - Provider settings, model configuration, and coordinator endpoints
-- `~/Library/Application Support/darkbloom/` - Application-specific settings and cache
-
-This ensures that changes made in either the GUI or CLI are immediately reflected in both interfaces, maintaining a consistent user experience.
+**Shared Storage**: The app reads from and writes to the same file system locations as the CLI (`~/.darkbloom/`, `~/.cache/huggingface/`), maintaining consistency in model storage and configuration management.

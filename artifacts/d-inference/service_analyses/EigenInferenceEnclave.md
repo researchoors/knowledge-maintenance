@@ -1,228 +1,159 @@
+Based on my comprehensive exploration of the EigenInferenceEnclave component, I now have a complete understanding of its architecture and functionality. Let me write the analysis.
+
 # EigenInferenceEnclave Analysis
-
-## Overview
-
-EigenInferenceEnclave is a Swift package that provides hardware-backed cryptographic attestation capabilities using Apple's Secure Enclave. This component serves as the foundation for hardware identity and security verification in the EigenInference provider ecosystem. It creates tamper-resistant device identities and generates cryptographically signed attestation blobs that prove hardware and software security posture.
 
 ## Architecture
 
-The component follows a **layered architecture pattern** with three distinct layers:
+The EigenInferenceEnclave component implements a hardware-backed attestation and signing system using Apple's Secure Enclave on macOS. It follows a layered architecture with three distinct levels:
 
-1. **Core Cryptographic Layer**: `SecureEnclaveIdentity` manages P-256 ECDSA keys stored in the Secure Enclave hardware
-2. **Attestation Service Layer**: `AttestationService` builds and signs attestation blobs containing system security state
-3. **Foreign Function Interface (FFI) Layer**: `Bridge.swift` provides C-callable functions for Rust integration
+1. **Core Swift Libraries** - Native Swift interfaces for Secure Enclave operations
+2. **C FFI Bridge** - Foreign Function Interface layer for cross-language integration  
+3. **Command-Line Interface** - Standalone tool for testing and diagnostics
 
-The architecture emphasizes security boundaries - private keys never leave the Secure Enclave hardware, and all cryptographic operations are hardware-isolated.
+The architecture prioritizes security through hardware isolation, ephemeral keys, and tamper-resistant operations. All private key material remains within the Secure Enclave hardware, with only public keys and signatures accessible to the host application.
 
 ## Key Components
 
-### 1. SecureEnclaveIdentity (Core Identity Management)
-- **Location**: `Sources/EigenInferenceEnclave/SecureEnclaveIdentity.swift`
-- **Purpose**: Manages hardware-bound P-256 ECDSA signing keys in Apple's Secure Enclave
-- **Key Features**:
-  - Creates ephemeral or persistent device identities
-  - Provides multiple public key formats (base64, hex, raw bytes)
-  - Hardware-isolated signing operations using `CryptoKit.SecureEnclave`
-  - Static verification methods for signature validation
+### SecureEnclaveIdentity (Core Identity Management)
+**Location**: `Sources/EigenInferenceEnclave/SecureEnclaveIdentity.swift`
 
-### 2. AttestationService (Security State Attestation)
-- **Location**: `Sources/EigenInferenceEnclave/Attestation.swift`
-- **Purpose**: Builds signed attestation blobs containing hardware/software security state
-- **Key Features**:
-  - Collects system security information (SIP, Secure Boot, ARV, RDMA status)
-  - Creates deterministic JSON attestation blobs with sorted keys
-  - Signs attestations with Secure Enclave keys
-  - Provides local verification capabilities
+Manages P-256 ECDSA signing keys stored in Apple's Secure Enclave. Provides hardware-bound identity with tamper-resistant signing operations. The private key never leaves the Secure Enclave hardware - only an opaque data representation can be persisted for key reloading on the same device.
 
-### 3. AttestationBlob (Data Structure)
-- **Location**: `Sources/EigenInferenceEnclave/Attestation.swift` (lines 44-59)
-- **Purpose**: Structured representation of hardware and software security state
-- **Key Fields**:
-  - Hardware identity: `chipName`, `hardwareModel`, `serialNumber`
-  - Security state: `sipEnabled`, `secureBootEnabled`, `authenticatedRootEnabled`
-  - Cryptographic binding: `publicKey`, `encryptionPublicKey` (optional)
-  - Freshness: `timestamp` in ISO 8601 format
+### AttestationService (Hardware State Attestation) 
+**Location**: `Sources/EigenInferenceEnclave/Attestation.swift`
 
-### 4. FFI Bridge (C Interoperability)
-- **Location**: `Sources/EigenInferenceEnclave/Bridge.swift`
-- **Purpose**: Provides C-callable functions for integration with Rust provider agents
-- **Key Features**:
-  - Memory-safe FFI with proper ownership semantics
-  - Opaque handle management for Swift objects
-  - String memory management with `strdup`/`free` convention
+Builds signed attestation blobs proving a provider's hardware identity and security configuration. Captures comprehensive system state including chip name, hardware model, security features (SIP, Secure Boot, RDMA status), and optional encryption key binding. The attestation is JSON-encoded with sorted keys for deterministic signing and verification.
 
-### 5. CLI Tool (Development Interface)
-- **Location**: `Sources/EigenInferenceEnclaveCLI/main.swift`
-- **Purpose**: Command-line interface for attestation generation and diagnostics
-- **Commands**:
-  - `attest`: Generate signed attestation blobs (ephemeral keys)
-  - `info`: Display Secure Enclave availability and system information
+### Bridge (FFI Interface Layer)
+**Location**: `Sources/EigenInferenceEnclave/Bridge.swift`
 
-### 6. System Information Collectors
-- **Location**: `Sources/EigenInferenceEnclave/Attestation.swift` (lines 163-344)
-- **Purpose**: Gather hardware and software security state from macOS
-- **Functions**: `getChipName()`, `checkSIPEnabled()`, `checkRDMADisabled()`, etc.
+Provides C-callable functions through `@_cdecl` declarations, enabling Rust applications to access Secure Enclave operations via FFI. Handles memory management with explicit `Unmanaged.passRetained` semantics and provides functions for identity creation, signing, attestation generation, and verification.
+
+### CLI Tool (Command-Line Interface)
+**Location**: `Sources/EigenInferenceEnclaveCLI/main.swift`
+
+Standalone executable for Secure Enclave diagnostics and attestation generation. Supports ephemeral key operations with commands for attestation creation (`attest`) and system information (`info`). Uses fresh P-256 keys created on each invocation - no persistent key material.
+
+### AttestationBlob (Data Structure)
+**Location**: `Sources/EigenInferenceEnclave/Attestation.swift` (lines 44-59)
+
+Codable struct containing comprehensive hardware and software security state. Fields are alphabetically ordered to match Swift's JSONEncoder with `.sortedKeys` output, ensuring deterministic JSON for signature verification. Includes hardware identity, security state, public keys, and timestamp.
+
+### System Information Helpers
+**Location**: `Sources/EigenInferenceEnclave/Attestation.swift` (lines 162-344)
+
+Collection of functions for gathering system security state including hardware model detection via sysctl, chip identification through system_profiler, security feature checking (SIP, Secure Boot, RDMA, Authenticated Root Volume), and OS version extraction.
 
 ## Data Flows
 
-### Attestation Generation Flow
-
 ```mermaid
-graph TD
-    A[Create SecureEnclaveIdentity] --> B[Generate P-256 Key in SE]
-    B --> C[Collect System State]
-    C --> D[Build AttestationBlob]
-    D --> E[JSON Encode with Sorted Keys]
-    E --> F[Sign with SE Private Key]
-    F --> G[Return SignedAttestation]
+flowchart TD
+    A[Provider Application] --> B[FFI Bridge]
+    B --> C[SecureEnclaveIdentity]
+    C --> D[Secure Enclave Hardware]
     
-    C --> C1[Get Chip Name via system_profiler]
-    C --> C2[Check SIP Status via csrutil]
-    C --> C3[Check RDMA Status via rdma_ctl]
-    C --> C4[Check ARV Status via diskutil]
+    B --> E[AttestationService]
+    E --> F[System Info Helpers]
+    F --> G[system_profiler/sysctl/diskutil]
+    E --> H[AttestationBlob]
+    H --> I[JSON Encoder]
+    I --> C
+    
+    D --> J[Signature]
+    J --> K[SignedAttestation]
+    K --> A
+    
+    subgraph "Hardware Isolation"
+        D
+    end
+    
+    subgraph "System State Collection"
+        F
+        G
+    end
 ```
 
-### FFI Integration Flow
+### Attestation Generation Flow
+1. **Identity Creation**: Provider creates ephemeral SecureEnclaveIdentity through FFI
+2. **System State Collection**: AttestationService gathers hardware/software security state
+3. **Attestation Assembly**: System state combined into AttestationBlob with optional encryption key binding
+4. **JSON Serialization**: Blob encoded with sorted keys for deterministic output
+5. **Secure Signing**: JSON bytes signed by Secure Enclave P-256 key
+6. **Response Packaging**: Signature and attestation combined into SignedAttestation
+7. **FFI Return**: JSON-serialized signed attestation returned to provider
 
-```mermaid
-graph LR
-    A[Rust Provider Agent] --> B[Call C Function]
-    B --> C[Swift FFI Bridge]
-    C --> D[SecureEnclaveIdentity]
-    D --> E[Secure Enclave Hardware]
-    E --> F[Return Signature]
-    F --> G[Base64 Encode]
-    G --> H[Return to Rust]
-```
-
-### Verification Flow
-
-```mermaid
-graph TD
-    A[SignedAttestation JSON] --> B[Parse JSON Structure]
-    B --> C[Extract AttestationBlob]
-    B --> D[Extract Signature]
-    C --> E[Re-encode with Sorted Keys]
-    E --> F[Verify ECDSA Signature]
-    D --> F
-    C --> G[Extract Public Key]
-    G --> F
-    F --> H{Valid?}
-    H -->|Yes| I[Accept Attestation]
-    H -->|No| J[Reject Attestation]
-```
+### Challenge-Response Flow
+1. **Challenge Receipt**: Coordinator sends nonce to provider
+2. **FFI Signing**: Provider calls `eigeninference_enclave_sign` with nonce bytes
+3. **Hardware Signing**: Secure Enclave produces DER-encoded ECDSA signature
+4. **Response Delivery**: Base64-encoded signature returned to coordinator
+5. **Verification**: Coordinator verifies signature against known public key
 
 ## External Dependencies
 
-### Core Swift Frameworks
+The component has minimal external dependencies, relying primarily on system frameworks:
 
-- **CryptoKit** (System): Apple's cryptographic framework providing Secure Enclave access
-  - **Category**: crypto
-  - **Purpose**: Provides `SecureEnclave.P256.Signing.PrivateKey` for hardware-isolated key operations and `P256.Signing.PublicKey` for verification. Essential for all cryptographic operations.
-  - **Integration points**: Used throughout `SecureEnclaveIdentity.swift` and `Bridge.swift` for key generation, signing, and verification.
+### External Libraries
 
-- **Foundation** (System): Apple's fundamental framework
-  - **Category**: other
-  - **Purpose**: Provides core data types (`Data`, `Date`, `String`), JSON encoding/decoding (`JSONEncoder`, `JSONDecoder`), and process execution (`Process`, `Pipe`) for system information gathering.
-  - **Integration points**: Used in all Swift files for data handling, JSON serialization, and system command execution.
+- **CryptoKit** (System Framework) [crypto]: Apple's cryptography framework providing Secure Enclave integration, P-256 key operations, and ECDSA signing primitives. Used throughout all modules for hardware-backed cryptographic operations. Primary integration points: `SecureEnclave.P256.Signing.PrivateKey`, `P256.Signing.PublicKey`, signature operations.
 
-### Testing Framework
+- **Foundation** (System Framework) [system]: Apple's core framework providing fundamental data types, JSON encoding/decoding, process execution, and system utilities. Used across all modules for data structures (`Data`, `Date`), JSON serialization (`JSONEncoder`/`JSONDecoder`), and system command execution (`Process`). Essential for attestation blob serialization and system state collection.
 
-- **XCTest** (System): Apple's unit testing framework
-  - **Category**: testing
-  - **Purpose**: Provides test infrastructure for validating Secure Enclave operations, attestation generation, and FFI bridge functionality.
-  - **Integration points**: Used in `Tests/EigenInferenceEnclaveTests/` for comprehensive test coverage.
-
-### System Tools (Runtime Dependencies)
-
-- **system_profiler** (macOS): System information utility
-  - **Purpose**: Used to extract hardware information like chip name and serial number for attestation blobs
-  - **Integration**: Called via `Process` in `getChipName()` and `getSerialNumber()` functions
-
-- **csrutil** (macOS): System Integrity Protection utility
-  - **Purpose**: Used to check SIP status for security attestation
-  - **Integration**: Called in `checkSIPEnabled()` function
-
-- **diskutil** (macOS): Disk utility for volume information
-  - **Purpose**: Used to verify Authenticated Root Volume status
-  - **Integration**: Called in `checkAuthenticatedRootEnabled()` and `getSystemVolumeHash()` functions
-
-- **rdma_ctl** (macOS): Remote Direct Memory Access control utility
-  - **Purpose**: Used to verify RDMA is disabled (security requirement)
-  - **Integration**: Called in `checkRDMADisabled()` function
+- **XCTest** (Development) [testing]: Apple's testing framework used exclusively in test files. Provides test case structure, assertions, and Secure Enclave availability checking. Integration points: `AttestationTests.swift`, `SecureEnclaveTests.swift`.
 
 ## Internal Dependencies
 
-This component has no direct internal dependencies within the d-inference codebase. However, it serves as a foundational library consumed by:
+This component has self-contained internal dependencies within the Swift package:
 
-- **Rust Provider Agent**: Consumes the FFI interface to integrate Secure Enclave attestation capabilities
-- **Go Coordinator**: Verifies attestation signatures using the embedded public keys
+### Internal Dependencies
+
+- **EigenInferenceEnclaveCLI depends on EigenInferenceEnclave**: The CLI executable imports and uses the core library for attestation operations. Uses `SecureEnclaveIdentity` for key creation, `AttestationService` for attestation generation, and `SecureEnclave.isAvailable` for availability checking. Integration points: `main.swift` imports `EigenInferenceEnclave` and calls `createAttestation()`.
 
 ## API Surface
 
-### Swift Library API
+### Swift Public API
+- `SecureEnclaveIdentity`: Hardware identity management with ephemeral and persistent key support
+- `AttestationService`: Attestation blob creation and verification  
+- `AttestationBlob`/`SignedAttestation`: Data structures for attestation payloads
+- Static verification methods for signature validation
 
-**SecureEnclaveIdentity Class**
-```swift
-public init() throws                                    // Create new identity
-public init(dataRepresentation: Data) throws          // Load existing identity
-public var publicKeyBase64: String                     // Base64-encoded public key
-public var publicKeyHex: String                        // Hex-encoded public key  
-public var publicKeyRaw: Data                          // Raw 64-byte public key
-public func sign(_ data: Data) throws -> Data          // Sign with SE private key
-public func verify(signature: Data, for: Data) -> Bool // Verify signature
-public static var isAvailable: Bool                    // Check SE availability
-```
-
-**AttestationService Class**
-```swift
-public init(identity: SecureEnclaveIdentity)
-public func createAttestation(encryptionPublicKey: String?, binaryHash: String?) throws -> SignedAttestation
-public static func verify(_ signed: SignedAttestation) -> Bool
-```
-
-### C FFI API
-
-**Core Functions**
-```c
-int32_t eigeninference_enclave_is_available(void);
-EigenInferenceEnclaveIdentity eigeninference_enclave_create(void);
-void eigeninference_enclave_free(EigenInferenceEnclaveIdentity identity);
-char* eigeninference_enclave_public_key_base64(EigenInferenceEnclaveIdentity identity);
-char* eigeninference_enclave_sign(EigenInferenceEnclaveIdentity identity, const uint8_t* data, int data_len);
-int32_t eigeninference_enclave_verify(const char* pub_key_base64, const uint8_t* data, int data_len, const char* sig_base64);
-```
-
-**Attestation Functions**
-```c
-char* eigeninference_enclave_create_attestation(EigenInferenceEnclaveIdentity identity);
-char* eigeninference_enclave_create_attestation_full(EigenInferenceEnclaveIdentity identity, const char* encryptionKeyBase64, const char* binaryHashHex);
-void eigeninference_enclave_free_string(char* str);
-```
+### C FFI API (for Rust Integration)
+- `eigeninference_enclave_create()`: Create ephemeral Secure Enclave identity
+- `eigeninference_enclave_public_key_base64()`: Extract public key
+- `eigeninference_enclave_sign()`: Sign data with hardware key
+- `eigeninference_enclave_create_attestation_full()`: Generate signed attestation with encryption key binding
+- `eigeninference_enclave_verify()`: Verify P-256 ECDSA signatures
+- Memory management functions for proper cleanup
 
 ### CLI Interface
+- `eigeninference-enclave attest`: Generate signed attestation blob
+- `eigeninference-enclave info`: Display Secure Enclave availability and ephemeral key info
+- Optional arguments for encryption key binding and binary hash inclusion
 
-**Commands**
-- `eigeninference-enclave attest [--encryption-key <base64>] [--binary-hash <hex>]`: Generate signed attestation
-- `eigeninference-enclave info`: Display Secure Enclave availability and generate ephemeral public key
+## External Systems
 
-## Security Model
+The component integrates with several external systems for security state collection:
 
-### Hardware Security Guarantees
+- **system_profiler**: Extracts hardware information (chip name, serial number) for attestation
+- **sysctl**: Retrieves machine model identifiers via `hw.model` 
+- **csrutil**: Checks System Integrity Protection status (development placeholder)
+- **diskutil**: Verifies Authenticated Root Volume status and snapshot hashes
+- **rdma_ctl**: Confirms RDMA is disabled for memory access security
 
-1. **Private Key Isolation**: P-256 private keys are generated and stored exclusively in the Secure Enclave hardware - they cannot be extracted or cloned
-2. **Tamper Resistance**: Secure Enclave provides hardware-level protection against physical and software attacks
-3. **Device Binding**: Keys are bound to the specific device's Secure Enclave and cannot be transferred
+## Component Interactions
 
-### Software Security Considerations
+### Rust Provider Integration
+The primary integration point is with the Rust-based provider agent through FFI:
 
-1. **Attestation Integrity**: All system security checks are software-based and can be spoofed by a compromised system. Production deployments should use Managed Device Attestation (MDA) for hardware-attested security state.
-2. **JSON Determinism**: Attestation blobs use sorted JSON keys to ensure identical serialization between Swift and Go implementations for signature verification.
-3. **Memory Safety**: FFI bridge uses proper memory management with `Unmanaged` references and explicit cleanup functions.
+- **Provider Build Process**: Rust build script (`build.rs`) compiles Swift package and links static library
+- **FFI Calls**: Provider uses C function signatures to create identities, sign data, and generate attestations
+- **Memory Management**: Rust side responsible for freeing returned strings and identity handles
+- **Platform Gating**: All Secure Enclave operations conditional on macOS target platform
 
-### Attack Surface Analysis
+### Coordinator Integration
+The component produces attestation blobs consumed by the Go coordinator:
 
-- **Secure Enclave Bypass**: Not possible - private keys are hardware-isolated
-- **Attestation Spoofing**: Possible for software-checked fields (SIP, Secure Boot) - mitigated by MDA in production
-- **Signature Replay**: Mitigated by timestamp freshness checking in coordinator
-- **FFI Memory Corruption**: Mitigated by careful memory management and Swift's type safety
+- **JSON Compatibility**: Attestation serialization matches Go's `encoding/json` map key ordering
+- **Signature Verification**: Coordinator independently verifies P-256 ECDSA signatures
+- **Public Key Format**: Raw P-256 representation (64 bytes: X||Y) compatible with Go crypto libraries
+- **Timestamp Format**: ISO 8601 timestamps for freshness validation

@@ -1,7 +1,7 @@
 {
   "schema_version": "2.0.0",
-  "source_repo": "/private/tmp/flashlight-repos/d-inference",
-  "source_commit": "f7dab6fa994a",
+  "source_repo": "/tmp/flashlight-repos/d-inference",
+  "source_commit": "b5dd04880ba0fd260f6e135bc3964d8add75c982",
   "nodes": {
     "components": {
       "analytics": {
@@ -113,7 +113,7 @@
       },
       "decrypt-test": {
         "name": "decrypt-test",
-        "kind": "service",
+        "kind": "cli",
         "type": "rust-crate",
         "root_path": "coordinator/internal/e2e/testdata/decrypt",
         "description": "",
@@ -250,6 +250,18 @@
           {
             "name": "pyo3",
             "version": "0.24"
+          },
+          {
+            "name": "security-framework",
+            "version": "3"
+          },
+          {
+            "name": "security-framework-sys",
+            "version": "2"
+          },
+          {
+            "name": "core-foundation",
+            "version": "0.10"
           }
         ],
         "key_files": [],
@@ -336,8 +348,8 @@
     "analyzed_count": 0,
     "by_kind": {
       "library": 1,
-      "service": 5,
-      "cli": 1,
+      "service": 4,
+      "cli": 2,
       "frontend": 2
     },
     "by_edge_type": {

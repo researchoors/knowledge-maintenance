@@ -3,147 +3,168 @@
   "source_file": "/tmp/d-inference/service_analyses/EigenInference.md",
   "source_repo": "",
   "source_commit": "",
-  "citation_count": 20,
+  "citation_count": 23,
   "citations": [
     {
-      "file_path": "Sources/EigenInference/EigenInferenceApp.swift",
-      "start_line": 22,
-      "end_line": 24,
-      "claim": "Main SwiftUI App struct with NSApplicationDelegateAdaptor for activation policy management",
-      "section": "Key Components"
+      "file_path": "app/EigenInference/Sources/EigenInference/EigenInferenceApp.swift",
+      "start_line": 1,
+      "end_line": 18,
+      "claim": "EigenInference is a macOS menu bar application that wraps the Rust darkbloom binary",
+      "section": "Architecture"
     },
     {
-      "file_path": "Sources/EigenInference/StatusViewModel.swift",
-      "start_line": 18,
-      "end_line": 25,
-      "claim": "Central ObservableObject managing provider state with @Published properties",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "Sources/EigenInference/ProviderManager.swift",
+      "file_path": "app/EigenInference/Sources/EigenInference/EigenInferenceApp.swift",
       "start_line": 23,
-      "end_line": 26,
-      "claim": "ProviderManager as ObservableObject managing darkbloom subprocess lifecycle",
+      "end_line": 25,
+      "claim": "The app follows MVVM architecture with StatusViewModel as central state manager",
+      "section": "Architecture"
+    },
+    {
+      "file_path": "app/EigenInference/Sources/EigenInference/EigenInferenceApp.swift",
+      "start_line": 118,
+      "end_line": 187,
+      "claim": "App switches between accessory and regular activation policies based on window visibility",
+      "section": "Architecture"
+    },
+    {
+      "file_path": "app/EigenInference/Sources/EigenInference/StatusViewModel.swift",
+      "start_line": 1,
+      "end_line": 10,
+      "claim": "StatusViewModel centralizes all provider state and coordinates between managers and UI",
       "section": "Key Components"
     },
     {
-      "file_path": "Sources/EigenInference/CLIRunner.swift",
-      "start_line": 24,
-      "end_line": 32,
-      "claim": "CLIRunner class centralizes darkbloom binary execution with path resolution",
+      "file_path": "app/EigenInference/Sources/EigenInference/StatusViewModel.swift",
+      "start_line": 203,
+      "end_line": 213,
+      "claim": "Status polling occurs every 5 seconds to check provider health",
+      "section": "Data Flows"
+    },
+    {
+      "file_path": "app/EigenInference/Sources/EigenInference/ProviderManager.swift",
+      "start_line": 1,
+      "end_line": 12,
+      "claim": "ProviderManager wraps the Rust binary as a subprocess with monitoring and auto-restart",
       "section": "Key Components"
     },
     {
-      "file_path": "Sources/EigenInference/ConfigManager.swift",
-      "start_line": 48,
-      "end_line": 65,
-      "claim": "ConfigManager enum provides TOML parsing for shared provider.toml configuration",
+      "file_path": "app/EigenInference/Sources/EigenInference/ProviderManager.swift",
+      "start_line": 207,
+      "end_line": 233,
+      "claim": "Auto-restart functionality with exponential backoff up to 5 attempts",
       "section": "Key Components"
     },
     {
-      "file_path": "Package.swift",
+      "file_path": "app/EigenInference/Sources/EigenInference/CLIRunner.swift",
+      "start_line": 1,
+      "end_line": 5,
+      "claim": "CLIRunner centralizes all darkbloom subcommand execution",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "app/EigenInference/Sources/EigenInference/CLIRunner.swift",
+      "start_line": 32,
+      "end_line": 40,
+      "claim": "Binary resolution follows consistent search order across app and CLI",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "app/EigenInference/Sources/EigenInference/ConfigManager.swift",
+      "start_line": 1,
+      "end_line": 20,
+      "claim": "ConfigManager handles shared provider.toml configuration between app and CLI",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "app/EigenInference/Sources/EigenInference/SecurityManager.swift",
+      "start_line": 1,
+      "end_line": 5,
+      "claim": "SecurityManager evaluates machine security posture for coordinator trust decisions",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "app/EigenInference/Sources/EigenInference/SecurityManager.swift",
+      "start_line": 65,
+      "end_line": 71,
+      "claim": "Trust level determination requires Secure Enclave, MDM enrollment, SIP, and Secure Boot",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "app/EigenInference/Sources/EigenInference/ModelManager.swift",
+      "start_line": 1,
+      "end_line": 17,
+      "claim": "ModelManager discovers MLX models in HuggingFace cache directory",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "app/EigenInference/Sources/EigenInference/MenuBarView.swift",
+      "start_line": 1,
+      "end_line": 4,
+      "claim": "MenuBarView is the primary UI shown when clicking the menu bar icon",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "app/EigenInference/Sources/EigenInference/SetupWizardView.swift",
+      "start_line": 1,
+      "end_line": 9,
+      "claim": "SetupWizardView provides comprehensive onboarding wizard for first-time users",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "app/EigenInference/Sources/EigenInference/DesignSystem.swift",
+      "start_line": 1,
+      "end_line": 5,
+      "claim": "DesignSystem provides unified colors, typography, and components matching brand guidelines",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "app/EigenInference/Sources/EigenInference/LaunchAgentManager.swift",
+      "start_line": 1,
+      "end_line": 9,
+      "claim": "LaunchAgentManager handles macOS LaunchAgent for automatic app startup",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "app/EigenInference/Sources/EigenInference/TelemetryReporter.swift",
+      "start_line": 1,
+      "end_line": 12,
+      "claim": "TelemetryReporter ships crash reports and telemetry to coordinator endpoint",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "app/EigenInference/Package.swift",
       "start_line": 4,
       "end_line": 7,
-      "claim": "Swift package with zero external dependencies, only built-in Apple frameworks",
+      "claim": "Application has zero external Swift package dependencies",
       "section": "External Dependencies"
     },
     {
-      "file_path": "Sources/EigenInference/EigenInferenceApp.swift",
-      "start_line": 123,
-      "end_line": 125,
-      "claim": "App starts as .accessory (menu bar only) and switches to .regular when windows open",
-      "section": "Architecture"
-    },
-    {
-      "file_path": "Sources/EigenInference/StatusViewModel.swift",
+      "file_path": "app/EigenInference/Sources/EigenInference/StatusViewModel.swift",
       "start_line": 216,
-      "end_line": 262,
-      "claim": "Real-time provider status polling via HTTP health checks on port 8100",
+      "end_line": 263,
+      "claim": "Provider status polling checks process running state and backend health",
       "section": "Data Flows"
     },
     {
-      "file_path": "Sources/EigenInference/ProviderManager.swift",
-      "start_line": 207,
-      "end_line": 233,
-      "claim": "Auto-restart logic with exponential backoff and maximum retry limits",
+      "file_path": "app/EigenInference/Sources/EigenInference/StatusViewModel.swift",
+      "start_line": 556,
+      "end_line": 584,
+      "claim": "Configuration synchronization writes schedule settings to provider TOML",
       "section": "Data Flows"
     },
     {
-      "file_path": "Sources/EigenInference/StatusViewModel.swift",
-      "start_line": 346,
-      "end_line": 358,
-      "claim": "Hardware detection using sysctlbyname and system_profiler commands",
-      "section": "Data Flows"
-    },
-    {
-      "file_path": "Sources/EigenInference/ConfigManager.swift",
-      "start_line": 50,
-      "end_line": 65,
-      "claim": "Shared configuration path with CLI tools via ~/.darkbloom/provider.toml",
-      "section": "Component Interactions"
-    },
-    {
-      "file_path": "Sources/EigenInference/TelemetryReporter.swift",
-      "start_line": 52,
-      "end_line": 77,
-      "claim": "Telemetry reporter for crash analytics and error reporting to coordinator backend",
-      "section": "External Systems"
-    },
-    {
-      "file_path": "Sources/EigenInference/ModelManager.swift",
-      "start_line": 56,
+      "file_path": "app/EigenInference/Sources/EigenInference/StatusViewModel.swift",
+      "start_line": 55,
       "end_line": 59,
-      "claim": "HuggingFace cache directory scanning for MLX model discovery",
-      "section": "External Systems"
+      "claim": "Settings changes trigger automatic configuration updates via ConfigManager",
+      "section": "Data Flows"
     },
     {
-      "file_path": "Sources/EigenInference/StatusViewModel.swift",
-      "start_line": 527,
-      "end_line": 538,
-      "claim": "Keychain Services integration for secure API key storage",
-      "section": "External Systems"
-    },
-    {
-      "file_path": "Sources/EigenInference/MenuBarView.swift",
-      "start_line": 8,
-      "end_line": 12,
-      "claim": "MenuBarView as primary user interface with ObservedObject pattern",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "Sources/EigenInference/DesignSystem.swift",
-      "start_line": 11,
-      "end_line": 83,
-      "claim": "Comprehensive design system with adaptive color palettes for light/dark modes",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "Tests/EigenInferenceTests/ConfigManagerTests.swift",
-      "start_line": 3,
-      "end_line": 5,
-      "claim": "Modern Swift Testing framework usage with @Test syntax instead of XCTest",
-      "section": "Architecture"
-    },
-    {
-      "file_path": "Sources/EigenInference/EigenInferenceApp.swift",
-      "start_line": 27,
-      "end_line": 58,
-      "claim": "Multiple SwiftUI scenes including MenuBarExtra, Settings, and various windows",
-      "section": "Architecture"
-    },
-    {
-      "file_path": "Sources/EigenInference/ProviderManager.swift",
-      "start_line": 147,
-      "end_line": 162,
-      "claim": "Environment setup matching CLIRunner for consistent tool discovery",
-      "section": "Component Interactions"
-    },
-    {
-      "file_path": "Sources/EigenInference/StatusViewModel.swift",
-      "start_line": 302,
-      "end_line": 320,
-      "claim": "Earnings and wallet integration via coordinator HTTP endpoints",
-      "section": "External Systems"
+      "file_path": "app/EigenInference/Sources/EigenInference/SecurityManager.swift",
+      "start_line": 45,
+      "end_line": 74,
+      "claim": "Security verification runs parallel checks and determines trust level",
+      "section": "Data Flows"
     }
   ]
 }
