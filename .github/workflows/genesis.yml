@@ -1,8 +1,7 @@
 name: Genesis Run
 
 # One-shot: run flashlight on all tracked repos that have no artifacts yet.
-# Triggers on push to main (after PR merge) if artifacts/ is empty,
-# or manually via workflow_dispatch.
+# Triggers manually via workflow_dispatch.
 
 on:
   workflow_dispatch:
@@ -27,25 +26,29 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install github-flashlight
-        run: pip install git+https://github.com/Layr-Labs/github-flashlight.git
-
-      - name: Find repos needing genesis
-        id: find
-        env:
-          INPUT_REPO: ${{ inputs.repo }}
+      - name: Install dependencies
         run: |
+          pip install git+https://github.com/Layr-Labs/github-flashlight.git
           pip install pyyaml --quiet
 
+      - name: Run genesis
+        id: genesis
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+          OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
+          INPUT_REPO: ${{ inputs.repo }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
           python3 << 'PYEOF'
-          import yaml, json, os
+          import yaml, json, os, subprocess, sys
 
           input_repo = os.environ.get("INPUT_REPO", "")
 
           with open("tracked-repos.yaml") as f:
               data = yaml.safe_load(f)
 
-          needs_genesis = []
+          repos_to_process = []
           for r in data.get("repos", []):
               repo = r["repo"]
               artifacts_path = r["artifacts_path"]
@@ -58,32 +61,6 @@ jobs:
                   print(f"{repo}: already has artifacts, skipping")
                   continue
 
-              needs_genesis.append({"repo": repo, "artifacts_path": artifacts_path})
-              print(f"{repo}: needs genesis run")
-
-          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-              f.write(f"count={len(needs_genesis)}\n")
-              f.write(f"repos={json.dumps(needs_genesis)}\n")
-          PYEOF
-
-      - name: Run flashlight for each repo
-        if: steps.find.outputs.count > 0
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
-          OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
-        run: |
-          python3 << 'PYEOF'
-          import json, subprocess, os
-
-          repos = json.loads("${{ steps.find.outputs.repos }}")
-          errors = []
-
-          for r in repos:
-              repo = r["repo"]
-              artifacts_path = r["artifacts_path"]
-              print(f"\n=== Genesis: {repo} ===")
-
               # Get HEAD SHA
               result = subprocess.run(
                   ["gh", "api", f"repos/{repo}/commits?per_page=1", "--jq", ".[0].sha"],
@@ -92,10 +69,28 @@ jobs:
               head_sha = result.stdout.strip()
               if not head_sha:
                   print(f"ERROR: Could not fetch HEAD for {repo}")
-                  errors.append(repo)
                   continue
 
-              # Run flashlight
+              repos_to_process.append({
+                  "repo": repo,
+                  "artifacts_path": artifacts_path,
+                  "head_sha": head_sha,
+              })
+              print(f"{repo}: needs genesis (HEAD {head_sha[:12]})")
+
+          if not repos_to_process:
+              print("No repos need genesis. Exiting.")
+              with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+                  f.write("has_artifacts=false\n")
+              sys.exit(0)
+
+          errors = []
+          for r in repos_to_process:
+              repo = r["repo"]
+              artifacts_path = r["artifacts_path"]
+              head_sha = r["head_sha"]
+
+              print(f"\n=== Genesis: {repo} @ {head_sha[:12]} ===")
               cmd = [
                   "flashlight",
                   "--repo", f"https://github.com/{repo}.git",
@@ -104,20 +99,24 @@ jobs:
                   "--verbose",
               ]
               print(f"Running: {' '.join(cmd)}")
-              result = subprocess.run(cmd, capture_output=False)
+              result = subprocess.run(cmd)
               if result.returncode != 0:
                   print(f"ERROR: flashlight failed for {repo}")
                   errors.append(repo)
               else:
-                  print(f"SUCCESS: {repo} artifacts generated at {artifacts_path}/")
+                  print(f"SUCCESS: {repo} artifacts at {artifacts_path}/")
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"has_artifacts={'true' if repos_to_process and not errors else 'false'}\n")
 
           if errors:
-              print(f"\n❌ Failed repos: {errors}")
-              exit(1)
-          print(f"\n✅ All {len(repos)} repos processed successfully")
+              print(f"\n❌ Failed: {errors}")
+              sys.exit(1)
+          print(f"\n✅ {len(repos_to_process)} repo(s) processed")
           PYEOF
 
       - name: Create PR with genesis artifacts
+        if: steps.genesis.outputs.has_artifacts == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
