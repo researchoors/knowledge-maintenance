@@ -1,0 +1,50 @@
+[
+  {
+    "source": "console-ui",
+    "target": "coordinator",
+    "nature": "api_calls",
+    "description": "Proxied API requests for AI inference, model management, and billing over HTTPS"
+  },
+  {
+    "source": "provider",
+    "target": "coordinator",
+    "nature": "websocket_connection",
+    "description": "Provider registration, inference request handling, and attestation challenges via outbound WebSocket"
+  },
+  {
+    "source": "provider",
+    "target": "enclave",
+    "nature": "ffi_calls",
+    "description": "Secure Enclave attestation and challenge-response signing via FFI bridge"
+  },
+  {
+    "source": "enclave",
+    "target": "attestation",
+    "nature": "hardware_calls",
+    "description": "P-256 ECDSA key operations and cryptographic signing via Apple Secure Enclave"
+  },
+  {
+    "source": "provider",
+    "target": "attestation",
+    "nature": "hardware_calls",
+    "description": "Hardware attestation blob generation and challenge signing via Apple Secure Enclave"
+  },
+  {
+    "source": "coordinator",
+    "target": "billing",
+    "nature": "api_calls",
+    "description": "Payment processing for deposits and Connect Express payouts via Stripe HTTPS API"
+  },
+  {
+    "source": "console-ui",
+    "target": "billing",
+    "nature": "api_calls",
+    "description": "Stripe Checkout session creation and payment flows via HTTPS"
+  },
+  {
+    "source": "coordinator",
+    "target": "verify-attestation",
+    "nature": "depends_on",
+    "description": "Utility service for verifying Apple Secure Enclave attestations, shares coordinator Go module"
+  }
+]
