@@ -138,30 +138,8 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Configure git credentials for private repos
-        if: matrix.public == false
-        env:
-          PRIVATE_TOKEN: ${{ secrets.FLASHLIGHT_REPO_TOKEN }}
-        run: |
-          git config --global url."https://x-access-token:${{ secrets.FLASHLIGHT_REPO_TOKEN }}@github.com/Layr-Labs/".insteadOf "https://github.com/Layr-Labs/"
-
       - name: Install github-flashlight
         run: pip install git+https://github.com/Layr-Labs/github-flashlight.git
-
-      - name: Clone source repo
-        run: |
-          CLONE_DIR="/tmp/source-repo"
-          LAST_SHA="${{ matrix.last_sha }}"
-
-          if [ -n "$LAST_SHA" ]; then
-            git clone --filter=blob:none \
-              "https://github.com/${{ matrix.repo }}.git" \
-              "$CLONE_DIR"
-          else
-            git clone --depth=1 \
-              "https://github.com/${{ matrix.repo }}.git" \
-              "$CLONE_DIR"
-          fi
 
       - name: Run flashlight
         env:
@@ -169,7 +147,7 @@ jobs:
           OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
           OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
         run: |
-          ARGS="--repo /tmp/source-repo"
+          ARGS="--repo https://github.com/${{ matrix.repo }}.git"
           ARGS="$ARGS --output ${{ matrix.artifacts_path }}"
           ARGS="$ARGS --head-sha ${{ matrix.head_sha }}"
 
@@ -178,7 +156,8 @@ jobs:
             ARGS="$ARGS --last-sha $LAST_SHA"
           fi
 
-          flashlight $ARGS
+          echo "Running: flashlight $ARGS"
+          flashlight $ARGS --verbose
 
       - name: Verify only target artifacts changed
         id: diff
@@ -222,7 +201,7 @@ jobs:
           if [ -n "$LAST_SHA" ]; then
             MODE="incremental (${LAST_SHA:0:12}..${HEAD_SHA:0:12})"
           else
-            MODE="full"
+            MODE="genesis"
           fi
 
           git commit -m "chore: update $PROJECT_NAME artifacts [flashlight-sweep]

@@ -1,0 +1,147 @@
+name: Genesis Run
+
+# One-shot: run flashlight on all tracked repos that have no artifacts yet.
+# Triggers on push to main (after PR merge) if artifacts/ is empty,
+# or manually via workflow_dispatch.
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: "Single repo to analyze (e.g. Layr-Labs/d-inference). Leave empty for all."
+        required: false
+        default: ""
+
+jobs:
+  genesis:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install github-flashlight
+        run: pip install git+https://github.com/Layr-Labs/github-flashlight.git
+
+      - name: Find repos needing genesis
+        id: find
+        env:
+          INPUT_REPO: ${{ inputs.repo }}
+        run: |
+          pip install pyyaml --quiet
+
+          python3 << 'PYEOF'
+          import yaml, json, os
+
+          input_repo = os.environ.get("INPUT_REPO", "")
+
+          with open("tracked-repos.yaml") as f:
+              data = yaml.safe_load(f)
+
+          needs_genesis = []
+          for r in data.get("repos", []):
+              repo = r["repo"]
+              artifacts_path = r["artifacts_path"]
+              manifest_path = os.path.join(artifacts_path, "manifest.json")
+
+              if input_repo and repo != input_repo:
+                  continue
+
+              if os.path.exists(manifest_path):
+                  print(f"{repo}: already has artifacts, skipping")
+                  continue
+
+              needs_genesis.append({"repo": repo, "artifacts_path": artifacts_path})
+              print(f"{repo}: needs genesis run")
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"count={len(needs_genesis)}\n")
+              f.write(f"repos={json.dumps(needs_genesis)}\n")
+          PYEOF
+
+      - name: Run flashlight for each repo
+        if: steps.find.outputs.count > 0
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+          OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
+        run: |
+          python3 << 'PYEOF'
+          import json, subprocess, os
+
+          repos = json.loads("${{ steps.find.outputs.repos }}")
+          errors = []
+
+          for r in repos:
+              repo = r["repo"]
+              artifacts_path = r["artifacts_path"]
+              print(f"\n=== Genesis: {repo} ===")
+
+              # Get HEAD SHA
+              result = subprocess.run(
+                  ["gh", "api", f"repos/{repo}/commits?per_page=1", "--jq", ".[0].sha"],
+                  capture_output=True, text=True
+              )
+              head_sha = result.stdout.strip()
+              if not head_sha:
+                  print(f"ERROR: Could not fetch HEAD for {repo}")
+                  errors.append(repo)
+                  continue
+
+              # Run flashlight
+              cmd = [
+                  "flashlight",
+                  "--repo", f"https://github.com/{repo}.git",
+                  "--output", artifacts_path,
+                  "--head-sha", head_sha,
+                  "--verbose",
+              ]
+              print(f"Running: {' '.join(cmd)}")
+              result = subprocess.run(cmd, capture_output=False)
+              if result.returncode != 0:
+                  print(f"ERROR: flashlight failed for {repo}")
+                  errors.append(repo)
+              else:
+                  print(f"SUCCESS: {repo} artifacts generated at {artifacts_path}/")
+
+          if errors:
+              print(f"\n❌ Failed repos: {errors}")
+              exit(1)
+          print(f"\n✅ All {len(repos)} repos processed successfully")
+          PYEOF
+
+      - name: Create PR with genesis artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="flashlight/genesis-run"
+          git checkout -b "$BRANCH"
+          git add artifacts/
+          git config user.name "flashlight-sweep[bot]"
+          git config user.email "flashlight-sweep[bot]@users.noreply.github.com"
+
+          if git diff --cached --quiet; then
+            echo "No artifacts to commit"
+            exit 0
+          fi
+
+          git commit -m "chore: genesis knowledge graph artifacts [flashlight-sweep]
+
+          Initial flashlight analysis for all tracked repos."
+          git push origin "$BRANCH"
+
+          gh pr create \
+            --title "flashlight: genesis knowledge graph" \
+            --body "Initial flashlight analysis for all tracked repos that had no prior artifacts.
+
+          Review the generated knowledge graphs and architecture docs before merging." \
+            --base main \
+            --head "$BRANCH" \
+            --label "flashlight-sweep"
