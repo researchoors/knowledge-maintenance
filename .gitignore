@@ -27,3 +27,4 @@ venv/
 
 # mypy
 .mypy_cache/
+artifacts/d-inference-llamaindex/.index_cache/
