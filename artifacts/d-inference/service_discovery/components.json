@@ -1,0 +1,386 @@
+{
+  "components": [
+    {
+      "name": "analytics",
+      "kind": "library",
+      "type": "go-module",
+      "root_path": "analytics",
+      "description": "Analytics library providing read-only data access and pseudonymization",
+      "internal_dependencies": [],
+      "external_dependencies": [],
+      "key_files": [],
+      "manifest_path": "analytics/go.mod",
+      "external_applications": ["postgresql", "datadog"]
+    },
+    {
+      "name": "analytics",
+      "kind": "service",
+      "type": "go-module",
+      "root_path": "analytics/cmd/analytics",
+      "description": "Standalone read-only analytics service for network statistics and earnings leaderboards",
+      "internal_dependencies": [
+        "analytics"
+      ],
+      "external_dependencies": [],
+      "key_files": [],
+      "manifest_path": "analytics/go.mod",
+      "external_applications": ["postgresql"]
+    },
+    {
+      "name": "coordinator",
+      "kind": "library",
+      "type": "go-module",
+      "root_path": "coordinator",
+      "description": "Core coordination library with provider registry, attestation, and payment systems",
+      "internal_dependencies": [],
+      "external_dependencies": [
+        {
+          "name": "github.com/DataDog/datadog-go/v5",
+          "version": "v5.8.3"
+        },
+        {
+          "name": "github.com/golang-jwt/jwt/v5",
+          "version": "v5.3.1"
+        },
+        {
+          "name": "github.com/google/uuid",
+          "version": "v1.6.0"
+        },
+        {
+          "name": "github.com/jackc/pgx/v5",
+          "version": "v5.8.0"
+        },
+        {
+          "name": "golang.org/x/crypto",
+          "version": "v0.49.0"
+        },
+        {
+          "name": "golang.org/x/time",
+          "version": "v0.15.0"
+        },
+        {
+          "name": "gopkg.in/DataDog/dd-trace-go.v1",
+          "version": "v1.74.8"
+        },
+        {
+          "name": "nhooyr.io/websocket",
+          "version": "v1.8.17"
+        }
+      ],
+      "key_files": [],
+      "manifest_path": "coordinator/go.mod",
+      "external_applications": ["postgresql", "stripe", "datadog", "privy", "apple-secure-enclave"]
+    },
+    {
+      "name": "coordinator",
+      "kind": "service",
+      "type": "go-module",
+      "root_path": "coordinator/cmd/coordinator",
+      "description": "Central control plane for routing AI inference requests to provider nodes with hardware attestation",
+      "internal_dependencies": [
+        "coordinator"
+      ],
+      "external_dependencies": [],
+      "key_files": [],
+      "manifest_path": "coordinator/go.mod",
+      "external_applications": ["postgresql", "stripe", "datadog", "privy", "apple-secure-enclave", "cloudflare-r2"]
+    },
+    {
+      "name": "verify-attestation",
+      "kind": "service",
+      "type": "go-module",
+      "root_path": "coordinator/cmd/verify-attestation",
+      "description": "Utility service for verifying Apple Secure Enclave attestations",
+      "internal_dependencies": [
+        "coordinator"
+      ],
+      "external_dependencies": [],
+      "key_files": [],
+      "manifest_path": "coordinator/go.mod",
+      "external_applications": ["apple-secure-enclave"]
+    },
+    {
+      "name": "web",
+      "kind": "frontend",
+      "type": "typescript-package",
+      "root_path": "console-ui",
+      "description": "Next.js web frontend providing chat interface and provider dashboard with E2E encryption",
+      "internal_dependencies": [],
+      "external_dependencies": [
+        {
+          "name": "@datadog/browser-rum",
+          "version": "^6.32.0"
+        },
+        {
+          "name": "@privy-io/react-auth",
+          "version": "^3.18.0"
+        },
+        {
+          "name": "@privy-io/server-auth",
+          "version": "^1.32.5"
+        },
+        {
+          "name": "asn1js",
+          "version": "^3.0.7"
+        },
+        {
+          "name": "lucide-react",
+          "version": "^1.0.1"
+        },
+        {
+          "name": "next",
+          "version": "^16.2.2"
+        },
+        {
+          "name": "pkijs",
+          "version": "^3.4.0"
+        },
+        {
+          "name": "react",
+          "version": "^19.2.4"
+        },
+        {
+          "name": "react-dom",
+          "version": "^19.2.4"
+        },
+        {
+          "name": "react-markdown",
+          "version": "^10.1.0"
+        },
+        {
+          "name": "rehype-highlight",
+          "version": "^7.0.2"
+        },
+        {
+          "name": "remark-gfm",
+          "version": "^4.0.1"
+        },
+        {
+          "name": "tweetnacl",
+          "version": "^1.0.3"
+        },
+        {
+          "name": "zustand",
+          "version": "^5.0.12"
+        }
+      ],
+      "key_files": [],
+      "manifest_path": "console-ui/package.json",
+      "external_applications": ["stripe", "datadog", "privy", "apple-ca"]
+    },
+    {
+      "name": "decrypt-test",
+      "kind": "service",
+      "type": "rust-crate",
+      "root_path": "coordinator/internal/e2e/testdata/decrypt",
+      "description": "Test utility for E2E encryption validation",
+      "internal_dependencies": [],
+      "external_dependencies": [
+        {
+          "name": "crypto_box",
+          "version": "0.9"
+        },
+        {
+          "name": "base64",
+          "version": "0.22"
+        }
+      ],
+      "key_files": [],
+      "manifest_path": "coordinator/internal/e2e/testdata/decrypt/Cargo.toml",
+      "external_applications": []
+    },
+    {
+      "name": "darkbloom",
+      "kind": "service",
+      "type": "rust-crate",
+      "root_path": "provider",
+      "description": "EigenInference provider agent for Apple Silicon Macs with hardware-attested security",
+      "internal_dependencies": [],
+      "external_dependencies": [
+        {
+          "name": "clap",
+          "version": "4"
+        },
+        {
+          "name": "tokio",
+          "version": "1"
+        },
+        {
+          "name": "tokio-util",
+          "version": "0.7"
+        },
+        {
+          "name": "serde",
+          "version": "1"
+        },
+        {
+          "name": "serde_json",
+          "version": "1"
+        },
+        {
+          "name": "toml",
+          "version": "0.8"
+        },
+        {
+          "name": "tracing",
+          "version": "0.1"
+        },
+        {
+          "name": "tracing-subscriber",
+          "version": "0.3"
+        },
+        {
+          "name": "reqwest",
+          "version": "0.12"
+        },
+        {
+          "name": "tokio-tungstenite",
+          "version": "0.26"
+        },
+        {
+          "name": "futures-util",
+          "version": "0.3"
+        },
+        {
+          "name": "axum",
+          "version": "0.8"
+        },
+        {
+          "name": "http-body-util",
+          "version": "0.1"
+        },
+        {
+          "name": "anyhow",
+          "version": "1"
+        },
+        {
+          "name": "thiserror",
+          "version": "2"
+        },
+        {
+          "name": "async-trait",
+          "version": "0.1"
+        },
+        {
+          "name": "uuid",
+          "version": "1"
+        },
+        {
+          "name": "libc",
+          "version": "0.2"
+        },
+        {
+          "name": "dirs",
+          "version": "6"
+        },
+        {
+          "name": "chrono",
+          "version": "0.4"
+        },
+        {
+          "name": "once_cell",
+          "version": "1"
+        },
+        {
+          "name": "backtrace",
+          "version": "0.3"
+        },
+        {
+          "name": "crossterm",
+          "version": "0.28"
+        },
+        {
+          "name": "crypto_box",
+          "version": "0.9"
+        },
+        {
+          "name": "base64",
+          "version": "0.22"
+        },
+        {
+          "name": "sha2",
+          "version": "0.10"
+        },
+        {
+          "name": "zeroize",
+          "version": "1"
+        },
+        {
+          "name": "pyo3",
+          "version": "0.24"
+        }
+      ],
+      "key_files": [],
+      "manifest_path": "provider/Cargo.toml",
+      "external_applications": ["coordinator-api", "cloudflare-r2", "apple-secure-enclave", "apple-hypervisor", "huggingface-hub", "macos-launchd"]
+    },
+    {
+      "name": "EigenInference",
+      "kind": "frontend",
+      "type": "swift-package",
+      "root_path": "app/EigenInference/Sources/EigenInference",
+      "description": "macOS menu bar application for managing darkbloom provider with native SwiftUI interface",
+      "internal_dependencies": [],
+      "external_dependencies": [],
+      "key_files": [],
+      "manifest_path": "app/EigenInference/Package.swift",
+      "external_applications": ["darkbloom-coordinator", "huggingface-hub", "mlx-backend", "macos-launch-services"]
+    },
+    {
+      "name": "EigenInferenceEnclave",
+      "kind": "library",
+      "type": "swift-package",
+      "root_path": "enclave/Sources/EigenInferenceEnclave",
+      "description": "Swift package providing Secure Enclave attestation and signing capabilities",
+      "internal_dependencies": [],
+      "external_dependencies": [],
+      "key_files": [],
+      "manifest_path": "enclave/Package.swift",
+      "external_applications": ["apple-secure-enclave", "macos-system-tools"]
+    },
+    {
+      "name": "EigenInferenceEnclaveCLI",
+      "kind": "cli",
+      "type": "swift-package",
+      "root_path": "enclave/Sources/EigenInferenceEnclaveCLI",
+      "description": "CLI tool for Secure Enclave operations and diagnostics",
+      "internal_dependencies": [
+        "EigenInferenceEnclave"
+      ],
+      "external_dependencies": [],
+      "key_files": [],
+      "manifest_path": "enclave/Package.swift",
+      "external_applications": ["apple-secure-enclave", "macos-system-tools"]
+    },
+    {
+      "name": "EigenInferenceEnclave",
+      "kind": "library",
+      "type": "swift-package",
+      "root_path": "enclave",
+      "description": "Swift package root providing Secure Enclave attestation and signing capabilities",
+      "internal_dependencies": [
+        "EigenInferenceEnclave",
+        "EigenInferenceEnclaveCLI"
+      ],
+      "external_dependencies": [],
+      "key_files": [],
+      "manifest_path": "enclave/Package.swift",
+      "external_applications": ["apple-secure-enclave", "macos-system-tools"]
+    }
+  ],
+  "metadata": {
+    "total_components": 12,
+    "by_kind": {
+      "library": 4,
+      "service": 5,
+      "cli": 1,
+      "frontend": 2
+    },
+    "by_language": {
+      "go-module": 5,
+      "rust-crate": 2,
+      "swift-package": 4,
+      "typescript-package": 1
+    }
+  }
+}

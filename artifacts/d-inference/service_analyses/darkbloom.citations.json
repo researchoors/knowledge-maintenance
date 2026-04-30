@@ -1,0 +1,149 @@
+{
+  "component": "darkbloom",
+  "source_file": "/tmp/d-inference/service_analyses/darkbloom.md",
+  "source_repo": "",
+  "source_commit": "",
+  "citation_count": 20,
+  "citations": [
+    {
+      "file_path": "src/main.rs",
+      "start_line": 1,
+      "end_line": 25,
+      "claim": "Darkbloom is the provider agent for Apple Silicon Macs with comprehensive architecture covering hardware detection, model management, backend lifecycle, coordinator connection, private text engine, attestation, and E2E crypto",
+      "section": "Architecture"
+    },
+    {
+      "file_path": "src/main.rs",
+      "start_line": 85,
+      "end_line": 97,
+      "claim": "CatalogModel struct defines the model metadata structure with fields for ID, display name, size, architecture, description, and memory requirements",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "provider/Cargo.toml",
+      "start_line": 1,
+      "end_line": 10,
+      "claim": "The component is named 'darkbloom' version 0.4.7 with description 'EigenInference provider agent for Apple Silicon Macs' and builds a binary at src/main.rs",
+      "section": "Analysis Data"
+    },
+    {
+      "file_path": "src/coordinator.rs",
+      "start_line": 1,
+      "end_line": 15,
+      "claim": "WebSocket client manages provider connection with automatic reconnection, registration, heartbeats, inference requests, attestation challenges, and result forwarding",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "src/security.rs",
+      "start_line": 1,
+      "end_line": 16,
+      "claim": "Security module implements runtime protections including PT_DENY_ATTACH, SIP verification, and memory wiping to prevent inspection of inference data",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "src/backend/mod.rs",
+      "start_line": 1,
+      "end_line": 16,
+      "claim": "Backend management supports vllm-mlx and mlx-lm with health monitoring, automatic restart, and BackendManager wrapper for lifecycle management",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "src/hardware.rs",
+      "start_line": 1,
+      "end_line": 15,
+      "claim": "Hardware detection queries macOS system APIs for memory size, CPU cores, machine model, and GPU capabilities using sysctl and system_profiler",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "src/crypto.rs",
+      "start_line": 1,
+      "end_line": 16,
+      "claim": "NodeKeyPair implements ephemeral X25519 key pairs for E2E encryption, generated fresh on each launch and protected by PT_DENY_ATTACH + Hardened Runtime + SIP",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "src/models.rs",
+      "start_line": 1,
+      "end_line": 18,
+      "claim": "Model scanning examines HuggingFace cache for MLX models, filtering by available memory with detection heuristics for directory names containing 'mlx' and quantization hints",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "src/hypervisor.rs",
+      "start_line": 1,
+      "end_line": 34,
+      "claim": "Hypervisor integration uses Apple's framework to create lightweight VM with Stage 2 page tables for memory isolation, requiring 16MB alignment and pre-allocated pools",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "src/proxy.rs",
+      "start_line": 1,
+      "end_line": 11,
+      "claim": "Request proxy handles legacy/local flows between coordinator WebSocket and local backends, with E2E decryption happening before proxy handling",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "src/service.rs",
+      "start_line": 1,
+      "end_line": 7,
+      "claim": "Service management provides launchd user agent integration with explicit user control - only runs when started via 'darkbloom start' or app toggle, no auto-start on login",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "src/telemetry/mod.rs",
+      "start_line": 1,
+      "end_line": 13,
+      "claim": "Telemetry architecture uses multiple sources (tracing layer, panic hook, backend scraper, direct emit) feeding into mpsc queue, async batcher, and HTTPS POST to coordinator with disk overflow",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "provider/Cargo.toml",
+      "start_line": 11,
+      "end_line": 77,
+      "claim": "Dependencies include tokio for async runtime, reqwest for HTTP, tokio-tungstenite for WebSocket, axum for HTTP server, serde for serialization, crypto_box for NaCl encryption, and security-framework for macOS integration",
+      "section": "External Dependencies"
+    },
+    {
+      "file_path": "src/main.rs",
+      "start_line": 1442,
+      "end_line": 1620,
+      "claim": "CLI interface provides comprehensive subcommands including init, serve, install, models, earnings, doctor, start/stop, logs, update, login/logout, and autoupdate configuration",
+      "section": "API Surface"
+    },
+    {
+      "file_path": "src/main.rs",
+      "start_line": 54,
+      "end_line": 83,
+      "claim": "Build-time coordinator URLs default to production (api.darkbloom.dev) with R2 CDN URLs for model and site-packages distribution, configurable via environment variables",
+      "section": "External Systems"
+    },
+    {
+      "file_path": "provider/build.rs",
+      "start_line": 59,
+      "end_line": 110,
+      "claim": "Build system integrates Swift Secure Enclave library, linking EigenInferenceEnclave static library with Foundation, Security, and CryptoKit frameworks plus Swift runtime paths",
+      "section": "External Systems"
+    },
+    {
+      "file_path": "src/protocol.rs",
+      "start_line": 1,
+      "end_line": 19,
+      "claim": "Wire protocol defines JSON-encoded WebSocket messages with provider-to-coordinator messages (Register, Heartbeat, InferenceResponse, AttestationResponse) and coordinator-to-provider messages (InferenceRequest, Cancel, AttestationChallenge)",
+      "section": "API Surface"
+    },
+    {
+      "file_path": "src/main.rs",
+      "start_line": 2118,
+      "end_line": 2200,
+      "claim": "Service startup includes single-instance enforcement via PID file, process cleanup, hypervisor VM creation, security posture verification, and core dump disable before processing any inference data",
+      "section": "Data Flows"
+    },
+    {
+      "file_path": "src/main.rs",
+      "start_line": 2860,
+      "end_line": 2880,
+      "claim": "Coordinator connection is deliberately delayed until all backends are loaded to prevent routing requests before the provider can serve them, ensuring service readiness",
+      "section": "Data Flows"
+    }
+  ]
+}

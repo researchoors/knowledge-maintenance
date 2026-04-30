@@ -1,0 +1,347 @@
+{
+  "schema_version": "2.0.0",
+  "source_repo": "/private/tmp/flashlight-repos/d-inference",
+  "source_commit": "f7dab6fa994a",
+  "nodes": {
+    "components": {
+      "analytics": {
+        "name": "analytics",
+        "kind": "service",
+        "type": "go-module",
+        "root_path": "analytics/cmd/analytics",
+        "description": "",
+        "internal_dependencies": [
+          "analytics"
+        ],
+        "external_dependencies": [],
+        "key_files": [],
+        "manifest_path": "analytics/go.mod"
+      },
+      "coordinator": {
+        "name": "coordinator",
+        "kind": "service",
+        "type": "go-module",
+        "root_path": "coordinator/cmd/coordinator",
+        "description": "",
+        "internal_dependencies": [
+          "coordinator"
+        ],
+        "external_dependencies": [],
+        "key_files": [],
+        "manifest_path": "coordinator/go.mod"
+      },
+      "verify-attestation": {
+        "name": "verify-attestation",
+        "kind": "service",
+        "type": "go-module",
+        "root_path": "coordinator/cmd/verify-attestation",
+        "description": "",
+        "internal_dependencies": [
+          "coordinator"
+        ],
+        "external_dependencies": [],
+        "key_files": [],
+        "manifest_path": "coordinator/go.mod"
+      },
+      "web": {
+        "name": "web",
+        "kind": "frontend",
+        "type": "typescript-package",
+        "root_path": "console-ui",
+        "description": "",
+        "internal_dependencies": [],
+        "external_dependencies": [
+          {
+            "name": "@datadog/browser-rum",
+            "version": "^6.32.0"
+          },
+          {
+            "name": "@privy-io/react-auth",
+            "version": "^3.18.0"
+          },
+          {
+            "name": "@privy-io/server-auth",
+            "version": "^1.32.5"
+          },
+          {
+            "name": "asn1js",
+            "version": "^3.0.7"
+          },
+          {
+            "name": "lucide-react",
+            "version": "^1.0.1"
+          },
+          {
+            "name": "next",
+            "version": "^16.2.2"
+          },
+          {
+            "name": "pkijs",
+            "version": "^3.4.0"
+          },
+          {
+            "name": "react",
+            "version": "^19.2.4"
+          },
+          {
+            "name": "react-dom",
+            "version": "^19.2.4"
+          },
+          {
+            "name": "react-markdown",
+            "version": "^10.1.0"
+          },
+          {
+            "name": "rehype-highlight",
+            "version": "^7.0.2"
+          },
+          {
+            "name": "remark-gfm",
+            "version": "^4.0.1"
+          },
+          {
+            "name": "tweetnacl",
+            "version": "^1.0.3"
+          },
+          {
+            "name": "zustand",
+            "version": "^5.0.12"
+          }
+        ],
+        "key_files": [],
+        "manifest_path": "console-ui/package.json"
+      },
+      "decrypt-test": {
+        "name": "decrypt-test",
+        "kind": "service",
+        "type": "rust-crate",
+        "root_path": "coordinator/internal/e2e/testdata/decrypt",
+        "description": "",
+        "internal_dependencies": [],
+        "external_dependencies": [
+          {
+            "name": "crypto_box",
+            "version": "0.9"
+          },
+          {
+            "name": "base64",
+            "version": "0.22"
+          }
+        ],
+        "key_files": [],
+        "manifest_path": "coordinator/internal/e2e/testdata/decrypt/Cargo.toml"
+      },
+      "darkbloom": {
+        "name": "darkbloom",
+        "kind": "service",
+        "type": "rust-crate",
+        "root_path": "provider",
+        "description": "EigenInference provider agent for Apple Silicon Macs",
+        "internal_dependencies": [],
+        "external_dependencies": [
+          {
+            "name": "clap",
+            "version": "4"
+          },
+          {
+            "name": "tokio",
+            "version": "1"
+          },
+          {
+            "name": "tokio-util",
+            "version": "0.7"
+          },
+          {
+            "name": "serde",
+            "version": "1"
+          },
+          {
+            "name": "serde_json",
+            "version": "1"
+          },
+          {
+            "name": "toml",
+            "version": "0.8"
+          },
+          {
+            "name": "tracing",
+            "version": "0.1"
+          },
+          {
+            "name": "tracing-subscriber",
+            "version": "0.3"
+          },
+          {
+            "name": "reqwest",
+            "version": "0.12"
+          },
+          {
+            "name": "tokio-tungstenite",
+            "version": "0.26"
+          },
+          {
+            "name": "futures-util",
+            "version": "0.3"
+          },
+          {
+            "name": "axum",
+            "version": "0.8"
+          },
+          {
+            "name": "http-body-util",
+            "version": "0.1"
+          },
+          {
+            "name": "anyhow",
+            "version": "1"
+          },
+          {
+            "name": "thiserror",
+            "version": "2"
+          },
+          {
+            "name": "async-trait",
+            "version": "0.1"
+          },
+          {
+            "name": "uuid",
+            "version": "1"
+          },
+          {
+            "name": "libc",
+            "version": "0.2"
+          },
+          {
+            "name": "dirs",
+            "version": "6"
+          },
+          {
+            "name": "chrono",
+            "version": "0.4"
+          },
+          {
+            "name": "once_cell",
+            "version": "1"
+          },
+          {
+            "name": "backtrace",
+            "version": "0.3"
+          },
+          {
+            "name": "crossterm",
+            "version": "0.28"
+          },
+          {
+            "name": "crypto_box",
+            "version": "0.9"
+          },
+          {
+            "name": "base64",
+            "version": "0.22"
+          },
+          {
+            "name": "sha2",
+            "version": "0.10"
+          },
+          {
+            "name": "zeroize",
+            "version": "1"
+          },
+          {
+            "name": "pyo3",
+            "version": "0.24"
+          }
+        ],
+        "key_files": [],
+        "manifest_path": "provider/Cargo.toml"
+      },
+      "EigenInference": {
+        "name": "EigenInference",
+        "kind": "frontend",
+        "type": "swift-package",
+        "root_path": "app/EigenInference/Sources/EigenInference",
+        "description": "",
+        "internal_dependencies": [],
+        "external_dependencies": [],
+        "key_files": [],
+        "manifest_path": "app/EigenInference/Package.swift"
+      },
+      "EigenInferenceEnclave": {
+        "name": "EigenInferenceEnclave",
+        "kind": "library",
+        "type": "swift-package",
+        "root_path": "enclave",
+        "description": "Swift package root",
+        "internal_dependencies": [
+          "EigenInferenceEnclave",
+          "EigenInferenceEnclaveCLI"
+        ],
+        "external_dependencies": [],
+        "key_files": [],
+        "manifest_path": "enclave/Package.swift"
+      },
+      "EigenInferenceEnclaveCLI": {
+        "name": "EigenInferenceEnclaveCLI",
+        "kind": "cli",
+        "type": "swift-package",
+        "root_path": "enclave/Sources/EigenInferenceEnclaveCLI",
+        "description": "",
+        "internal_dependencies": [
+          "EigenInferenceEnclave"
+        ],
+        "external_dependencies": [],
+        "key_files": [],
+        "manifest_path": "enclave/Package.swift"
+      }
+    },
+    "external_services": {}
+  },
+  "edges": [
+    {
+      "source": "analytics",
+      "target": "analytics",
+      "type": "depends_on"
+    },
+    {
+      "source": "coordinator",
+      "target": "coordinator",
+      "type": "depends_on"
+    },
+    {
+      "source": "verify-attestation",
+      "target": "coordinator",
+      "type": "depends_on"
+    },
+    {
+      "source": "EigenInferenceEnclave",
+      "target": "EigenInferenceEnclave",
+      "type": "depends_on"
+    },
+    {
+      "source": "EigenInferenceEnclave",
+      "target": "EigenInferenceEnclaveCLI",
+      "type": "depends_on"
+    },
+    {
+      "source": "EigenInferenceEnclaveCLI",
+      "target": "EigenInferenceEnclave",
+      "type": "depends_on"
+    }
+  ],
+  "analysis": {},
+  "metadata": {
+    "component_count": 9,
+    "external_service_count": 0,
+    "edge_count": 6,
+    "analyzed_count": 0,
+    "by_kind": {
+      "library": 1,
+      "service": 5,
+      "cli": 1,
+      "frontend": 2
+    },
+    "by_edge_type": {
+      "depends_on": 6
+    }
+  }
+}

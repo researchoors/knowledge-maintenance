@@ -1,0 +1,2563 @@
+{
+  "metadata": {
+    "source_repo": "",
+    "source_commit": "",
+    "generated_at": "2026-04-30T02:24:03.526602+00:00",
+    "total_citations": 158,
+    "total_raw_parsed": 158,
+    "total_validation_errors": 0,
+    "components_with_citations": 9,
+    "components_without_citations": 0,
+    "components_analyzed": 9
+  },
+  "by_component": {
+    "EigenInference": [
+      {
+        "file_path": "Sources/EigenInference/EigenInferenceApp.swift",
+        "start_line": 22,
+        "end_line": 24,
+        "claim": "Main SwiftUI App struct with NSApplicationDelegateAdaptor for activation policy management",
+        "section": "Key Components",
+        "component": "EigenInference"
+      },
+      {
+        "file_path": "Sources/EigenInference/StatusViewModel.swift",
+        "start_line": 18,
+        "end_line": 25,
+        "claim": "Central ObservableObject managing provider state with @Published properties",
+        "section": "Key Components",
+        "component": "EigenInference"
+      },
+      {
+        "file_path": "Sources/EigenInference/ProviderManager.swift",
+        "start_line": 23,
+        "end_line": 26,
+        "claim": "ProviderManager as ObservableObject managing darkbloom subprocess lifecycle",
+        "section": "Key Components",
+        "component": "EigenInference"
+      },
+      {
+        "file_path": "Sources/EigenInference/CLIRunner.swift",
+        "start_line": 24,
+        "end_line": 32,
+        "claim": "CLIRunner class centralizes darkbloom binary execution with path resolution",
+        "section": "Key Components",
+        "component": "EigenInference"
+      },
+      {
+        "file_path": "Sources/EigenInference/ConfigManager.swift",
+        "start_line": 48,
+        "end_line": 65,
+        "claim": "ConfigManager enum provides TOML parsing for shared provider.toml configuration",
+        "section": "Key Components",
+        "component": "EigenInference"
+      },
+      {
+        "file_path": "Package.swift",
+        "start_line": 4,
+        "end_line": 7,
+        "claim": "Swift package with zero external dependencies, only built-in Apple frameworks",
+        "section": "External Dependencies",
+        "component": "EigenInference"
+      },
+      {
+        "file_path": "Sources/EigenInference/EigenInferenceApp.swift",
+        "start_line": 123,
+        "end_line": 125,
+        "claim": "App starts as .accessory (menu bar only) and switches to .regular when windows open",
+        "section": "Architecture",
+        "component": "EigenInference"
+      },
+      {
+        "file_path": "Sources/EigenInference/StatusViewModel.swift",
+        "start_line": 216,
+        "end_line": 262,
+        "claim": "Real-time provider status polling via HTTP health checks on port 8100",
+        "section": "Data Flows",
+        "component": "EigenInference"
+      },
+      {
+        "file_path": "Sources/EigenInference/ProviderManager.swift",
+        "start_line": 207,
+        "end_line": 233,
+        "claim": "Auto-restart logic with exponential backoff and maximum retry limits",
+        "section": "Data Flows",
+        "component": "EigenInference"
+      },
+      {
+        "file_path": "Sources/EigenInference/StatusViewModel.swift",
+        "start_line": 346,
+        "end_line": 358,
+        "claim": "Hardware detection using sysctlbyname and system_profiler commands",
+        "section": "Data Flows",
+        "component": "EigenInference"
+      },
+      {
+        "file_path": "Sources/EigenInference/ConfigManager.swift",
+        "start_line": 50,
+        "end_line": 65,
+        "claim": "Shared configuration path with CLI tools via ~/.darkbloom/provider.toml",
+        "section": "Component Interactions",
+        "component": "EigenInference"
+      },
+      {
+        "file_path": "Sources/EigenInference/TelemetryReporter.swift",
+        "start_line": 52,
+        "end_line": 77,
+        "claim": "Telemetry reporter for crash analytics and error reporting to coordinator backend",
+        "section": "External Systems",
+        "component": "EigenInference"
+      },
+      {
+        "file_path": "Sources/EigenInference/ModelManager.swift",
+        "start_line": 56,
+        "end_line": 59,
+        "claim": "HuggingFace cache directory scanning for MLX model discovery",
+        "section": "External Systems",
+        "component": "EigenInference"
+      },
+      {
+        "file_path": "Sources/EigenInference/StatusViewModel.swift",
+        "start_line": 527,
+        "end_line": 538,
+        "claim": "Keychain Services integration for secure API key storage",
+        "section": "External Systems",
+        "component": "EigenInference"
+      },
+      {
+        "file_path": "Sources/EigenInference/MenuBarView.swift",
+        "start_line": 8,
+        "end_line": 12,
+        "claim": "MenuBarView as primary user interface with ObservedObject pattern",
+        "section": "Key Components",
+        "component": "EigenInference"
+      },
+      {
+        "file_path": "Sources/EigenInference/DesignSystem.swift",
+        "start_line": 11,
+        "end_line": 83,
+        "claim": "Comprehensive design system with adaptive color palettes for light/dark modes",
+        "section": "Key Components",
+        "component": "EigenInference"
+      },
+      {
+        "file_path": "Tests/EigenInferenceTests/ConfigManagerTests.swift",
+        "start_line": 3,
+        "end_line": 5,
+        "claim": "Modern Swift Testing framework usage with @Test syntax instead of XCTest",
+        "section": "Architecture",
+        "component": "EigenInference"
+      },
+      {
+        "file_path": "Sources/EigenInference/EigenInferenceApp.swift",
+        "start_line": 27,
+        "end_line": 58,
+        "claim": "Multiple SwiftUI scenes including MenuBarExtra, Settings, and various windows",
+        "section": "Architecture",
+        "component": "EigenInference"
+      },
+      {
+        "file_path": "Sources/EigenInference/ProviderManager.swift",
+        "start_line": 147,
+        "end_line": 162,
+        "claim": "Environment setup matching CLIRunner for consistent tool discovery",
+        "section": "Component Interactions",
+        "component": "EigenInference"
+      },
+      {
+        "file_path": "Sources/EigenInference/StatusViewModel.swift",
+        "start_line": 302,
+        "end_line": 320,
+        "claim": "Earnings and wallet integration via coordinator HTTP endpoints",
+        "section": "External Systems",
+        "component": "EigenInference"
+      }
+    ],
+    "EigenInferenceEnclave": [
+      {
+        "file_path": "Sources/EigenInferenceEnclave/SecureEnclaveIdentity.swift",
+        "start_line": 36,
+        "end_line": 38,
+        "claim": "SecureEnclaveIdentity manages hardware-bound P-256 signing keys",
+        "section": "Key Components",
+        "component": "EigenInferenceEnclave"
+      },
+      {
+        "file_path": "Sources/EigenInferenceEnclave/SecureEnclaveIdentity.swift",
+        "start_line": 46,
+        "end_line": 49,
+        "claim": "Creates new identity by generating P-256 key in Secure Enclave",
+        "section": "Key Components",
+        "component": "EigenInferenceEnclave"
+      },
+      {
+        "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
+        "start_line": 44,
+        "end_line": 59,
+        "claim": "AttestationBlob contains hardware identity and security state fields",
+        "section": "Key Components",
+        "component": "EigenInferenceEnclave"
+      },
+      {
+        "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
+        "start_line": 100,
+        "end_line": 131,
+        "claim": "AttestationService creates attestations with deterministic JSON encoding",
+        "section": "Data Flows",
+        "component": "EigenInferenceEnclave"
+      },
+      {
+        "file_path": "Sources/EigenInferenceEnclave/Bridge.swift",
+        "start_line": 36,
+        "end_line": 41,
+        "claim": "FFI bridge provides C-callable functions with proper memory management",
+        "section": "Key Components",
+        "component": "EigenInferenceEnclave"
+      },
+      {
+        "file_path": "Sources/EigenInferenceEnclave/Bridge.swift",
+        "start_line": 79,
+        "end_line": 90,
+        "claim": "FFI sign function takes raw data and returns base64-encoded signature",
+        "section": "API Surface",
+        "component": "EigenInferenceEnclave"
+      },
+      {
+        "file_path": "Sources/EigenInferenceEnclaveCLI/main.swift",
+        "start_line": 31,
+        "end_line": 52,
+        "claim": "CLI attest command generates ephemeral attestations with optional parameters",
+        "section": "Key Components",
+        "component": "EigenInferenceEnclave"
+      },
+      {
+        "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
+        "start_line": 175,
+        "end_line": 194,
+        "claim": "getChipName() uses system_profiler to extract Apple Silicon chip information",
+        "section": "External Dependencies",
+        "component": "EigenInferenceEnclave"
+      },
+      {
+        "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
+        "start_line": 260,
+        "end_line": 273,
+        "claim": "checkSIPEnabled() calls csrutil status to determine SIP state",
+        "section": "External Dependencies",
+        "component": "EigenInferenceEnclave"
+      },
+      {
+        "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
+        "start_line": 118,
+        "end_line": 126,
+        "claim": "JSON encoder uses sortedKeys for deterministic output matching Go implementation",
+        "section": "Data Flows",
+        "component": "EigenInferenceEnclave"
+      },
+      {
+        "file_path": "Sources/EigenInferenceEnclave/SecureEnclaveIdentity.swift",
+        "start_line": 100,
+        "end_line": 103,
+        "claim": "Sign operation returns DER-encoded ECDSA signature compatible with Go crypto/ecdsa",
+        "section": "API Surface",
+        "component": "EigenInferenceEnclave"
+      },
+      {
+        "file_path": "Sources/EigenInferenceEnclave/SecureEnclaveIdentity.swift",
+        "start_line": 75,
+        "end_line": 77,
+        "claim": "Public key is exported as raw 64-byte representation (X||Y without prefix)",
+        "section": "API Surface",
+        "component": "EigenInferenceEnclave"
+      },
+      {
+        "file_path": "include/eigeninference_enclave.h",
+        "start_line": 17,
+        "end_line": 17,
+        "claim": "FFI provides Secure Enclave availability check function",
+        "section": "API Surface",
+        "component": "EigenInferenceEnclave"
+      },
+      {
+        "file_path": "include/eigeninference_enclave.h",
+        "start_line": 80,
+        "end_line": 84,
+        "claim": "Full attestation function supports optional encryption key and binary hash binding",
+        "section": "API Surface",
+        "component": "EigenInferenceEnclave"
+      },
+      {
+        "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
+        "start_line": 139,
+        "end_line": 157,
+        "claim": "Static verify method re-encodes attestation for signature validation",
+        "section": "Data Flows",
+        "component": "EigenInferenceEnclave"
+      },
+      {
+        "file_path": "Package.swift",
+        "start_line": 7,
+        "end_line": 10,
+        "claim": "Package provides both static library and executable CLI tool products",
+        "section": "Architecture",
+        "component": "EigenInferenceEnclave"
+      },
+      {
+        "file_path": "Tests/EigenInferenceEnclaveTests/SecureEnclaveTests.swift",
+        "start_line": 18,
+        "end_line": 24,
+        "claim": "Identity creation produces 64-byte raw P-256 public keys",
+        "section": "API Surface",
+        "component": "EigenInferenceEnclave"
+      },
+      {
+        "file_path": "Tests/EigenInferenceEnclaveTests/SecureEnclaveTests.swift",
+        "start_line": 83,
+        "end_line": 98,
+        "claim": "Attestation service creates verifiable signed attestation blobs",
+        "section": "Data Flows",
+        "component": "EigenInferenceEnclave"
+      },
+      {
+        "file_path": "Tests/EigenInferenceEnclaveTests/AttestationTests.swift",
+        "start_line": 52,
+        "end_line": 68,
+        "claim": "JSON output uses sorted keys for deterministic encoding",
+        "section": "Data Flows",
+        "component": "EigenInferenceEnclave"
+      },
+      {
+        "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
+        "start_line": 235,
+        "end_line": 253,
+        "claim": "RDMA check ensures remote memory access is disabled for security",
+        "section": "Security Model",
+        "component": "EigenInferenceEnclave"
+      }
+    ],
+    "EigenInferenceEnclaveCLI": [
+      {
+        "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+        "start_line": 1,
+        "end_line": 15,
+        "claim": "CLI imports CryptoKit and EigenInferenceEnclave, provides command-line attestation tool",
+        "section": "Overview",
+        "component": "EigenInferenceEnclaveCLI"
+      },
+      {
+        "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+        "start_line": 16,
+        "end_line": 29,
+        "claim": "printUsage function defines command structure with attest and info commands",
+        "section": "Key Components",
+        "component": "EigenInferenceEnclaveCLI"
+      },
+      {
+        "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+        "start_line": 31,
+        "end_line": 52,
+        "claim": "cmdAttest function handles attestation generation with optional parameters",
+        "section": "Key Components",
+        "component": "EigenInferenceEnclaveCLI"
+      },
+      {
+        "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+        "start_line": 54,
+        "end_line": 73,
+        "claim": "cmdInfo function displays Secure Enclave availability and ephemeral key info",
+        "section": "Key Components",
+        "component": "EigenInferenceEnclaveCLI"
+      },
+      {
+        "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+        "start_line": 32,
+        "end_line": 35,
+        "claim": "Secure Enclave availability is checked before operations",
+        "section": "Data Flows",
+        "component": "EigenInferenceEnclaveCLI"
+      },
+      {
+        "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+        "start_line": 37,
+        "end_line": 39,
+        "claim": "Creates ephemeral SecureEnclaveIdentity and AttestationService for each invocation",
+        "section": "Internal Dependencies",
+        "component": "EigenInferenceEnclaveCLI"
+      },
+      {
+        "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+        "start_line": 41,
+        "end_line": 44,
+        "claim": "Uses JSONEncoder with sortedKeys for deterministic output",
+        "section": "API Surface",
+        "component": "EigenInferenceEnclaveCLI"
+      },
+      {
+        "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+        "start_line": 77,
+        "end_line": 117,
+        "claim": "Main function provides argument parsing and command dispatch",
+        "section": "Key Components",
+        "component": "EigenInferenceEnclaveCLI"
+      },
+      {
+        "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+        "start_line": 87,
+        "end_line": 104,
+        "claim": "Manual argument parsing handles --encryption-key and --binary-hash options",
+        "section": "Key Components",
+        "component": "EigenInferenceEnclaveCLI"
+      },
+      {
+        "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/WebSocketBridge.swift",
+        "start_line": 1,
+        "end_line": 3,
+        "claim": "WebSocketBridge is a stub indicating removed TLS bridge functionality",
+        "section": "Key Components",
+        "component": "EigenInferenceEnclaveCLI"
+      },
+      {
+        "file_path": "enclave/Package.swift",
+        "start_line": 9,
+        "end_line": 9,
+        "claim": "CLI is built as executable target named eigeninference-enclave",
+        "section": "Overview",
+        "component": "EigenInferenceEnclaveCLI"
+      },
+      {
+        "file_path": "enclave/Package.swift",
+        "start_line": 13,
+        "end_line": 16,
+        "claim": "CLI target depends on EigenInferenceEnclave library",
+        "section": "Internal Dependencies",
+        "component": "EigenInferenceEnclaveCLI"
+      },
+      {
+        "file_path": "enclave/Package.swift",
+        "start_line": 6,
+        "end_line": 6,
+        "claim": "Requires macOS 13.0 or later for Secure Enclave support",
+        "section": "External Dependencies",
+        "component": "EigenInferenceEnclaveCLI"
+      }
+    ],
+    "analytics": [
+      {
+        "file_path": "analytics/cmd/analytics/main.go",
+        "start_line": 19,
+        "end_line": 28,
+        "claim": "The service entry point initializes structured logging and loads configuration with error handling",
+        "section": "Key Components",
+        "component": "analytics"
+      },
+      {
+        "file_path": "analytics/cmd/analytics/main.go",
+        "start_line": 84,
+        "end_line": 93,
+        "claim": "Backend selection pattern allows memory or PostgreSQL storage based on configuration",
+        "section": "Architecture",
+        "component": "analytics"
+      },
+      {
+        "file_path": "analytics/internal/config/config.go",
+        "start_line": 17,
+        "end_line": 24,
+        "claim": "Configuration structure includes address, backend type, database URL, CORS origin, and pseudonym secret",
+        "section": "Key Components",
+        "component": "analytics"
+      },
+      {
+        "file_path": "analytics/internal/config/config.go",
+        "start_line": 47,
+        "end_line": 65,
+        "claim": "Backend-specific validation ensures required parameters for PostgreSQL mode",
+        "section": "Key Components",
+        "component": "analytics"
+      },
+      {
+        "file_path": "analytics/internal/httpapi/server.go",
+        "start_line": 24,
+        "end_line": 41,
+        "claim": "Health check endpoint tests backend connectivity and returns status with timestamp",
+        "section": "API Surface",
+        "component": "analytics"
+      },
+      {
+        "file_path": "analytics/internal/httpapi/server.go",
+        "start_line": 57,
+        "end_line": 99,
+        "claim": "Earnings leaderboard endpoint supports scope, window, and limit query parameters with validation",
+        "section": "API Surface",
+        "component": "analytics"
+      },
+      {
+        "file_path": "analytics/internal/leaderboard/store.go",
+        "start_line": 19,
+        "end_line": 24,
+        "claim": "Leaderboard supports account and node scopes for different aggregation levels",
+        "section": "Key Components",
+        "component": "analytics"
+      },
+      {
+        "file_path": "analytics/internal/leaderboard/store.go",
+        "start_line": 27,
+        "end_line": 33,
+        "claim": "Time window filtering supports 24h, 7d, 30d, and all-time periods",
+        "section": "Key Components",
+        "component": "analytics"
+      },
+      {
+        "file_path": "analytics/internal/leaderboard/store.go",
+        "start_line": 144,
+        "end_line": 185,
+        "claim": "Service layer handles query normalization, validation, and pseudonym generation for leaderboard entries",
+        "section": "Data Flows",
+        "component": "analytics"
+      },
+      {
+        "file_path": "analytics/internal/leaderboard/store.go",
+        "start_line": 477,
+        "end_line": 496,
+        "claim": "PostgreSQL store implementation uses connection pooling and validates connectivity on initialization",
+        "section": "External Systems",
+        "component": "analytics"
+      },
+      {
+        "file_path": "analytics/internal/leaderboard/store.go",
+        "start_line": 517,
+        "end_line": 546,
+        "claim": "PostgreSQL overview query uses CTEs for efficient provider and earnings statistics aggregation",
+        "section": "External Systems",
+        "component": "analytics"
+      },
+      {
+        "file_path": "analytics/internal/pseudonym/alias.go",
+        "start_line": 21,
+        "end_line": 33,
+        "claim": "Pseudonym generator uses HMAC-SHA256 with kind prefixing to create deterministic human-readable aliases",
+        "section": "Key Components",
+        "component": "analytics"
+      },
+      {
+        "file_path": "analytics/internal/pseudonym/alias.go",
+        "start_line": 35,
+        "end_line": 107,
+        "claim": "Alias format uses predefined adjectives, animals, and numbers for human-readable pseudonyms",
+        "section": "Key Components",
+        "component": "analytics"
+      },
+      {
+        "file_path": "analytics/go.mod",
+        "start_line": 5,
+        "end_line": 5,
+        "claim": "Primary external dependency is pgx/v5 for PostgreSQL connectivity",
+        "section": "External Dependencies",
+        "component": "analytics"
+      },
+      {
+        "file_path": "analytics/README.md",
+        "start_line": 3,
+        "end_line": 12,
+        "claim": "Service is designed to sit beside coordinator as standalone read-only analytics service",
+        "section": "Overview",
+        "component": "analytics"
+      },
+      {
+        "file_path": "analytics/README.md",
+        "start_line": 71,
+        "end_line": 81,
+        "claim": "PostgreSQL mode requires read-only user with SELECT privileges on analytics tables",
+        "section": "External Systems",
+        "component": "analytics"
+      }
+    ],
+    "coordinator": [
+      {
+        "file_path": "cmd/coordinator/main.go",
+        "start_line": 1,
+        "end_line": 24,
+        "claim": "The coordinator runs in a GCP Confidential VM with hardware-encrypted memory and acts as central routing layer",
+        "section": "Overview",
+        "component": "coordinator"
+      },
+      {
+        "file_path": "internal/api/server.go",
+        "start_line": 99,
+        "end_line": 207,
+        "claim": "Server struct implements hexagonal architecture with clear separation between external interfaces and business logic",
+        "section": "Architecture",
+        "component": "coordinator"
+      },
+      {
+        "file_path": "internal/registry/registry.go",
+        "start_line": 330,
+        "end_line": 362,
+        "claim": "Registry manages 1000+ concurrent providers with trust levels and intelligent routing",
+        "section": "Key Components",
+        "component": "coordinator"
+      },
+      {
+        "file_path": "internal/store/interface.go",
+        "start_line": 22,
+        "end_line": 354,
+        "claim": "Store interface abstracts persistence layer supporting PostgreSQL and in-memory backends",
+        "section": "Key Components",
+        "component": "coordinator"
+      },
+      {
+        "file_path": "internal/payments/payments.go",
+        "start_line": 1,
+        "end_line": 22,
+        "claim": "Payment system uses double-entry accounting with micro-USD precision for blockchain compatibility",
+        "section": "Key Components",
+        "component": "coordinator"
+      },
+      {
+        "file_path": "go.mod",
+        "start_line": 5,
+        "end_line": 14,
+        "claim": "Primary runtime dependencies include WebSocket, PostgreSQL, JWT, and cryptographic libraries",
+        "section": "External Dependencies",
+        "component": "coordinator"
+      },
+      {
+        "file_path": "internal/api/server.go",
+        "start_line": 766,
+        "end_line": 937,
+        "claim": "API routes include OpenAI-compatible inference endpoints and administrative interfaces",
+        "section": "API Surface",
+        "component": "coordinator"
+      },
+      {
+        "file_path": "internal/registry/registry.go",
+        "start_line": 1112,
+        "end_line": 1245,
+        "claim": "Scoring algorithm considers provider load, hardware specs, trust level, and model cache state",
+        "section": "Key Components",
+        "component": "coordinator"
+      },
+      {
+        "file_path": "internal/api/consumer.go",
+        "start_line": 38,
+        "end_line": 64,
+        "claim": "Request timeouts and retry logic handle provider failures and capacity constraints",
+        "section": "Data Flows",
+        "component": "coordinator"
+      },
+      {
+        "file_path": "cmd/coordinator/main.go",
+        "start_line": 78,
+        "end_line": 131,
+        "claim": "Supports both PostgreSQL for production and in-memory store for development with explicit safety checks",
+        "section": "External Systems",
+        "component": "coordinator"
+      },
+      {
+        "file_path": "internal/registry/registry.go",
+        "start_line": 727,
+        "end_line": 840,
+        "claim": "Provider registration includes model catalog filtering and hardware attestation validation",
+        "section": "Data Flows",
+        "component": "coordinator"
+      },
+      {
+        "file_path": "internal/api/server.go",
+        "start_line": 1040,
+        "end_line": 1094,
+        "claim": "Authentication supports both Privy JWTs and API keys with different access levels",
+        "section": "API Surface",
+        "component": "coordinator"
+      },
+      {
+        "file_path": "internal/ratelimit/ratelimit.go",
+        "start_line": 1,
+        "end_line": 50,
+        "claim": "Rate limiting uses per-account token buckets with separate tiers for inference vs financial operations",
+        "section": "Key Components",
+        "component": "coordinator"
+      },
+      {
+        "file_path": "cmd/coordinator/main.go",
+        "start_line": 184,
+        "end_line": 207,
+        "claim": "Datadog integration provides APM tracing, metrics, and log forwarding",
+        "section": "External Systems",
+        "component": "coordinator"
+      },
+      {
+        "file_path": "cmd/coordinator/main.go",
+        "start_line": 410,
+        "end_line": 451,
+        "claim": "MDM integration enables independent provider security verification via MicroMDM",
+        "section": "External Systems",
+        "component": "coordinator"
+      },
+      {
+        "file_path": "cmd/coordinator/main.go",
+        "start_line": 314,
+        "end_line": 367,
+        "claim": "End-to-end encryption uses X25519 keys derived from BIP39 mnemonic for coordinator identity",
+        "section": "Key Components",
+        "component": "coordinator"
+      },
+      {
+        "file_path": "internal/registry/registry.go",
+        "start_line": 1604,
+        "end_line": 1634,
+        "claim": "Background eviction loop removes stale providers every 30 seconds based on heartbeat timeout",
+        "section": "Key Components",
+        "component": "coordinator"
+      },
+      {
+        "file_path": "cmd/coordinator/main.go",
+        "start_line": 557,
+        "end_line": 605,
+        "claim": "Model catalog seeding includes hardcoded models with size and architecture metadata",
+        "section": "Key Components",
+        "component": "coordinator"
+      },
+      {
+        "file_path": "Dockerfile",
+        "start_line": 24,
+        "end_line": 31,
+        "claim": "Deployment includes MicroMDM and step-ca integration with environment configuration",
+        "section": "External Systems",
+        "component": "coordinator"
+      },
+      {
+        "file_path": "internal/api/server.go",
+        "start_line": 989,
+        "end_line": 997,
+        "claim": "Middleware stack includes CORS, panic recovery, and structured request logging",
+        "section": "Architecture",
+        "component": "coordinator"
+      }
+    ],
+    "darkbloom": [
+      {
+        "file_path": "src/main.rs",
+        "start_line": 1,
+        "end_line": 25,
+        "claim": "Darkbloom is the provider agent for Apple Silicon Macs with comprehensive architecture covering hardware detection, model management, backend lifecycle, coordinator connection, private text engine, attestation, and E2E crypto",
+        "section": "Architecture",
+        "component": "darkbloom"
+      },
+      {
+        "file_path": "src/main.rs",
+        "start_line": 85,
+        "end_line": 97,
+        "claim": "CatalogModel struct defines the model metadata structure with fields for ID, display name, size, architecture, description, and memory requirements",
+        "section": "Key Components",
+        "component": "darkbloom"
+      },
+      {
+        "file_path": "provider/Cargo.toml",
+        "start_line": 1,
+        "end_line": 10,
+        "claim": "The component is named 'darkbloom' version 0.4.7 with description 'EigenInference provider agent for Apple Silicon Macs' and builds a binary at src/main.rs",
+        "section": "Analysis Data",
+        "component": "darkbloom"
+      },
+      {
+        "file_path": "src/coordinator.rs",
+        "start_line": 1,
+        "end_line": 15,
+        "claim": "WebSocket client manages provider connection with automatic reconnection, registration, heartbeats, inference requests, attestation challenges, and result forwarding",
+        "section": "Key Components",
+        "component": "darkbloom"
+      },
+      {
+        "file_path": "src/security.rs",
+        "start_line": 1,
+        "end_line": 16,
+        "claim": "Security module implements runtime protections including PT_DENY_ATTACH, SIP verification, and memory wiping to prevent inspection of inference data",
+        "section": "Key Components",
+        "component": "darkbloom"
+      },
+      {
+        "file_path": "src/backend/mod.rs",
+        "start_line": 1,
+        "end_line": 16,
+        "claim": "Backend management supports vllm-mlx and mlx-lm with health monitoring, automatic restart, and BackendManager wrapper for lifecycle management",
+        "section": "Key Components",
+        "component": "darkbloom"
+      },
+      {
+        "file_path": "src/hardware.rs",
+        "start_line": 1,
+        "end_line": 15,
+        "claim": "Hardware detection queries macOS system APIs for memory size, CPU cores, machine model, and GPU capabilities using sysctl and system_profiler",
+        "section": "Key Components",
+        "component": "darkbloom"
+      },
+      {
+        "file_path": "src/crypto.rs",
+        "start_line": 1,
+        "end_line": 16,
+        "claim": "NodeKeyPair implements ephemeral X25519 key pairs for E2E encryption, generated fresh on each launch and protected by PT_DENY_ATTACH + Hardened Runtime + SIP",
+        "section": "Key Components",
+        "component": "darkbloom"
+      },
+      {
+        "file_path": "src/models.rs",
+        "start_line": 1,
+        "end_line": 18,
+        "claim": "Model scanning examines HuggingFace cache for MLX models, filtering by available memory with detection heuristics for directory names containing 'mlx' and quantization hints",
+        "section": "Key Components",
+        "component": "darkbloom"
+      },
+      {
+        "file_path": "src/hypervisor.rs",
+        "start_line": 1,
+        "end_line": 34,
+        "claim": "Hypervisor integration uses Apple's framework to create lightweight VM with Stage 2 page tables for memory isolation, requiring 16MB alignment and pre-allocated pools",
+        "section": "Key Components",
+        "component": "darkbloom"
+      },
+      {
+        "file_path": "src/proxy.rs",
+        "start_line": 1,
+        "end_line": 11,
+        "claim": "Request proxy handles legacy/local flows between coordinator WebSocket and local backends, with E2E decryption happening before proxy handling",
+        "section": "Key Components",
+        "component": "darkbloom"
+      },
+      {
+        "file_path": "src/service.rs",
+        "start_line": 1,
+        "end_line": 7,
+        "claim": "Service management provides launchd user agent integration with explicit user control - only runs when started via 'darkbloom start' or app toggle, no auto-start on login",
+        "section": "Key Components",
+        "component": "darkbloom"
+      },
+      {
+        "file_path": "src/telemetry/mod.rs",
+        "start_line": 1,
+        "end_line": 13,
+        "claim": "Telemetry architecture uses multiple sources (tracing layer, panic hook, backend scraper, direct emit) feeding into mpsc queue, async batcher, and HTTPS POST to coordinator with disk overflow",
+        "section": "Key Components",
+        "component": "darkbloom"
+      },
+      {
+        "file_path": "provider/Cargo.toml",
+        "start_line": 11,
+        "end_line": 77,
+        "claim": "Dependencies include tokio for async runtime, reqwest for HTTP, tokio-tungstenite for WebSocket, axum for HTTP server, serde for serialization, crypto_box for NaCl encryption, and security-framework for macOS integration",
+        "section": "External Dependencies",
+        "component": "darkbloom"
+      },
+      {
+        "file_path": "src/main.rs",
+        "start_line": 1442,
+        "end_line": 1620,
+        "claim": "CLI interface provides comprehensive subcommands including init, serve, install, models, earnings, doctor, start/stop, logs, update, login/logout, and autoupdate configuration",
+        "section": "API Surface",
+        "component": "darkbloom"
+      },
+      {
+        "file_path": "src/main.rs",
+        "start_line": 54,
+        "end_line": 83,
+        "claim": "Build-time coordinator URLs default to production (api.darkbloom.dev) with R2 CDN URLs for model and site-packages distribution, configurable via environment variables",
+        "section": "External Systems",
+        "component": "darkbloom"
+      },
+      {
+        "file_path": "provider/build.rs",
+        "start_line": 59,
+        "end_line": 110,
+        "claim": "Build system integrates Swift Secure Enclave library, linking EigenInferenceEnclave static library with Foundation, Security, and CryptoKit frameworks plus Swift runtime paths",
+        "section": "External Systems",
+        "component": "darkbloom"
+      },
+      {
+        "file_path": "src/protocol.rs",
+        "start_line": 1,
+        "end_line": 19,
+        "claim": "Wire protocol defines JSON-encoded WebSocket messages with provider-to-coordinator messages (Register, Heartbeat, InferenceResponse, AttestationResponse) and coordinator-to-provider messages (InferenceRequest, Cancel, AttestationChallenge)",
+        "section": "API Surface",
+        "component": "darkbloom"
+      },
+      {
+        "file_path": "src/main.rs",
+        "start_line": 2118,
+        "end_line": 2200,
+        "claim": "Service startup includes single-instance enforcement via PID file, process cleanup, hypervisor VM creation, security posture verification, and core dump disable before processing any inference data",
+        "section": "Data Flows",
+        "component": "darkbloom"
+      },
+      {
+        "file_path": "src/main.rs",
+        "start_line": 2860,
+        "end_line": 2880,
+        "claim": "Coordinator connection is deliberately delayed until all backends are loaded to prevent routing requests before the provider can serve them, ensuring service readiness",
+        "section": "Data Flows",
+        "component": "darkbloom"
+      }
+    ],
+    "decrypt-test": [
+      {
+        "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+        "start_line": 1,
+        "end_line": 9,
+        "claim": "Component serves as a cross-language compatibility testing tool for NaCl Box decryption",
+        "section": "Overview",
+        "component": "decrypt-test"
+      },
+      {
+        "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+        "start_line": 15,
+        "end_line": 23,
+        "claim": "Main entry point validates exactly 3 CLI arguments with usage message",
+        "section": "Key Components",
+        "component": "decrypt-test"
+      },
+      {
+        "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+        "start_line": 38,
+        "end_line": 58,
+        "claim": "Input validation ensures 32-byte keys and minimum 24-byte ciphertext per NaCl specifications",
+        "section": "Key Components",
+        "component": "decrypt-test"
+      },
+      {
+        "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+        "start_line": 60,
+        "end_line": 65,
+        "claim": "Key material is converted from byte arrays to crypto_box types for NaCl operations",
+        "section": "Key Components",
+        "component": "decrypt-test"
+      },
+      {
+        "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+        "start_line": 67,
+        "end_line": 76,
+        "claim": "Decryption extracts nonce from ciphertext prefix and performs AEAD decryption",
+        "section": "Key Components",
+        "component": "decrypt-test"
+      },
+      {
+        "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+        "start_line": 77,
+        "end_line": 81,
+        "claim": "Output handler validates UTF-8 and writes plaintext to stdout",
+        "section": "Key Components",
+        "component": "decrypt-test"
+      },
+      {
+        "file_path": "coordinator/internal/e2e/testdata/decrypt/Cargo.toml",
+        "start_line": 6,
+        "end_line": 8,
+        "claim": "Component depends on crypto_box 0.9 for NaCl operations and base64 0.22 for encoding",
+        "section": "External Dependencies",
+        "component": "decrypt-test"
+      },
+      {
+        "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+        "start_line": 10,
+        "end_line": 13,
+        "claim": "Uses base64 STANDARD engine and crypto_box AEAD traits for cryptographic operations",
+        "section": "External Dependencies",
+        "component": "decrypt-test"
+      },
+      {
+        "file_path": "coordinator/internal/e2e/cross_compat_test.go",
+        "start_line": 15,
+        "end_line": 22,
+        "claim": "Go tests verify cross-language encryption compatibility by building and invoking this Rust binary",
+        "section": "Component Interactions",
+        "component": "decrypt-test"
+      },
+      {
+        "file_path": "coordinator/internal/e2e/cross_compat_test.go",
+        "start_line": 44,
+        "end_line": 47,
+        "claim": "Test suite builds release binary and executes it with encrypted payloads",
+        "section": "Component Interactions",
+        "component": "decrypt-test"
+      },
+      {
+        "file_path": "coordinator/internal/e2e/cross_compat_test.go",
+        "start_line": 88,
+        "end_line": 128,
+        "claim": "Cross-language test encrypts with Go e2e package and decrypts with this Rust utility",
+        "section": "Component Interactions",
+        "component": "decrypt-test"
+      },
+      {
+        "file_path": "coordinator/internal/e2e/cross_compat_test.go",
+        "start_line": 56,
+        "end_line": 83,
+        "claim": "Test scenarios include JSON, empty, Unicode, large, and multiple round-trip payloads",
+        "section": "Cross-Language Compatibility Testing",
+        "component": "decrypt-test"
+      },
+      {
+        "file_path": "coordinator/internal/e2e/e2e.go",
+        "start_line": 64,
+        "end_line": 78,
+        "claim": "Go encryption uses NaCl Box with nonce prefix format compatible with this Rust decryptor",
+        "section": "Cross-Language Compatibility Testing",
+        "component": "decrypt-test"
+      },
+      {
+        "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+        "start_line": 25,
+        "end_line": 36,
+        "claim": "All inputs are base64 decoded with error handling and process exit on failure",
+        "section": "Data Flows",
+        "component": "decrypt-test"
+      }
+    ],
+    "verify-attestation": [
+      {
+        "file_path": "coordinator/cmd/verify-attestation/main.go",
+        "start_line": 1,
+        "end_line": 8,
+        "claim": "Simple package structure importing only fmt, os, and internal attestation library",
+        "section": "Architecture",
+        "component": "verify-attestation"
+      },
+      {
+        "file_path": "coordinator/cmd/verify-attestation/main.go",
+        "start_line": 10,
+        "end_line": 16,
+        "claim": "File reading from fixed path /tmp/eigeninference_attestation.json with error handling",
+        "section": "Key Components",
+        "component": "verify-attestation"
+      },
+      {
+        "file_path": "coordinator/cmd/verify-attestation/main.go",
+        "start_line": 17,
+        "end_line": 22,
+        "claim": "JSON parsing and verification delegation to attestation.VerifyJSON",
+        "section": "Key Components",
+        "component": "verify-attestation"
+      },
+      {
+        "file_path": "coordinator/cmd/verify-attestation/main.go",
+        "start_line": 23,
+        "end_line": 26,
+        "claim": "Hardware identity extraction and display from verification result",
+        "section": "Key Components",
+        "component": "verify-attestation"
+      },
+      {
+        "file_path": "coordinator/cmd/verify-attestation/main.go",
+        "start_line": 27,
+        "end_line": 34,
+        "claim": "Verification status display and exit code management",
+        "section": "Key Components",
+        "component": "verify-attestation"
+      },
+      {
+        "file_path": "coordinator/cmd/verify-attestation/main.go",
+        "start_line": 28,
+        "end_line": 29,
+        "claim": "Cross-language verification success message indicating Swift to Go validation",
+        "section": "API Surface",
+        "component": "verify-attestation"
+      },
+      {
+        "file_path": "coordinator/cmd/verify-attestation/main.go",
+        "start_line": 11,
+        "end_line": 11,
+        "claim": "Fixed file path for attestation input at /tmp/eigeninference_attestation.json",
+        "section": "External Systems",
+        "component": "verify-attestation"
+      },
+      {
+        "file_path": "coordinator/cmd/verify-attestation/main.go",
+        "start_line": 14,
+        "end_line": 14,
+        "claim": "Exit code 1 for file read errors",
+        "section": "External Systems",
+        "component": "verify-attestation"
+      },
+      {
+        "file_path": "coordinator/cmd/verify-attestation/main.go",
+        "start_line": 20,
+        "end_line": 20,
+        "claim": "Exit code 1 for verification failures",
+        "section": "External Systems",
+        "component": "verify-attestation"
+      },
+      {
+        "file_path": "coordinator/cmd/verify-attestation/main.go",
+        "start_line": 32,
+        "end_line": 32,
+        "claim": "Exit code 1 for invalid attestations",
+        "section": "External Systems",
+        "component": "verify-attestation"
+      },
+      {
+        "file_path": "coordinator/internal/attestation/attestation.go",
+        "start_line": 1,
+        "end_line": 25,
+        "claim": "Attestation package provides cross-language verification for Secure Enclave signed blobs",
+        "section": "Internal Dependencies",
+        "component": "verify-attestation"
+      },
+      {
+        "file_path": "coordinator/internal/attestation/attestation.go",
+        "start_line": 233,
+        "end_line": 240,
+        "claim": "VerifyJSON function used by verify-attestation for attestation verification",
+        "section": "Internal Dependencies",
+        "component": "verify-attestation"
+      },
+      {
+        "file_path": "coordinator/internal/attestation/attestation.go",
+        "start_line": 127,
+        "end_line": 131,
+        "claim": "Verification checks P-256 ECDSA signatures and security requirements",
+        "section": "Internal Dependencies",
+        "component": "verify-attestation"
+      },
+      {
+        "file_path": "coordinator/go.mod",
+        "start_line": 1,
+        "end_line": 4,
+        "claim": "Go module definition with Go 1.25.0 requirement",
+        "section": "External Dependencies",
+        "component": "verify-attestation"
+      }
+    ],
+    "web": [
+      {
+        "file_path": "package.json",
+        "start_line": 16,
+        "end_line": 30,
+        "claim": "External dependencies analysis including Next.js, React, Privy, and cryptographic libraries",
+        "section": "External Dependencies",
+        "component": "web"
+      },
+      {
+        "file_path": "src/app/layout.tsx",
+        "start_line": 23,
+        "end_line": 43,
+        "claim": "Layered architecture with provider wrapping and component structure",
+        "section": "Architecture",
+        "component": "web"
+      },
+      {
+        "file_path": "src/app/page.tsx",
+        "start_line": 41,
+        "end_line": 61,
+        "claim": "Main chat interface component with state management integration",
+        "section": "Key Components",
+        "component": "web"
+      },
+      {
+        "file_path": "src/lib/api.ts",
+        "start_line": 299,
+        "end_line": 335,
+        "claim": "Streaming chat function with optional encryption support",
+        "section": "Key Components",
+        "component": "web"
+      },
+      {
+        "file_path": "src/hooks/useAuth.ts",
+        "start_line": 21,
+        "end_line": 58,
+        "claim": "Privy-based authentication with automatic API key provisioning",
+        "section": "Key Components",
+        "component": "web"
+      },
+      {
+        "file_path": "src/lib/store.ts",
+        "start_line": 52,
+        "end_line": 74,
+        "claim": "Zustand state management with persistence for chat history",
+        "section": "Key Components",
+        "component": "web"
+      },
+      {
+        "file_path": "src/lib/encryption.ts",
+        "start_line": 169,
+        "end_line": 197,
+        "claim": "NaCl Box encryption implementation for coordinator communication",
+        "section": "Key Components",
+        "component": "web"
+      },
+      {
+        "file_path": "src/lib/cert-verify.ts",
+        "start_line": 1,
+        "end_line": 28,
+        "claim": "Client-side X.509 certificate verification against Apple Enterprise Attestation Root CA",
+        "section": "Key Components",
+        "component": "web"
+      },
+      {
+        "file_path": "src/components/AppShell.tsx",
+        "start_line": 8,
+        "end_line": 37,
+        "claim": "App shell layout wrapper with conditional rendering based on authentication",
+        "section": "Key Components",
+        "component": "web"
+      },
+      {
+        "file_path": "src/app/api/chat/route.ts",
+        "start_line": 11,
+        "end_line": 36,
+        "claim": "Next.js API route for chat proxy with streaming and encryption support",
+        "section": "API Surface",
+        "component": "web"
+      },
+      {
+        "file_path": "src/app/api/chat/route.ts",
+        "start_line": 51,
+        "end_line": 68,
+        "claim": "Trust metadata header passthrough for hardware attestation verification",
+        "section": "API Surface",
+        "component": "web"
+      },
+      {
+        "file_path": "src/lib/api.ts",
+        "start_line": 530,
+        "end_line": 563,
+        "claim": "Sealed response handling for encrypted streaming events",
+        "section": "Data Flows",
+        "component": "web"
+      },
+      {
+        "file_path": "src/app/page.tsx",
+        "start_line": 84,
+        "end_line": 152,
+        "claim": "Chat message handling with system prompt and trust tracking",
+        "section": "Data Flows",
+        "component": "web"
+      },
+      {
+        "file_path": "src/hooks/useAuth.ts",
+        "start_line": 35,
+        "end_line": 58,
+        "claim": "API key provisioning flow using Privy access tokens",
+        "section": "Data Flows",
+        "component": "web"
+      },
+      {
+        "file_path": "src/components/providers/PrivyClientProvider.tsx",
+        "start_line": 78,
+        "end_line": 91,
+        "claim": "Privy authentication provider configuration with email login",
+        "section": "External Dependencies",
+        "component": "web"
+      },
+      {
+        "file_path": "src/lib/encryption.ts",
+        "start_line": 15,
+        "end_line": 20,
+        "claim": "TweetNaCl library usage for X25519 and Box encryption",
+        "section": "External Dependencies",
+        "component": "web"
+      },
+      {
+        "file_path": "src/components/DatadogRUM.tsx",
+        "start_line": 1,
+        "end_line": 10,
+        "claim": "Datadog Real User Monitoring integration for performance tracking",
+        "section": "External Systems",
+        "component": "web"
+      },
+      {
+        "file_path": "src/lib/google-analytics.ts",
+        "start_line": 1,
+        "end_line": 30,
+        "claim": "Google Analytics 4 integration with privacy controls and consent management",
+        "section": "External Systems",
+        "component": "web"
+      },
+      {
+        "file_path": "README.md",
+        "start_line": 17,
+        "end_line": 23,
+        "claim": "Environment variables configuration for coordinator URL and Privy app ID",
+        "section": "Component Interactions",
+        "component": "web"
+      },
+      {
+        "file_path": "src/app/providers/ProviderDashboardContent.tsx",
+        "start_line": 71,
+        "end_line": 100,
+        "claim": "Provider dashboard for hardware attestation monitoring and earnings tracking",
+        "section": "Key Components",
+        "component": "web"
+      },
+      {
+        "file_path": "next.config.ts",
+        "start_line": 3,
+        "end_line": 10,
+        "claim": "Next.js configuration with TypeScript build optimization",
+        "section": "Architecture",
+        "component": "web"
+      }
+    ]
+  },
+  "all_citations": [
+    {
+      "file_path": "Sources/EigenInference/EigenInferenceApp.swift",
+      "start_line": 22,
+      "end_line": 24,
+      "claim": "Main SwiftUI App struct with NSApplicationDelegateAdaptor for activation policy management",
+      "section": "Key Components",
+      "component": "EigenInference"
+    },
+    {
+      "file_path": "Sources/EigenInference/StatusViewModel.swift",
+      "start_line": 18,
+      "end_line": 25,
+      "claim": "Central ObservableObject managing provider state with @Published properties",
+      "section": "Key Components",
+      "component": "EigenInference"
+    },
+    {
+      "file_path": "Sources/EigenInference/ProviderManager.swift",
+      "start_line": 23,
+      "end_line": 26,
+      "claim": "ProviderManager as ObservableObject managing darkbloom subprocess lifecycle",
+      "section": "Key Components",
+      "component": "EigenInference"
+    },
+    {
+      "file_path": "Sources/EigenInference/CLIRunner.swift",
+      "start_line": 24,
+      "end_line": 32,
+      "claim": "CLIRunner class centralizes darkbloom binary execution with path resolution",
+      "section": "Key Components",
+      "component": "EigenInference"
+    },
+    {
+      "file_path": "Sources/EigenInference/ConfigManager.swift",
+      "start_line": 48,
+      "end_line": 65,
+      "claim": "ConfigManager enum provides TOML parsing for shared provider.toml configuration",
+      "section": "Key Components",
+      "component": "EigenInference"
+    },
+    {
+      "file_path": "Package.swift",
+      "start_line": 4,
+      "end_line": 7,
+      "claim": "Swift package with zero external dependencies, only built-in Apple frameworks",
+      "section": "External Dependencies",
+      "component": "EigenInference"
+    },
+    {
+      "file_path": "Sources/EigenInference/EigenInferenceApp.swift",
+      "start_line": 123,
+      "end_line": 125,
+      "claim": "App starts as .accessory (menu bar only) and switches to .regular when windows open",
+      "section": "Architecture",
+      "component": "EigenInference"
+    },
+    {
+      "file_path": "Sources/EigenInference/StatusViewModel.swift",
+      "start_line": 216,
+      "end_line": 262,
+      "claim": "Real-time provider status polling via HTTP health checks on port 8100",
+      "section": "Data Flows",
+      "component": "EigenInference"
+    },
+    {
+      "file_path": "Sources/EigenInference/ProviderManager.swift",
+      "start_line": 207,
+      "end_line": 233,
+      "claim": "Auto-restart logic with exponential backoff and maximum retry limits",
+      "section": "Data Flows",
+      "component": "EigenInference"
+    },
+    {
+      "file_path": "Sources/EigenInference/StatusViewModel.swift",
+      "start_line": 346,
+      "end_line": 358,
+      "claim": "Hardware detection using sysctlbyname and system_profiler commands",
+      "section": "Data Flows",
+      "component": "EigenInference"
+    },
+    {
+      "file_path": "Sources/EigenInference/ConfigManager.swift",
+      "start_line": 50,
+      "end_line": 65,
+      "claim": "Shared configuration path with CLI tools via ~/.darkbloom/provider.toml",
+      "section": "Component Interactions",
+      "component": "EigenInference"
+    },
+    {
+      "file_path": "Sources/EigenInference/TelemetryReporter.swift",
+      "start_line": 52,
+      "end_line": 77,
+      "claim": "Telemetry reporter for crash analytics and error reporting to coordinator backend",
+      "section": "External Systems",
+      "component": "EigenInference"
+    },
+    {
+      "file_path": "Sources/EigenInference/ModelManager.swift",
+      "start_line": 56,
+      "end_line": 59,
+      "claim": "HuggingFace cache directory scanning for MLX model discovery",
+      "section": "External Systems",
+      "component": "EigenInference"
+    },
+    {
+      "file_path": "Sources/EigenInference/StatusViewModel.swift",
+      "start_line": 527,
+      "end_line": 538,
+      "claim": "Keychain Services integration for secure API key storage",
+      "section": "External Systems",
+      "component": "EigenInference"
+    },
+    {
+      "file_path": "Sources/EigenInference/MenuBarView.swift",
+      "start_line": 8,
+      "end_line": 12,
+      "claim": "MenuBarView as primary user interface with ObservedObject pattern",
+      "section": "Key Components",
+      "component": "EigenInference"
+    },
+    {
+      "file_path": "Sources/EigenInference/DesignSystem.swift",
+      "start_line": 11,
+      "end_line": 83,
+      "claim": "Comprehensive design system with adaptive color palettes for light/dark modes",
+      "section": "Key Components",
+      "component": "EigenInference"
+    },
+    {
+      "file_path": "Tests/EigenInferenceTests/ConfigManagerTests.swift",
+      "start_line": 3,
+      "end_line": 5,
+      "claim": "Modern Swift Testing framework usage with @Test syntax instead of XCTest",
+      "section": "Architecture",
+      "component": "EigenInference"
+    },
+    {
+      "file_path": "Sources/EigenInference/EigenInferenceApp.swift",
+      "start_line": 27,
+      "end_line": 58,
+      "claim": "Multiple SwiftUI scenes including MenuBarExtra, Settings, and various windows",
+      "section": "Architecture",
+      "component": "EigenInference"
+    },
+    {
+      "file_path": "Sources/EigenInference/ProviderManager.swift",
+      "start_line": 147,
+      "end_line": 162,
+      "claim": "Environment setup matching CLIRunner for consistent tool discovery",
+      "section": "Component Interactions",
+      "component": "EigenInference"
+    },
+    {
+      "file_path": "Sources/EigenInference/StatusViewModel.swift",
+      "start_line": 302,
+      "end_line": 320,
+      "claim": "Earnings and wallet integration via coordinator HTTP endpoints",
+      "section": "External Systems",
+      "component": "EigenInference"
+    },
+    {
+      "file_path": "Sources/EigenInferenceEnclave/SecureEnclaveIdentity.swift",
+      "start_line": 36,
+      "end_line": 38,
+      "claim": "SecureEnclaveIdentity manages hardware-bound P-256 signing keys",
+      "section": "Key Components",
+      "component": "EigenInferenceEnclave"
+    },
+    {
+      "file_path": "Sources/EigenInferenceEnclave/SecureEnclaveIdentity.swift",
+      "start_line": 46,
+      "end_line": 49,
+      "claim": "Creates new identity by generating P-256 key in Secure Enclave",
+      "section": "Key Components",
+      "component": "EigenInferenceEnclave"
+    },
+    {
+      "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
+      "start_line": 44,
+      "end_line": 59,
+      "claim": "AttestationBlob contains hardware identity and security state fields",
+      "section": "Key Components",
+      "component": "EigenInferenceEnclave"
+    },
+    {
+      "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
+      "start_line": 100,
+      "end_line": 131,
+      "claim": "AttestationService creates attestations with deterministic JSON encoding",
+      "section": "Data Flows",
+      "component": "EigenInferenceEnclave"
+    },
+    {
+      "file_path": "Sources/EigenInferenceEnclave/Bridge.swift",
+      "start_line": 36,
+      "end_line": 41,
+      "claim": "FFI bridge provides C-callable functions with proper memory management",
+      "section": "Key Components",
+      "component": "EigenInferenceEnclave"
+    },
+    {
+      "file_path": "Sources/EigenInferenceEnclave/Bridge.swift",
+      "start_line": 79,
+      "end_line": 90,
+      "claim": "FFI sign function takes raw data and returns base64-encoded signature",
+      "section": "API Surface",
+      "component": "EigenInferenceEnclave"
+    },
+    {
+      "file_path": "Sources/EigenInferenceEnclaveCLI/main.swift",
+      "start_line": 31,
+      "end_line": 52,
+      "claim": "CLI attest command generates ephemeral attestations with optional parameters",
+      "section": "Key Components",
+      "component": "EigenInferenceEnclave"
+    },
+    {
+      "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
+      "start_line": 175,
+      "end_line": 194,
+      "claim": "getChipName() uses system_profiler to extract Apple Silicon chip information",
+      "section": "External Dependencies",
+      "component": "EigenInferenceEnclave"
+    },
+    {
+      "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
+      "start_line": 260,
+      "end_line": 273,
+      "claim": "checkSIPEnabled() calls csrutil status to determine SIP state",
+      "section": "External Dependencies",
+      "component": "EigenInferenceEnclave"
+    },
+    {
+      "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
+      "start_line": 118,
+      "end_line": 126,
+      "claim": "JSON encoder uses sortedKeys for deterministic output matching Go implementation",
+      "section": "Data Flows",
+      "component": "EigenInferenceEnclave"
+    },
+    {
+      "file_path": "Sources/EigenInferenceEnclave/SecureEnclaveIdentity.swift",
+      "start_line": 100,
+      "end_line": 103,
+      "claim": "Sign operation returns DER-encoded ECDSA signature compatible with Go crypto/ecdsa",
+      "section": "API Surface",
+      "component": "EigenInferenceEnclave"
+    },
+    {
+      "file_path": "Sources/EigenInferenceEnclave/SecureEnclaveIdentity.swift",
+      "start_line": 75,
+      "end_line": 77,
+      "claim": "Public key is exported as raw 64-byte representation (X||Y without prefix)",
+      "section": "API Surface",
+      "component": "EigenInferenceEnclave"
+    },
+    {
+      "file_path": "include/eigeninference_enclave.h",
+      "start_line": 17,
+      "end_line": 17,
+      "claim": "FFI provides Secure Enclave availability check function",
+      "section": "API Surface",
+      "component": "EigenInferenceEnclave"
+    },
+    {
+      "file_path": "include/eigeninference_enclave.h",
+      "start_line": 80,
+      "end_line": 84,
+      "claim": "Full attestation function supports optional encryption key and binary hash binding",
+      "section": "API Surface",
+      "component": "EigenInferenceEnclave"
+    },
+    {
+      "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
+      "start_line": 139,
+      "end_line": 157,
+      "claim": "Static verify method re-encodes attestation for signature validation",
+      "section": "Data Flows",
+      "component": "EigenInferenceEnclave"
+    },
+    {
+      "file_path": "Package.swift",
+      "start_line": 7,
+      "end_line": 10,
+      "claim": "Package provides both static library and executable CLI tool products",
+      "section": "Architecture",
+      "component": "EigenInferenceEnclave"
+    },
+    {
+      "file_path": "Tests/EigenInferenceEnclaveTests/SecureEnclaveTests.swift",
+      "start_line": 18,
+      "end_line": 24,
+      "claim": "Identity creation produces 64-byte raw P-256 public keys",
+      "section": "API Surface",
+      "component": "EigenInferenceEnclave"
+    },
+    {
+      "file_path": "Tests/EigenInferenceEnclaveTests/SecureEnclaveTests.swift",
+      "start_line": 83,
+      "end_line": 98,
+      "claim": "Attestation service creates verifiable signed attestation blobs",
+      "section": "Data Flows",
+      "component": "EigenInferenceEnclave"
+    },
+    {
+      "file_path": "Tests/EigenInferenceEnclaveTests/AttestationTests.swift",
+      "start_line": 52,
+      "end_line": 68,
+      "claim": "JSON output uses sorted keys for deterministic encoding",
+      "section": "Data Flows",
+      "component": "EigenInferenceEnclave"
+    },
+    {
+      "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
+      "start_line": 235,
+      "end_line": 253,
+      "claim": "RDMA check ensures remote memory access is disabled for security",
+      "section": "Security Model",
+      "component": "EigenInferenceEnclave"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+      "start_line": 1,
+      "end_line": 15,
+      "claim": "CLI imports CryptoKit and EigenInferenceEnclave, provides command-line attestation tool",
+      "section": "Overview",
+      "component": "EigenInferenceEnclaveCLI"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+      "start_line": 16,
+      "end_line": 29,
+      "claim": "printUsage function defines command structure with attest and info commands",
+      "section": "Key Components",
+      "component": "EigenInferenceEnclaveCLI"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+      "start_line": 31,
+      "end_line": 52,
+      "claim": "cmdAttest function handles attestation generation with optional parameters",
+      "section": "Key Components",
+      "component": "EigenInferenceEnclaveCLI"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+      "start_line": 54,
+      "end_line": 73,
+      "claim": "cmdInfo function displays Secure Enclave availability and ephemeral key info",
+      "section": "Key Components",
+      "component": "EigenInferenceEnclaveCLI"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+      "start_line": 32,
+      "end_line": 35,
+      "claim": "Secure Enclave availability is checked before operations",
+      "section": "Data Flows",
+      "component": "EigenInferenceEnclaveCLI"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+      "start_line": 37,
+      "end_line": 39,
+      "claim": "Creates ephemeral SecureEnclaveIdentity and AttestationService for each invocation",
+      "section": "Internal Dependencies",
+      "component": "EigenInferenceEnclaveCLI"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+      "start_line": 41,
+      "end_line": 44,
+      "claim": "Uses JSONEncoder with sortedKeys for deterministic output",
+      "section": "API Surface",
+      "component": "EigenInferenceEnclaveCLI"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+      "start_line": 77,
+      "end_line": 117,
+      "claim": "Main function provides argument parsing and command dispatch",
+      "section": "Key Components",
+      "component": "EigenInferenceEnclaveCLI"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+      "start_line": 87,
+      "end_line": 104,
+      "claim": "Manual argument parsing handles --encryption-key and --binary-hash options",
+      "section": "Key Components",
+      "component": "EigenInferenceEnclaveCLI"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/WebSocketBridge.swift",
+      "start_line": 1,
+      "end_line": 3,
+      "claim": "WebSocketBridge is a stub indicating removed TLS bridge functionality",
+      "section": "Key Components",
+      "component": "EigenInferenceEnclaveCLI"
+    },
+    {
+      "file_path": "enclave/Package.swift",
+      "start_line": 9,
+      "end_line": 9,
+      "claim": "CLI is built as executable target named eigeninference-enclave",
+      "section": "Overview",
+      "component": "EigenInferenceEnclaveCLI"
+    },
+    {
+      "file_path": "enclave/Package.swift",
+      "start_line": 13,
+      "end_line": 16,
+      "claim": "CLI target depends on EigenInferenceEnclave library",
+      "section": "Internal Dependencies",
+      "component": "EigenInferenceEnclaveCLI"
+    },
+    {
+      "file_path": "enclave/Package.swift",
+      "start_line": 6,
+      "end_line": 6,
+      "claim": "Requires macOS 13.0 or later for Secure Enclave support",
+      "section": "External Dependencies",
+      "component": "EigenInferenceEnclaveCLI"
+    },
+    {
+      "file_path": "analytics/cmd/analytics/main.go",
+      "start_line": 19,
+      "end_line": 28,
+      "claim": "The service entry point initializes structured logging and loads configuration with error handling",
+      "section": "Key Components",
+      "component": "analytics"
+    },
+    {
+      "file_path": "analytics/cmd/analytics/main.go",
+      "start_line": 84,
+      "end_line": 93,
+      "claim": "Backend selection pattern allows memory or PostgreSQL storage based on configuration",
+      "section": "Architecture",
+      "component": "analytics"
+    },
+    {
+      "file_path": "analytics/internal/config/config.go",
+      "start_line": 17,
+      "end_line": 24,
+      "claim": "Configuration structure includes address, backend type, database URL, CORS origin, and pseudonym secret",
+      "section": "Key Components",
+      "component": "analytics"
+    },
+    {
+      "file_path": "analytics/internal/config/config.go",
+      "start_line": 47,
+      "end_line": 65,
+      "claim": "Backend-specific validation ensures required parameters for PostgreSQL mode",
+      "section": "Key Components",
+      "component": "analytics"
+    },
+    {
+      "file_path": "analytics/internal/httpapi/server.go",
+      "start_line": 24,
+      "end_line": 41,
+      "claim": "Health check endpoint tests backend connectivity and returns status with timestamp",
+      "section": "API Surface",
+      "component": "analytics"
+    },
+    {
+      "file_path": "analytics/internal/httpapi/server.go",
+      "start_line": 57,
+      "end_line": 99,
+      "claim": "Earnings leaderboard endpoint supports scope, window, and limit query parameters with validation",
+      "section": "API Surface",
+      "component": "analytics"
+    },
+    {
+      "file_path": "analytics/internal/leaderboard/store.go",
+      "start_line": 19,
+      "end_line": 24,
+      "claim": "Leaderboard supports account and node scopes for different aggregation levels",
+      "section": "Key Components",
+      "component": "analytics"
+    },
+    {
+      "file_path": "analytics/internal/leaderboard/store.go",
+      "start_line": 27,
+      "end_line": 33,
+      "claim": "Time window filtering supports 24h, 7d, 30d, and all-time periods",
+      "section": "Key Components",
+      "component": "analytics"
+    },
+    {
+      "file_path": "analytics/internal/leaderboard/store.go",
+      "start_line": 144,
+      "end_line": 185,
+      "claim": "Service layer handles query normalization, validation, and pseudonym generation for leaderboard entries",
+      "section": "Data Flows",
+      "component": "analytics"
+    },
+    {
+      "file_path": "analytics/internal/leaderboard/store.go",
+      "start_line": 477,
+      "end_line": 496,
+      "claim": "PostgreSQL store implementation uses connection pooling and validates connectivity on initialization",
+      "section": "External Systems",
+      "component": "analytics"
+    },
+    {
+      "file_path": "analytics/internal/leaderboard/store.go",
+      "start_line": 517,
+      "end_line": 546,
+      "claim": "PostgreSQL overview query uses CTEs for efficient provider and earnings statistics aggregation",
+      "section": "External Systems",
+      "component": "analytics"
+    },
+    {
+      "file_path": "analytics/internal/pseudonym/alias.go",
+      "start_line": 21,
+      "end_line": 33,
+      "claim": "Pseudonym generator uses HMAC-SHA256 with kind prefixing to create deterministic human-readable aliases",
+      "section": "Key Components",
+      "component": "analytics"
+    },
+    {
+      "file_path": "analytics/internal/pseudonym/alias.go",
+      "start_line": 35,
+      "end_line": 107,
+      "claim": "Alias format uses predefined adjectives, animals, and numbers for human-readable pseudonyms",
+      "section": "Key Components",
+      "component": "analytics"
+    },
+    {
+      "file_path": "analytics/go.mod",
+      "start_line": 5,
+      "end_line": 5,
+      "claim": "Primary external dependency is pgx/v5 for PostgreSQL connectivity",
+      "section": "External Dependencies",
+      "component": "analytics"
+    },
+    {
+      "file_path": "analytics/README.md",
+      "start_line": 3,
+      "end_line": 12,
+      "claim": "Service is designed to sit beside coordinator as standalone read-only analytics service",
+      "section": "Overview",
+      "component": "analytics"
+    },
+    {
+      "file_path": "analytics/README.md",
+      "start_line": 71,
+      "end_line": 81,
+      "claim": "PostgreSQL mode requires read-only user with SELECT privileges on analytics tables",
+      "section": "External Systems",
+      "component": "analytics"
+    },
+    {
+      "file_path": "cmd/coordinator/main.go",
+      "start_line": 1,
+      "end_line": 24,
+      "claim": "The coordinator runs in a GCP Confidential VM with hardware-encrypted memory and acts as central routing layer",
+      "section": "Overview",
+      "component": "coordinator"
+    },
+    {
+      "file_path": "internal/api/server.go",
+      "start_line": 99,
+      "end_line": 207,
+      "claim": "Server struct implements hexagonal architecture with clear separation between external interfaces and business logic",
+      "section": "Architecture",
+      "component": "coordinator"
+    },
+    {
+      "file_path": "internal/registry/registry.go",
+      "start_line": 330,
+      "end_line": 362,
+      "claim": "Registry manages 1000+ concurrent providers with trust levels and intelligent routing",
+      "section": "Key Components",
+      "component": "coordinator"
+    },
+    {
+      "file_path": "internal/store/interface.go",
+      "start_line": 22,
+      "end_line": 354,
+      "claim": "Store interface abstracts persistence layer supporting PostgreSQL and in-memory backends",
+      "section": "Key Components",
+      "component": "coordinator"
+    },
+    {
+      "file_path": "internal/payments/payments.go",
+      "start_line": 1,
+      "end_line": 22,
+      "claim": "Payment system uses double-entry accounting with micro-USD precision for blockchain compatibility",
+      "section": "Key Components",
+      "component": "coordinator"
+    },
+    {
+      "file_path": "go.mod",
+      "start_line": 5,
+      "end_line": 14,
+      "claim": "Primary runtime dependencies include WebSocket, PostgreSQL, JWT, and cryptographic libraries",
+      "section": "External Dependencies",
+      "component": "coordinator"
+    },
+    {
+      "file_path": "internal/api/server.go",
+      "start_line": 766,
+      "end_line": 937,
+      "claim": "API routes include OpenAI-compatible inference endpoints and administrative interfaces",
+      "section": "API Surface",
+      "component": "coordinator"
+    },
+    {
+      "file_path": "internal/registry/registry.go",
+      "start_line": 1112,
+      "end_line": 1245,
+      "claim": "Scoring algorithm considers provider load, hardware specs, trust level, and model cache state",
+      "section": "Key Components",
+      "component": "coordinator"
+    },
+    {
+      "file_path": "internal/api/consumer.go",
+      "start_line": 38,
+      "end_line": 64,
+      "claim": "Request timeouts and retry logic handle provider failures and capacity constraints",
+      "section": "Data Flows",
+      "component": "coordinator"
+    },
+    {
+      "file_path": "cmd/coordinator/main.go",
+      "start_line": 78,
+      "end_line": 131,
+      "claim": "Supports both PostgreSQL for production and in-memory store for development with explicit safety checks",
+      "section": "External Systems",
+      "component": "coordinator"
+    },
+    {
+      "file_path": "internal/registry/registry.go",
+      "start_line": 727,
+      "end_line": 840,
+      "claim": "Provider registration includes model catalog filtering and hardware attestation validation",
+      "section": "Data Flows",
+      "component": "coordinator"
+    },
+    {
+      "file_path": "internal/api/server.go",
+      "start_line": 1040,
+      "end_line": 1094,
+      "claim": "Authentication supports both Privy JWTs and API keys with different access levels",
+      "section": "API Surface",
+      "component": "coordinator"
+    },
+    {
+      "file_path": "internal/ratelimit/ratelimit.go",
+      "start_line": 1,
+      "end_line": 50,
+      "claim": "Rate limiting uses per-account token buckets with separate tiers for inference vs financial operations",
+      "section": "Key Components",
+      "component": "coordinator"
+    },
+    {
+      "file_path": "cmd/coordinator/main.go",
+      "start_line": 184,
+      "end_line": 207,
+      "claim": "Datadog integration provides APM tracing, metrics, and log forwarding",
+      "section": "External Systems",
+      "component": "coordinator"
+    },
+    {
+      "file_path": "cmd/coordinator/main.go",
+      "start_line": 410,
+      "end_line": 451,
+      "claim": "MDM integration enables independent provider security verification via MicroMDM",
+      "section": "External Systems",
+      "component": "coordinator"
+    },
+    {
+      "file_path": "cmd/coordinator/main.go",
+      "start_line": 314,
+      "end_line": 367,
+      "claim": "End-to-end encryption uses X25519 keys derived from BIP39 mnemonic for coordinator identity",
+      "section": "Key Components",
+      "component": "coordinator"
+    },
+    {
+      "file_path": "internal/registry/registry.go",
+      "start_line": 1604,
+      "end_line": 1634,
+      "claim": "Background eviction loop removes stale providers every 30 seconds based on heartbeat timeout",
+      "section": "Key Components",
+      "component": "coordinator"
+    },
+    {
+      "file_path": "cmd/coordinator/main.go",
+      "start_line": 557,
+      "end_line": 605,
+      "claim": "Model catalog seeding includes hardcoded models with size and architecture metadata",
+      "section": "Key Components",
+      "component": "coordinator"
+    },
+    {
+      "file_path": "Dockerfile",
+      "start_line": 24,
+      "end_line": 31,
+      "claim": "Deployment includes MicroMDM and step-ca integration with environment configuration",
+      "section": "External Systems",
+      "component": "coordinator"
+    },
+    {
+      "file_path": "internal/api/server.go",
+      "start_line": 989,
+      "end_line": 997,
+      "claim": "Middleware stack includes CORS, panic recovery, and structured request logging",
+      "section": "Architecture",
+      "component": "coordinator"
+    },
+    {
+      "file_path": "src/main.rs",
+      "start_line": 1,
+      "end_line": 25,
+      "claim": "Darkbloom is the provider agent for Apple Silicon Macs with comprehensive architecture covering hardware detection, model management, backend lifecycle, coordinator connection, private text engine, attestation, and E2E crypto",
+      "section": "Architecture",
+      "component": "darkbloom"
+    },
+    {
+      "file_path": "src/main.rs",
+      "start_line": 85,
+      "end_line": 97,
+      "claim": "CatalogModel struct defines the model metadata structure with fields for ID, display name, size, architecture, description, and memory requirements",
+      "section": "Key Components",
+      "component": "darkbloom"
+    },
+    {
+      "file_path": "provider/Cargo.toml",
+      "start_line": 1,
+      "end_line": 10,
+      "claim": "The component is named 'darkbloom' version 0.4.7 with description 'EigenInference provider agent for Apple Silicon Macs' and builds a binary at src/main.rs",
+      "section": "Analysis Data",
+      "component": "darkbloom"
+    },
+    {
+      "file_path": "src/coordinator.rs",
+      "start_line": 1,
+      "end_line": 15,
+      "claim": "WebSocket client manages provider connection with automatic reconnection, registration, heartbeats, inference requests, attestation challenges, and result forwarding",
+      "section": "Key Components",
+      "component": "darkbloom"
+    },
+    {
+      "file_path": "src/security.rs",
+      "start_line": 1,
+      "end_line": 16,
+      "claim": "Security module implements runtime protections including PT_DENY_ATTACH, SIP verification, and memory wiping to prevent inspection of inference data",
+      "section": "Key Components",
+      "component": "darkbloom"
+    },
+    {
+      "file_path": "src/backend/mod.rs",
+      "start_line": 1,
+      "end_line": 16,
+      "claim": "Backend management supports vllm-mlx and mlx-lm with health monitoring, automatic restart, and BackendManager wrapper for lifecycle management",
+      "section": "Key Components",
+      "component": "darkbloom"
+    },
+    {
+      "file_path": "src/hardware.rs",
+      "start_line": 1,
+      "end_line": 15,
+      "claim": "Hardware detection queries macOS system APIs for memory size, CPU cores, machine model, and GPU capabilities using sysctl and system_profiler",
+      "section": "Key Components",
+      "component": "darkbloom"
+    },
+    {
+      "file_path": "src/crypto.rs",
+      "start_line": 1,
+      "end_line": 16,
+      "claim": "NodeKeyPair implements ephemeral X25519 key pairs for E2E encryption, generated fresh on each launch and protected by PT_DENY_ATTACH + Hardened Runtime + SIP",
+      "section": "Key Components",
+      "component": "darkbloom"
+    },
+    {
+      "file_path": "src/models.rs",
+      "start_line": 1,
+      "end_line": 18,
+      "claim": "Model scanning examines HuggingFace cache for MLX models, filtering by available memory with detection heuristics for directory names containing 'mlx' and quantization hints",
+      "section": "Key Components",
+      "component": "darkbloom"
+    },
+    {
+      "file_path": "src/hypervisor.rs",
+      "start_line": 1,
+      "end_line": 34,
+      "claim": "Hypervisor integration uses Apple's framework to create lightweight VM with Stage 2 page tables for memory isolation, requiring 16MB alignment and pre-allocated pools",
+      "section": "Key Components",
+      "component": "darkbloom"
+    },
+    {
+      "file_path": "src/proxy.rs",
+      "start_line": 1,
+      "end_line": 11,
+      "claim": "Request proxy handles legacy/local flows between coordinator WebSocket and local backends, with E2E decryption happening before proxy handling",
+      "section": "Key Components",
+      "component": "darkbloom"
+    },
+    {
+      "file_path": "src/service.rs",
+      "start_line": 1,
+      "end_line": 7,
+      "claim": "Service management provides launchd user agent integration with explicit user control - only runs when started via 'darkbloom start' or app toggle, no auto-start on login",
+      "section": "Key Components",
+      "component": "darkbloom"
+    },
+    {
+      "file_path": "src/telemetry/mod.rs",
+      "start_line": 1,
+      "end_line": 13,
+      "claim": "Telemetry architecture uses multiple sources (tracing layer, panic hook, backend scraper, direct emit) feeding into mpsc queue, async batcher, and HTTPS POST to coordinator with disk overflow",
+      "section": "Key Components",
+      "component": "darkbloom"
+    },
+    {
+      "file_path": "provider/Cargo.toml",
+      "start_line": 11,
+      "end_line": 77,
+      "claim": "Dependencies include tokio for async runtime, reqwest for HTTP, tokio-tungstenite for WebSocket, axum for HTTP server, serde for serialization, crypto_box for NaCl encryption, and security-framework for macOS integration",
+      "section": "External Dependencies",
+      "component": "darkbloom"
+    },
+    {
+      "file_path": "src/main.rs",
+      "start_line": 1442,
+      "end_line": 1620,
+      "claim": "CLI interface provides comprehensive subcommands including init, serve, install, models, earnings, doctor, start/stop, logs, update, login/logout, and autoupdate configuration",
+      "section": "API Surface",
+      "component": "darkbloom"
+    },
+    {
+      "file_path": "src/main.rs",
+      "start_line": 54,
+      "end_line": 83,
+      "claim": "Build-time coordinator URLs default to production (api.darkbloom.dev) with R2 CDN URLs for model and site-packages distribution, configurable via environment variables",
+      "section": "External Systems",
+      "component": "darkbloom"
+    },
+    {
+      "file_path": "provider/build.rs",
+      "start_line": 59,
+      "end_line": 110,
+      "claim": "Build system integrates Swift Secure Enclave library, linking EigenInferenceEnclave static library with Foundation, Security, and CryptoKit frameworks plus Swift runtime paths",
+      "section": "External Systems",
+      "component": "darkbloom"
+    },
+    {
+      "file_path": "src/protocol.rs",
+      "start_line": 1,
+      "end_line": 19,
+      "claim": "Wire protocol defines JSON-encoded WebSocket messages with provider-to-coordinator messages (Register, Heartbeat, InferenceResponse, AttestationResponse) and coordinator-to-provider messages (InferenceRequest, Cancel, AttestationChallenge)",
+      "section": "API Surface",
+      "component": "darkbloom"
+    },
+    {
+      "file_path": "src/main.rs",
+      "start_line": 2118,
+      "end_line": 2200,
+      "claim": "Service startup includes single-instance enforcement via PID file, process cleanup, hypervisor VM creation, security posture verification, and core dump disable before processing any inference data",
+      "section": "Data Flows",
+      "component": "darkbloom"
+    },
+    {
+      "file_path": "src/main.rs",
+      "start_line": 2860,
+      "end_line": 2880,
+      "claim": "Coordinator connection is deliberately delayed until all backends are loaded to prevent routing requests before the provider can serve them, ensuring service readiness",
+      "section": "Data Flows",
+      "component": "darkbloom"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+      "start_line": 1,
+      "end_line": 9,
+      "claim": "Component serves as a cross-language compatibility testing tool for NaCl Box decryption",
+      "section": "Overview",
+      "component": "decrypt-test"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+      "start_line": 15,
+      "end_line": 23,
+      "claim": "Main entry point validates exactly 3 CLI arguments with usage message",
+      "section": "Key Components",
+      "component": "decrypt-test"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+      "start_line": 38,
+      "end_line": 58,
+      "claim": "Input validation ensures 32-byte keys and minimum 24-byte ciphertext per NaCl specifications",
+      "section": "Key Components",
+      "component": "decrypt-test"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+      "start_line": 60,
+      "end_line": 65,
+      "claim": "Key material is converted from byte arrays to crypto_box types for NaCl operations",
+      "section": "Key Components",
+      "component": "decrypt-test"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+      "start_line": 67,
+      "end_line": 76,
+      "claim": "Decryption extracts nonce from ciphertext prefix and performs AEAD decryption",
+      "section": "Key Components",
+      "component": "decrypt-test"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+      "start_line": 77,
+      "end_line": 81,
+      "claim": "Output handler validates UTF-8 and writes plaintext to stdout",
+      "section": "Key Components",
+      "component": "decrypt-test"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/Cargo.toml",
+      "start_line": 6,
+      "end_line": 8,
+      "claim": "Component depends on crypto_box 0.9 for NaCl operations and base64 0.22 for encoding",
+      "section": "External Dependencies",
+      "component": "decrypt-test"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+      "start_line": 10,
+      "end_line": 13,
+      "claim": "Uses base64 STANDARD engine and crypto_box AEAD traits for cryptographic operations",
+      "section": "External Dependencies",
+      "component": "decrypt-test"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/cross_compat_test.go",
+      "start_line": 15,
+      "end_line": 22,
+      "claim": "Go tests verify cross-language encryption compatibility by building and invoking this Rust binary",
+      "section": "Component Interactions",
+      "component": "decrypt-test"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/cross_compat_test.go",
+      "start_line": 44,
+      "end_line": 47,
+      "claim": "Test suite builds release binary and executes it with encrypted payloads",
+      "section": "Component Interactions",
+      "component": "decrypt-test"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/cross_compat_test.go",
+      "start_line": 88,
+      "end_line": 128,
+      "claim": "Cross-language test encrypts with Go e2e package and decrypts with this Rust utility",
+      "section": "Component Interactions",
+      "component": "decrypt-test"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/cross_compat_test.go",
+      "start_line": 56,
+      "end_line": 83,
+      "claim": "Test scenarios include JSON, empty, Unicode, large, and multiple round-trip payloads",
+      "section": "Cross-Language Compatibility Testing",
+      "component": "decrypt-test"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/e2e.go",
+      "start_line": 64,
+      "end_line": 78,
+      "claim": "Go encryption uses NaCl Box with nonce prefix format compatible with this Rust decryptor",
+      "section": "Cross-Language Compatibility Testing",
+      "component": "decrypt-test"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+      "start_line": 25,
+      "end_line": 36,
+      "claim": "All inputs are base64 decoded with error handling and process exit on failure",
+      "section": "Data Flows",
+      "component": "decrypt-test"
+    },
+    {
+      "file_path": "coordinator/cmd/verify-attestation/main.go",
+      "start_line": 1,
+      "end_line": 8,
+      "claim": "Simple package structure importing only fmt, os, and internal attestation library",
+      "section": "Architecture",
+      "component": "verify-attestation"
+    },
+    {
+      "file_path": "coordinator/cmd/verify-attestation/main.go",
+      "start_line": 10,
+      "end_line": 16,
+      "claim": "File reading from fixed path /tmp/eigeninference_attestation.json with error handling",
+      "section": "Key Components",
+      "component": "verify-attestation"
+    },
+    {
+      "file_path": "coordinator/cmd/verify-attestation/main.go",
+      "start_line": 17,
+      "end_line": 22,
+      "claim": "JSON parsing and verification delegation to attestation.VerifyJSON",
+      "section": "Key Components",
+      "component": "verify-attestation"
+    },
+    {
+      "file_path": "coordinator/cmd/verify-attestation/main.go",
+      "start_line": 23,
+      "end_line": 26,
+      "claim": "Hardware identity extraction and display from verification result",
+      "section": "Key Components",
+      "component": "verify-attestation"
+    },
+    {
+      "file_path": "coordinator/cmd/verify-attestation/main.go",
+      "start_line": 27,
+      "end_line": 34,
+      "claim": "Verification status display and exit code management",
+      "section": "Key Components",
+      "component": "verify-attestation"
+    },
+    {
+      "file_path": "coordinator/cmd/verify-attestation/main.go",
+      "start_line": 28,
+      "end_line": 29,
+      "claim": "Cross-language verification success message indicating Swift to Go validation",
+      "section": "API Surface",
+      "component": "verify-attestation"
+    },
+    {
+      "file_path": "coordinator/cmd/verify-attestation/main.go",
+      "start_line": 11,
+      "end_line": 11,
+      "claim": "Fixed file path for attestation input at /tmp/eigeninference_attestation.json",
+      "section": "External Systems",
+      "component": "verify-attestation"
+    },
+    {
+      "file_path": "coordinator/cmd/verify-attestation/main.go",
+      "start_line": 14,
+      "end_line": 14,
+      "claim": "Exit code 1 for file read errors",
+      "section": "External Systems",
+      "component": "verify-attestation"
+    },
+    {
+      "file_path": "coordinator/cmd/verify-attestation/main.go",
+      "start_line": 20,
+      "end_line": 20,
+      "claim": "Exit code 1 for verification failures",
+      "section": "External Systems",
+      "component": "verify-attestation"
+    },
+    {
+      "file_path": "coordinator/cmd/verify-attestation/main.go",
+      "start_line": 32,
+      "end_line": 32,
+      "claim": "Exit code 1 for invalid attestations",
+      "section": "External Systems",
+      "component": "verify-attestation"
+    },
+    {
+      "file_path": "coordinator/internal/attestation/attestation.go",
+      "start_line": 1,
+      "end_line": 25,
+      "claim": "Attestation package provides cross-language verification for Secure Enclave signed blobs",
+      "section": "Internal Dependencies",
+      "component": "verify-attestation"
+    },
+    {
+      "file_path": "coordinator/internal/attestation/attestation.go",
+      "start_line": 233,
+      "end_line": 240,
+      "claim": "VerifyJSON function used by verify-attestation for attestation verification",
+      "section": "Internal Dependencies",
+      "component": "verify-attestation"
+    },
+    {
+      "file_path": "coordinator/internal/attestation/attestation.go",
+      "start_line": 127,
+      "end_line": 131,
+      "claim": "Verification checks P-256 ECDSA signatures and security requirements",
+      "section": "Internal Dependencies",
+      "component": "verify-attestation"
+    },
+    {
+      "file_path": "coordinator/go.mod",
+      "start_line": 1,
+      "end_line": 4,
+      "claim": "Go module definition with Go 1.25.0 requirement",
+      "section": "External Dependencies",
+      "component": "verify-attestation"
+    },
+    {
+      "file_path": "package.json",
+      "start_line": 16,
+      "end_line": 30,
+      "claim": "External dependencies analysis including Next.js, React, Privy, and cryptographic libraries",
+      "section": "External Dependencies",
+      "component": "web"
+    },
+    {
+      "file_path": "src/app/layout.tsx",
+      "start_line": 23,
+      "end_line": 43,
+      "claim": "Layered architecture with provider wrapping and component structure",
+      "section": "Architecture",
+      "component": "web"
+    },
+    {
+      "file_path": "src/app/page.tsx",
+      "start_line": 41,
+      "end_line": 61,
+      "claim": "Main chat interface component with state management integration",
+      "section": "Key Components",
+      "component": "web"
+    },
+    {
+      "file_path": "src/lib/api.ts",
+      "start_line": 299,
+      "end_line": 335,
+      "claim": "Streaming chat function with optional encryption support",
+      "section": "Key Components",
+      "component": "web"
+    },
+    {
+      "file_path": "src/hooks/useAuth.ts",
+      "start_line": 21,
+      "end_line": 58,
+      "claim": "Privy-based authentication with automatic API key provisioning",
+      "section": "Key Components",
+      "component": "web"
+    },
+    {
+      "file_path": "src/lib/store.ts",
+      "start_line": 52,
+      "end_line": 74,
+      "claim": "Zustand state management with persistence for chat history",
+      "section": "Key Components",
+      "component": "web"
+    },
+    {
+      "file_path": "src/lib/encryption.ts",
+      "start_line": 169,
+      "end_line": 197,
+      "claim": "NaCl Box encryption implementation for coordinator communication",
+      "section": "Key Components",
+      "component": "web"
+    },
+    {
+      "file_path": "src/lib/cert-verify.ts",
+      "start_line": 1,
+      "end_line": 28,
+      "claim": "Client-side X.509 certificate verification against Apple Enterprise Attestation Root CA",
+      "section": "Key Components",
+      "component": "web"
+    },
+    {
+      "file_path": "src/components/AppShell.tsx",
+      "start_line": 8,
+      "end_line": 37,
+      "claim": "App shell layout wrapper with conditional rendering based on authentication",
+      "section": "Key Components",
+      "component": "web"
+    },
+    {
+      "file_path": "src/app/api/chat/route.ts",
+      "start_line": 11,
+      "end_line": 36,
+      "claim": "Next.js API route for chat proxy with streaming and encryption support",
+      "section": "API Surface",
+      "component": "web"
+    },
+    {
+      "file_path": "src/app/api/chat/route.ts",
+      "start_line": 51,
+      "end_line": 68,
+      "claim": "Trust metadata header passthrough for hardware attestation verification",
+      "section": "API Surface",
+      "component": "web"
+    },
+    {
+      "file_path": "src/lib/api.ts",
+      "start_line": 530,
+      "end_line": 563,
+      "claim": "Sealed response handling for encrypted streaming events",
+      "section": "Data Flows",
+      "component": "web"
+    },
+    {
+      "file_path": "src/app/page.tsx",
+      "start_line": 84,
+      "end_line": 152,
+      "claim": "Chat message handling with system prompt and trust tracking",
+      "section": "Data Flows",
+      "component": "web"
+    },
+    {
+      "file_path": "src/hooks/useAuth.ts",
+      "start_line": 35,
+      "end_line": 58,
+      "claim": "API key provisioning flow using Privy access tokens",
+      "section": "Data Flows",
+      "component": "web"
+    },
+    {
+      "file_path": "src/components/providers/PrivyClientProvider.tsx",
+      "start_line": 78,
+      "end_line": 91,
+      "claim": "Privy authentication provider configuration with email login",
+      "section": "External Dependencies",
+      "component": "web"
+    },
+    {
+      "file_path": "src/lib/encryption.ts",
+      "start_line": 15,
+      "end_line": 20,
+      "claim": "TweetNaCl library usage for X25519 and Box encryption",
+      "section": "External Dependencies",
+      "component": "web"
+    },
+    {
+      "file_path": "src/components/DatadogRUM.tsx",
+      "start_line": 1,
+      "end_line": 10,
+      "claim": "Datadog Real User Monitoring integration for performance tracking",
+      "section": "External Systems",
+      "component": "web"
+    },
+    {
+      "file_path": "src/lib/google-analytics.ts",
+      "start_line": 1,
+      "end_line": 30,
+      "claim": "Google Analytics 4 integration with privacy controls and consent management",
+      "section": "External Systems",
+      "component": "web"
+    },
+    {
+      "file_path": "README.md",
+      "start_line": 17,
+      "end_line": 23,
+      "claim": "Environment variables configuration for coordinator URL and Privy app ID",
+      "section": "Component Interactions",
+      "component": "web"
+    },
+    {
+      "file_path": "src/app/providers/ProviderDashboardContent.tsx",
+      "start_line": 71,
+      "end_line": 100,
+      "claim": "Provider dashboard for hardware attestation monitoring and earnings tracking",
+      "section": "Key Components",
+      "component": "web"
+    },
+    {
+      "file_path": "next.config.ts",
+      "start_line": 3,
+      "end_line": 10,
+      "claim": "Next.js configuration with TypeScript build optimization",
+      "section": "Architecture",
+      "component": "web"
+    }
+  ]
+}
