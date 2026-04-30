@@ -27,3 +27,4 @@ venv/
 
 # mypy
 .mypy_cache/
+dist/
