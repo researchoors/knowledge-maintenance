@@ -5,31 +5,33 @@
       "kind": "library",
       "type": "go-module",
       "root_path": "analytics",
-      "description": "",
+      "description": "Analytics library providing read-only data access and pseudonymization",
       "internal_dependencies": [],
       "external_dependencies": [],
       "key_files": [],
-      "manifest_path": "analytics/go.mod"
+      "manifest_path": "analytics/go.mod",
+      "external_applications": ["postgresql", "datadog"]
     },
     {
       "name": "analytics",
       "kind": "service",
       "type": "go-module",
       "root_path": "analytics/cmd/analytics",
-      "description": "",
+      "description": "Standalone read-only analytics service for network statistics and earnings leaderboards",
       "internal_dependencies": [
         "analytics"
       ],
       "external_dependencies": [],
       "key_files": [],
-      "manifest_path": "analytics/go.mod"
+      "manifest_path": "analytics/go.mod",
+      "external_applications": ["postgresql"]
     },
     {
       "name": "coordinator",
       "kind": "library",
       "type": "go-module",
       "root_path": "coordinator",
-      "description": "",
+      "description": "Core coordination library with provider registry, attestation, and payment systems",
       "internal_dependencies": [],
       "external_dependencies": [
         {
@@ -66,40 +68,43 @@
         }
       ],
       "key_files": [],
-      "manifest_path": "coordinator/go.mod"
+      "manifest_path": "coordinator/go.mod",
+      "external_applications": ["postgresql", "stripe", "datadog", "privy", "apple-secure-enclave"]
     },
     {
       "name": "coordinator",
       "kind": "service",
       "type": "go-module",
       "root_path": "coordinator/cmd/coordinator",
-      "description": "",
+      "description": "Central control plane for routing AI inference requests to provider nodes with hardware attestation",
       "internal_dependencies": [
         "coordinator"
       ],
       "external_dependencies": [],
       "key_files": [],
-      "manifest_path": "coordinator/go.mod"
+      "manifest_path": "coordinator/go.mod",
+      "external_applications": ["postgresql", "stripe", "datadog", "privy", "apple-secure-enclave", "cloudflare-r2"]
     },
     {
       "name": "verify-attestation",
       "kind": "service",
       "type": "go-module",
       "root_path": "coordinator/cmd/verify-attestation",
-      "description": "",
+      "description": "Utility service for verifying Apple Secure Enclave attestations",
       "internal_dependencies": [
         "coordinator"
       ],
       "external_dependencies": [],
       "key_files": [],
-      "manifest_path": "coordinator/go.mod"
+      "manifest_path": "coordinator/go.mod",
+      "external_applications": ["apple-secure-enclave"]
     },
     {
       "name": "web",
       "kind": "frontend",
       "type": "typescript-package",
       "root_path": "console-ui",
-      "description": "",
+      "description": "Next.js web frontend providing chat interface and provider dashboard with E2E encryption",
       "internal_dependencies": [],
       "external_dependencies": [
         {
@@ -160,14 +165,15 @@
         }
       ],
       "key_files": [],
-      "manifest_path": "console-ui/package.json"
+      "manifest_path": "console-ui/package.json",
+      "external_applications": ["stripe", "datadog", "privy", "apple-ca"]
     },
     {
       "name": "decrypt-test",
       "kind": "service",
       "type": "rust-crate",
       "root_path": "coordinator/internal/e2e/testdata/decrypt",
-      "description": "",
+      "description": "Test utility for E2E encryption validation",
       "internal_dependencies": [],
       "external_dependencies": [
         {
@@ -180,14 +186,15 @@
         }
       ],
       "key_files": [],
-      "manifest_path": "coordinator/internal/e2e/testdata/decrypt/Cargo.toml"
+      "manifest_path": "coordinator/internal/e2e/testdata/decrypt/Cargo.toml",
+      "external_applications": []
     },
     {
       "name": "darkbloom",
       "kind": "service",
       "type": "rust-crate",
       "root_path": "provider",
-      "description": "EigenInference provider agent for Apple Silicon Macs",
+      "description": "EigenInference provider agent for Apple Silicon Macs with hardware-attested security",
       "internal_dependencies": [],
       "external_dependencies": [
         {
@@ -304,56 +311,61 @@
         }
       ],
       "key_files": [],
-      "manifest_path": "provider/Cargo.toml"
+      "manifest_path": "provider/Cargo.toml",
+      "external_applications": ["coordinator-api", "cloudflare-r2", "apple-secure-enclave", "apple-hypervisor", "huggingface-hub", "macos-launchd"]
     },
     {
       "name": "EigenInference",
       "kind": "frontend",
       "type": "swift-package",
       "root_path": "app/EigenInference/Sources/EigenInference",
-      "description": "",
+      "description": "macOS menu bar application for managing darkbloom provider with native SwiftUI interface",
       "internal_dependencies": [],
       "external_dependencies": [],
       "key_files": [],
-      "manifest_path": "app/EigenInference/Package.swift"
+      "manifest_path": "app/EigenInference/Package.swift",
+      "external_applications": ["darkbloom-coordinator", "huggingface-hub", "mlx-backend", "macos-launch-services"]
     },
     {
       "name": "EigenInferenceEnclave",
       "kind": "library",
       "type": "swift-package",
       "root_path": "enclave/Sources/EigenInferenceEnclave",
-      "description": "",
+      "description": "Swift package providing Secure Enclave attestation and signing capabilities",
       "internal_dependencies": [],
       "external_dependencies": [],
       "key_files": [],
-      "manifest_path": "enclave/Package.swift"
+      "manifest_path": "enclave/Package.swift",
+      "external_applications": ["apple-secure-enclave", "macos-system-tools"]
     },
     {
       "name": "EigenInferenceEnclaveCLI",
       "kind": "cli",
       "type": "swift-package",
       "root_path": "enclave/Sources/EigenInferenceEnclaveCLI",
-      "description": "",
+      "description": "CLI tool for Secure Enclave operations and diagnostics",
       "internal_dependencies": [
         "EigenInferenceEnclave"
       ],
       "external_dependencies": [],
       "key_files": [],
-      "manifest_path": "enclave/Package.swift"
+      "manifest_path": "enclave/Package.swift",
+      "external_applications": ["apple-secure-enclave", "macos-system-tools"]
     },
     {
       "name": "EigenInferenceEnclave",
       "kind": "library",
       "type": "swift-package",
       "root_path": "enclave",
-      "description": "Swift package root",
+      "description": "Swift package root providing Secure Enclave attestation and signing capabilities",
       "internal_dependencies": [
         "EigenInferenceEnclave",
         "EigenInferenceEnclaveCLI"
       ],
       "external_dependencies": [],
       "key_files": [],
-      "manifest_path": "enclave/Package.swift"
+      "manifest_path": "enclave/Package.swift",
+      "external_applications": ["apple-secure-enclave", "macos-system-tools"]
     }
   ],
   "metadata": {

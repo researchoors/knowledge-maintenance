@@ -1,0 +1,14 @@
+{
+  "source_repo": "Layr-Labs/d-inference",
+  "source_commit": "f7dab6fa994a",
+  "analysis_timestamp": "2026-04-30T09:24:03Z",
+  "mode": "genesis",
+  "components": 9,
+  "citations": 158,
+  "artifacts": {
+    "service_analyses": 9,
+    "architecture_docs": 1,
+    "dependency_graphs": 3,
+    "service_discovery": 1
+  }
+}

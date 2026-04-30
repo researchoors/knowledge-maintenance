@@ -1,7 +1,7 @@
 {
   "schema_version": "2.0.0",
-  "source_repo": "/tmp/flashlight-repos/d-inference",
-  "source_commit": "f7dab6fa994abda2cbcb132f9ea28c727909af8f",
+  "source_repo": "/private/tmp/flashlight-repos/d-inference",
+  "source_commit": "f7dab6fa994a",
   "nodes": {
     "components": {
       "analytics": {

@@ -1,0 +1,156 @@
+{
+  "component": "web",
+  "source_file": "/tmp/d-inference/service_analyses/web.md",
+  "source_repo": "",
+  "source_commit": "",
+  "citation_count": 21,
+  "citations": [
+    {
+      "file_path": "package.json",
+      "start_line": 16,
+      "end_line": 30,
+      "claim": "External dependencies analysis including Next.js, React, Privy, and cryptographic libraries",
+      "section": "External Dependencies"
+    },
+    {
+      "file_path": "src/app/layout.tsx",
+      "start_line": 23,
+      "end_line": 43,
+      "claim": "Layered architecture with provider wrapping and component structure",
+      "section": "Architecture"
+    },
+    {
+      "file_path": "src/app/page.tsx",
+      "start_line": 41,
+      "end_line": 61,
+      "claim": "Main chat interface component with state management integration",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "src/lib/api.ts",
+      "start_line": 299,
+      "end_line": 335,
+      "claim": "Streaming chat function with optional encryption support",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "src/hooks/useAuth.ts",
+      "start_line": 21,
+      "end_line": 58,
+      "claim": "Privy-based authentication with automatic API key provisioning",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "src/lib/store.ts",
+      "start_line": 52,
+      "end_line": 74,
+      "claim": "Zustand state management with persistence for chat history",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "src/lib/encryption.ts",
+      "start_line": 169,
+      "end_line": 197,
+      "claim": "NaCl Box encryption implementation for coordinator communication",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "src/lib/cert-verify.ts",
+      "start_line": 1,
+      "end_line": 28,
+      "claim": "Client-side X.509 certificate verification against Apple Enterprise Attestation Root CA",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "src/components/AppShell.tsx",
+      "start_line": 8,
+      "end_line": 37,
+      "claim": "App shell layout wrapper with conditional rendering based on authentication",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "src/app/api/chat/route.ts",
+      "start_line": 11,
+      "end_line": 36,
+      "claim": "Next.js API route for chat proxy with streaming and encryption support",
+      "section": "API Surface"
+    },
+    {
+      "file_path": "src/app/api/chat/route.ts",
+      "start_line": 51,
+      "end_line": 68,
+      "claim": "Trust metadata header passthrough for hardware attestation verification",
+      "section": "API Surface"
+    },
+    {
+      "file_path": "src/lib/api.ts",
+      "start_line": 530,
+      "end_line": 563,
+      "claim": "Sealed response handling for encrypted streaming events",
+      "section": "Data Flows"
+    },
+    {
+      "file_path": "src/app/page.tsx",
+      "start_line": 84,
+      "end_line": 152,
+      "claim": "Chat message handling with system prompt and trust tracking",
+      "section": "Data Flows"
+    },
+    {
+      "file_path": "src/hooks/useAuth.ts",
+      "start_line": 35,
+      "end_line": 58,
+      "claim": "API key provisioning flow using Privy access tokens",
+      "section": "Data Flows"
+    },
+    {
+      "file_path": "src/components/providers/PrivyClientProvider.tsx",
+      "start_line": 78,
+      "end_line": 91,
+      "claim": "Privy authentication provider configuration with email login",
+      "section": "External Dependencies"
+    },
+    {
+      "file_path": "src/lib/encryption.ts",
+      "start_line": 15,
+      "end_line": 20,
+      "claim": "TweetNaCl library usage for X25519 and Box encryption",
+      "section": "External Dependencies"
+    },
+    {
+      "file_path": "src/components/DatadogRUM.tsx",
+      "start_line": 1,
+      "end_line": 10,
+      "claim": "Datadog Real User Monitoring integration for performance tracking",
+      "section": "External Systems"
+    },
+    {
+      "file_path": "src/lib/google-analytics.ts",
+      "start_line": 1,
+      "end_line": 30,
+      "claim": "Google Analytics 4 integration with privacy controls and consent management",
+      "section": "External Systems"
+    },
+    {
+      "file_path": "README.md",
+      "start_line": 17,
+      "end_line": 23,
+      "claim": "Environment variables configuration for coordinator URL and Privy app ID",
+      "section": "Component Interactions"
+    },
+    {
+      "file_path": "src/app/providers/ProviderDashboardContent.tsx",
+      "start_line": 71,
+      "end_line": 100,
+      "claim": "Provider dashboard for hardware attestation monitoring and earnings tracking",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "next.config.ts",
+      "start_line": 3,
+      "end_line": 10,
+      "claim": "Next.js configuration with TypeScript build optimization",
+      "section": "Architecture"
+    }
+  ]
+}

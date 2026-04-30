@@ -1,0 +1,107 @@
+{
+  "component": "decrypt-test",
+  "source_file": "/tmp/d-inference/service_analyses/decrypt-test.md",
+  "source_repo": "",
+  "source_commit": "",
+  "citation_count": 14,
+  "citations": [
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+      "start_line": 1,
+      "end_line": 9,
+      "claim": "Component serves as a cross-language compatibility testing tool for NaCl Box decryption",
+      "section": "Overview"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+      "start_line": 15,
+      "end_line": 23,
+      "claim": "Main entry point validates exactly 3 CLI arguments with usage message",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+      "start_line": 38,
+      "end_line": 58,
+      "claim": "Input validation ensures 32-byte keys and minimum 24-byte ciphertext per NaCl specifications",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+      "start_line": 60,
+      "end_line": 65,
+      "claim": "Key material is converted from byte arrays to crypto_box types for NaCl operations",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+      "start_line": 67,
+      "end_line": 76,
+      "claim": "Decryption extracts nonce from ciphertext prefix and performs AEAD decryption",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+      "start_line": 77,
+      "end_line": 81,
+      "claim": "Output handler validates UTF-8 and writes plaintext to stdout",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/Cargo.toml",
+      "start_line": 6,
+      "end_line": 8,
+      "claim": "Component depends on crypto_box 0.9 for NaCl operations and base64 0.22 for encoding",
+      "section": "External Dependencies"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+      "start_line": 10,
+      "end_line": 13,
+      "claim": "Uses base64 STANDARD engine and crypto_box AEAD traits for cryptographic operations",
+      "section": "External Dependencies"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/cross_compat_test.go",
+      "start_line": 15,
+      "end_line": 22,
+      "claim": "Go tests verify cross-language encryption compatibility by building and invoking this Rust binary",
+      "section": "Component Interactions"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/cross_compat_test.go",
+      "start_line": 44,
+      "end_line": 47,
+      "claim": "Test suite builds release binary and executes it with encrypted payloads",
+      "section": "Component Interactions"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/cross_compat_test.go",
+      "start_line": 88,
+      "end_line": 128,
+      "claim": "Cross-language test encrypts with Go e2e package and decrypts with this Rust utility",
+      "section": "Component Interactions"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/cross_compat_test.go",
+      "start_line": 56,
+      "end_line": 83,
+      "claim": "Test scenarios include JSON, empty, Unicode, large, and multiple round-trip payloads",
+      "section": "Cross-Language Compatibility Testing"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/e2e.go",
+      "start_line": 64,
+      "end_line": 78,
+      "claim": "Go encryption uses NaCl Box with nonce prefix format compatible with this Rust decryptor",
+      "section": "Cross-Language Compatibility Testing"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+      "start_line": 25,
+      "end_line": 36,
+      "claim": "All inputs are base64 decoded with error handling and process exit on failure",
+      "section": "Data Flows"
+    }
+  ]
+}
