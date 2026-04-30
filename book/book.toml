@@ -1,0 +1,28 @@
+[book]
+title = "Darkbloom Architecture"
+authors = ["Flashlight Knowledge Pipeline"]
+description = "Auto-generated architecture documentation for Layr-Labs/d-inference (DarkBloom)"
+language = "en"
+src = "src"
+
+[build]
+build-dir = "../dist"
+
+[preprocessor.mermaid]
+
+[output.html]
+default-theme = "navy"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/researchoors/knowledge-maintenance"
+edit-url-template = "https://github.com/researchoors/knowledge-maintenance/edit/docs/mdbook/book/src/{path}"
+no-section-label = false
+additional-js = ["mermaid.min.js", "mermaid-init.js"]
+
+[output.html.fold]
+enable = true
+level = 1
+
+[output.html.search]
+enable = true
+limit-results = 30
+use-boolean-and = true

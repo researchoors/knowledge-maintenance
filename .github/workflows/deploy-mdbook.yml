@@ -1,0 +1,59 @@
+name: Deploy mdBook to GitHub Pages
+
+on:
+  push:
+    branches: [docs/mdbook]
+    paths:
+      - 'book/src/**'
+      - 'book/book.toml'
+      - 'artifacts/d-inference/**'
+      - '.github/workflows/deploy-mdbook.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo bins
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin
+          key: cargo-bins-mdbook-mermaid-v0.17
+
+      - name: Install mdBook & mermaid preprocessor
+        run: |
+          which mdbook || cargo install mdbook --version 0.5.2
+          which mdbook-mermaid || cargo install mdbook-mermaid --version 0.17.0
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Copy mermaid JS to book root
+        run: cp book/src/mermaid.min.js book/src/mermaid-init.js book/
+
+      - name: Build mdBook
+        run: cd book && mdbook build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
