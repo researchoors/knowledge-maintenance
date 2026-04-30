@@ -19,8 +19,8 @@ venv/
 .vscode/
 .idea/
 
-# Flashlight artifacts (generated)
-artifacts/
+# Flashlight artifacts are tracked in git (committed via PR)
+# Do NOT ignore artifacts/ — they are the knowledge graph output
 
 # OS
 .DS_Store
