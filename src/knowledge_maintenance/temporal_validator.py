@@ -51,15 +51,15 @@ def _load_edges(artifacts_dir: Path) -> list[dict]:
     return data.get("edges", [])
 
 
-def _check_stale_references(
-    components: list[dict], codebase_files: set[str]
-) -> list[Discrepancy]:
+def _check_stale_references(components: list[dict], codebase_files: set[str]) -> list[Discrepancy]:
     """Detect knowledge entries that reference files/modules absent from the codebase."""
     discrepancies: list[Discrepancy] = []
     for comp in components:
         root = comp.get("root_path", "")
-        if root and root not in codebase_files and not any(
-            f.startswith(root.rstrip("/") + "/") for f in codebase_files
+        if (
+            root
+            and root not in codebase_files
+            and not any(f.startswith(root.rstrip("/") + "/") for f in codebase_files)
         ):
             discrepancies.append(
                 Discrepancy(
@@ -82,9 +82,7 @@ def _check_stale_references(
     return discrepancies
 
 
-def _check_stale_edges(
-    edges: list[dict], component_names: set[str], external_ids: set[str]
-) -> list[Discrepancy]:
+def _check_stale_edges(edges: list[dict], component_names: set[str], external_ids: set[str]) -> list[Discrepancy]:
     """Detect dependency edges that reference non-existent targets."""
     discrepancies: list[Discrepancy] = []
     valid_targets = component_names | external_ids
@@ -112,9 +110,7 @@ def _check_stale_edges(
     return discrepancies
 
 
-def _check_component_kinds(
-    known_components: list[dict], rediscovered_components: list[dict]
-) -> list[Discrepancy]:
+def _check_component_kinds(known_components: list[dict], rediscovered_components: list[dict]) -> list[Discrepancy]:
     """Detect components whose kind classification has changed."""
     discrepancies: list[Discrepancy] = []
     rediscovered_kinds = {c["name"]: c.get("kind", "unknown") for c in rediscovered_components}
@@ -136,9 +132,7 @@ def _check_component_kinds(
     return discrepancies
 
 
-def _check_missing_components(
-    known_components: list[dict], rediscovered_components: list[dict]
-) -> list[Discrepancy]:
+def _check_missing_components(known_components: list[dict], rediscovered_components: list[dict]) -> list[Discrepancy]:
     """Detect new components in the codebase that are not present in knowledge."""
     discrepancies: list[Discrepancy] = []
     known_names = {c["name"] for c in known_components}

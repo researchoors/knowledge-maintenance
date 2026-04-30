@@ -110,9 +110,16 @@ class TestFullValidation:
         subprocess.run(["git", "init"], cwd=repo, capture_output=True, check=True)
         subprocess.run(["git", "add", "."], cwd=repo, capture_output=True, check=True)
         subprocess.run(
-            ["git", "commit", "-m", "init"], cwd=repo, capture_output=True, check=True,
-            env={"GIT_AUTHOR_NAME": "test", "GIT_AUTHOR_EMAIL": "test@test.com",
-                 "GIT_COMMITTER_NAME": "test", "GIT_COMMITTER_EMAIL": "test@test.com"}
+            ["git", "commit", "-m", "init"],
+            cwd=repo,
+            capture_output=True,
+            check=True,
+            env={
+                "GIT_AUTHOR_NAME": "test",
+                "GIT_AUTHOR_EMAIL": "test@test.com",
+                "GIT_COMMITTER_NAME": "test",
+                "GIT_COMMITTER_EMAIL": "test@test.com",
+            },
         )
 
         report = validate(
@@ -138,9 +145,16 @@ class TestFullValidation:
         subprocess.run(["git", "init"], cwd=repo, capture_output=True, check=True)
         subprocess.run(["git", "add", "."], cwd=repo, capture_output=True, check=True)
         subprocess.run(
-            ["git", "commit", "-m", "init"], cwd=repo, capture_output=True, check=True,
-            env={"GIT_AUTHOR_NAME": "test", "GIT_AUTHOR_EMAIL": "test@test.com",
-                 "GIT_COMMITTER_NAME": "test", "GIT_COMMITTER_EMAIL": "test@test.com"}
+            ["git", "commit", "-m", "init"],
+            cwd=repo,
+            capture_output=True,
+            check=True,
+            env={
+                "GIT_AUTHOR_NAME": "test",
+                "GIT_AUTHOR_EMAIL": "test@test.com",
+                "GIT_COMMITTER_NAME": "test",
+                "GIT_COMMITTER_EMAIL": "test@test.com",
+            },
         )
 
         report = validate(
