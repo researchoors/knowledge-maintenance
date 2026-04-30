@@ -1,25 +1,10 @@
-# D-Inference Architecture Docs
+# Darkbloom Architecture
 
 > Auto-generated from [Layr-Labs/d-inference](https://github.com/Layr-Labs/d-inference) commit `f7dab6fa`
 
-This book contains architecture documentation for **d-inference** (DarkBloom) — a decentralized AI inference network built on Apple Silicon.
+This book contains architectural documentation for Darkbloom, a decentralized AI inference network built on Apple Silicon.
 
-## Quick Stats
-
-| Metric | Value |
-|--------|-------|
-| Components | 9 |
-| Dependency Edges | 20 |
-| External Services | 6 |
-| Code Citations | 158 |
-| Analysis Timestamp | 2026-04-30T09:24:03Z |
-
-## What's Inside
-
-- **Architecture** — system-wide overview, trust boundaries, and data flows
-- **Dependency Graph** — how components connect (API calls, WebSocket, FFI, etc.)
-- **Components** — per-component deep dives with API signatures and security notes
-- **External Services** — PostgreSQL, Stripe, Datadog, Privy, Apple SE, Cloudflare R2
+Darkbloom turns Apple Silicon Macs into hardware-attested inference providers, creating a trustless marketplace where consumers submit encrypted requests that providers can never read in plaintext. A central coordinator handles routing, billing, and attestation verification while providers run inside hardened macOS sandboxes with Secure Enclave–signed identities. The entire pipeline—request encryption through NaCl Box, provider attestation via Apple's Secure Enclave, and inference execution inside seatbelt-restricted containers—is designed so no party needs to trust any other. See the [full architecture breakdown](./architecture.md) for details.
 
 ---
 
