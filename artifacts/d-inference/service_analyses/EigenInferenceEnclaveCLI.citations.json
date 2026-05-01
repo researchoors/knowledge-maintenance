@@ -8,93 +8,93 @@
     {
       "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
       "start_line": 1,
-      "end_line": 15,
-      "claim": "CLI imports CryptoKit and EigenInferenceEnclave, provides command-line attestation tool",
+      "end_line": 3,
+      "claim": "The CLI imports CryptoKit for cryptographic operations, EigenInferenceEnclave for core functionality, and Foundation for runtime support",
+      "section": "External Dependencies"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+      "start_line": 7,
+      "end_line": 14,
+      "claim": "The CLI provides two main commands: attest for generating signed attestation blobs and info for showing Secure Enclave availability, with emphasis on ephemeral keys",
       "section": "Overview"
     },
     {
       "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
-      "start_line": 16,
-      "end_line": 29,
-      "claim": "printUsage function defines command structure with attest and info commands",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
       "start_line": 31,
-      "end_line": 52,
-      "claim": "cmdAttest function handles attestation generation with optional parameters",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
-      "start_line": 54,
-      "end_line": 73,
-      "claim": "cmdInfo function displays Secure Enclave availability and ephemeral key info",
+      "end_line": 39,
+      "claim": "The cmdAttest function validates Secure Enclave availability, creates ephemeral identity, and uses AttestationService to generate signed attestations",
       "section": "Key Components"
     },
     {
       "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
       "start_line": 32,
       "end_line": 35,
-      "claim": "Secure Enclave availability is checked before operations",
+      "claim": "Secure Enclave availability is checked before attempting cryptographic operations, with error exit if unavailable",
       "section": "Data Flows"
     },
     {
       "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
-      "start_line": 37,
-      "end_line": 39,
-      "claim": "Creates ephemeral SecureEnclaveIdentity and AttestationService for each invocation",
-      "section": "Internal Dependencies"
-    },
-    {
-      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
-      "start_line": 41,
-      "end_line": 44,
-      "claim": "Uses JSONEncoder with sortedKeys for deterministic output",
-      "section": "API Surface"
-    },
-    {
-      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
-      "start_line": 77,
-      "end_line": 117,
-      "claim": "Main function provides argument parsing and command dispatch",
+      "start_line": 54,
+      "end_line": 64,
+      "claim": "The cmdInfo function reports device capabilities including secure enclave availability and ephemeral public key",
       "section": "Key Components"
     },
     {
       "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
       "start_line": 87,
       "end_line": 104,
-      "claim": "Manual argument parsing handles --encryption-key and --binary-hash options",
+      "claim": "Command-line argument parsing handles attest command with optional encryption-key and binary-hash parameters",
+      "section": "API Surface"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+      "start_line": 16,
+      "end_line": 28,
+      "claim": "Usage documentation shows command structure and options for both attest and info commands",
       "section": "Key Components"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+      "start_line": 41,
+      "end_line": 51,
+      "claim": "JSON encoding uses ISO 8601 dates and sorted keys for deterministic output to STDOUT",
+      "section": "API Surface"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+      "start_line": 114,
+      "end_line": 117,
+      "claim": "Error handling outputs error messages to STDERR and exits with code 1 on failures",
+      "section": "API Surface"
     },
     {
       "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/WebSocketBridge.swift",
       "start_line": 1,
       "end_line": 3,
-      "claim": "WebSocketBridge is a stub indicating removed TLS bridge functionality",
+      "claim": "WebSocket bridge functionality was removed due to Apple keychain restrictions with ACME managed identities",
       "section": "Key Components"
-    },
-    {
-      "file_path": "enclave/Package.swift",
-      "start_line": 9,
-      "end_line": 9,
-      "claim": "CLI is built as executable target named eigeninference-enclave",
-      "section": "Overview"
-    },
-    {
-      "file_path": "enclave/Package.swift",
-      "start_line": 13,
-      "end_line": 16,
-      "claim": "CLI target depends on EigenInferenceEnclave library",
-      "section": "Internal Dependencies"
     },
     {
       "file_path": "enclave/Package.swift",
       "start_line": 6,
       "end_line": 6,
-      "claim": "Requires macOS 13.0 or later for Secure Enclave support",
+      "claim": "Package requires macOS 13.0 or later for Secure Enclave functionality",
       "section": "External Dependencies"
+    },
+    {
+      "file_path": "enclave/Package.swift",
+      "start_line": 13,
+      "end_line": 16,
+      "claim": "CLI executable target depends directly on EigenInferenceEnclave library",
+      "section": "Internal Dependencies"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+      "start_line": 57,
+      "end_line": 59,
+      "claim": "Device info includes secure_enclave_available boolean and key_persistence set to ephemeral",
+      "section": "API Surface"
     }
   ]
 }

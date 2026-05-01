@@ -3,118 +3,125 @@
   "source_file": "/tmp/d-inference/service_analyses/analytics.md",
   "source_repo": "",
   "source_commit": "",
-  "citation_count": 16,
+  "citation_count": 17,
   "citations": [
     {
       "file_path": "analytics/cmd/analytics/main.go",
       "start_line": 19,
       "end_line": 28,
-      "claim": "The service entry point initializes structured logging and loads configuration with error handling",
+      "claim": "Entry point orchestrates service initialization with configuration loading",
       "section": "Key Components"
     },
     {
       "file_path": "analytics/cmd/analytics/main.go",
       "start_line": 84,
       "end_line": 93,
-      "claim": "Backend selection pattern allows memory or PostgreSQL storage based on configuration",
-      "section": "Architecture"
+      "claim": "Builds appropriate storage backend based on configuration",
+      "section": "Key Components"
     },
     {
       "file_path": "analytics/internal/config/config.go",
       "start_line": 17,
       "end_line": 24,
-      "claim": "Configuration structure includes address, backend type, database URL, CORS origin, and pseudonym secret",
+      "claim": "Configuration struct supports dual backend modes",
       "section": "Key Components"
     },
     {
       "file_path": "analytics/internal/config/config.go",
       "start_line": 47,
       "end_line": 65,
-      "claim": "Backend-specific validation ensures required parameters for PostgreSQL mode",
+      "claim": "Different validation requirements for memory vs postgres backends",
       "section": "Key Components"
     },
     {
       "file_path": "analytics/internal/httpapi/server.go",
       "start_line": 24,
       "end_line": 41,
-      "claim": "Health check endpoint tests backend connectivity and returns status with timestamp",
+      "claim": "Health check endpoint returns service status and backend type",
+      "section": "API Surface"
+    },
+    {
+      "file_path": "analytics/internal/httpapi/server.go",
+      "start_line": 43,
+      "end_line": 55,
+      "claim": "Overview endpoint provides network statistics",
       "section": "API Surface"
     },
     {
       "file_path": "analytics/internal/httpapi/server.go",
       "start_line": 57,
       "end_line": 99,
-      "claim": "Earnings leaderboard endpoint supports scope, window, and limit query parameters with validation",
+      "claim": "Earnings leaderboard endpoint with query parameter validation",
       "section": "API Surface"
     },
     {
       "file_path": "analytics/internal/leaderboard/store.go",
-      "start_line": 19,
-      "end_line": 24,
-      "claim": "Leaderboard supports account and node scopes for different aggregation levels",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "analytics/internal/leaderboard/store.go",
-      "start_line": 27,
-      "end_line": 33,
-      "claim": "Time window filtering supports 24h, 7d, 30d, and all-time periods",
-      "section": "Key Components"
+      "start_line": 104,
+      "end_line": 119,
+      "claim": "Service layer implements business logic with clean interfaces",
+      "section": "Architecture"
     },
     {
       "file_path": "analytics/internal/leaderboard/store.go",
       "start_line": 144,
       "end_line": 185,
-      "claim": "Service layer handles query normalization, validation, and pseudonym generation for leaderboard entries",
-      "section": "Data Flows"
+      "claim": "Core earnings leaderboard logic with ranking and formatting",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "analytics/internal/leaderboard/store.go",
+      "start_line": 306,
+      "end_line": 340,
+      "claim": "MemoryStore contains hardcoded sample data for development",
+      "section": "External Systems"
     },
     {
       "file_path": "analytics/internal/leaderboard/store.go",
       "start_line": 477,
       "end_line": 496,
-      "claim": "PostgreSQL store implementation uses connection pooling and validates connectivity on initialization",
+      "claim": "PostgresStore provides production database backend",
       "section": "External Systems"
     },
     {
       "file_path": "analytics/internal/leaderboard/store.go",
       "start_line": 517,
-      "end_line": 546,
-      "claim": "PostgreSQL overview query uses CTEs for efficient provider and earnings statistics aggregation",
+      "end_line": 563,
+      "claim": "PostgreSQL queries for network overview statistics",
       "section": "External Systems"
     },
     {
       "file_path": "analytics/internal/pseudonym/alias.go",
       "start_line": 21,
       "end_line": 33,
-      "claim": "Pseudonym generator uses HMAC-SHA256 with kind prefixing to create deterministic human-readable aliases",
+      "claim": "HMAC-SHA256 based deterministic alias generation",
       "section": "Key Components"
     },
     {
       "file_path": "analytics/internal/pseudonym/alias.go",
       "start_line": 35,
       "end_line": 107,
-      "claim": "Alias format uses predefined adjectives, animals, and numbers for human-readable pseudonyms",
+      "claim": "Adjective-Animal-Number format for privacy-preserving aliases",
       "section": "Key Components"
     },
     {
       "file_path": "analytics/go.mod",
       "start_line": 5,
       "end_line": 5,
-      "claim": "Primary external dependency is pgx/v5 for PostgreSQL connectivity",
+      "claim": "Primary external dependency is pgx PostgreSQL driver",
       "section": "External Dependencies"
     },
     {
       "file_path": "analytics/README.md",
       "start_line": 3,
-      "end_line": 12,
-      "claim": "Service is designed to sit beside coordinator as standalone read-only analytics service",
-      "section": "Overview"
+      "end_line": 6,
+      "claim": "Standalone read-only analytics service designed to sit beside coordinator",
+      "section": "Architecture"
     },
     {
       "file_path": "analytics/README.md",
       "start_line": 71,
-      "end_line": 81,
-      "claim": "PostgreSQL mode requires read-only user with SELECT privileges on analytics tables",
+      "end_line": 75,
+      "claim": "Reads from providers and provider_earnings database tables",
       "section": "External Systems"
     }
   ]

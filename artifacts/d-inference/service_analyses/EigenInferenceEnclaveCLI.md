@@ -2,128 +2,109 @@
 
 ## Overview
 
-The EigenInferenceEnclaveCLI is a command-line interface tool that provides Secure Enclave attestation and diagnostics functionality for the EigenInference system. This Swift-based CLI wraps the EigenInferenceEnclave library to enable command-line access to hardware-bound cryptographic operations and system security attestation.
+The EigenInferenceEnclaveCLI is a Swift command-line interface that provides secure attestation capabilities using Apple's Secure Enclave hardware security module. This CLI tool serves as a bridge between the Secure Enclave and external systems, enabling attestation generation and device capability verification for the d-inference project's trusted execution environment.
 
 ## Architecture
 
-The component follows a **command pattern architecture** with a simple CLI interface that delegates to the underlying EigenInferenceEnclave library. The architecture is structured as:
+The component follows a **simple command-based architecture** with direct CLI argument parsing and immediate command execution. It implements a minimalist design pattern where each command is handled by a dedicated function, maintaining separation of concerns while keeping the codebase lightweight and focused.
 
-1. **Main Entry Point** - Argument parsing and command dispatch
-2. **Command Handlers** - Specific implementations for each CLI command
-3. **Library Integration** - Direct usage of EigenInferenceEnclave APIs
-4. **Output Formatting** - JSON serialization for machine-readable output
-
-The CLI is designed to be ephemeral - it creates fresh cryptographic keys for each invocation rather than persisting state, making it suitable for one-off attestation operations.
+The architecture emphasizes **ephemeral security** - all cryptographic keys are generated fresh in the Secure Enclave for each invocation, with no persistent state maintained on disk. This design choice maximizes security by ensuring that no long-lived key material exists outside the hardware security module.
 
 ## Key Components
 
-### 1. Main CLI Parser (`main.swift`)
-- **Location**: `main.swift:77-117`
-- **Purpose**: Entry point that handles command-line argument parsing and routing
-- **Key Functions**: 
-  - `printUsage()` - Displays command syntax and options
-  - Command routing for `attest` and `info` commands
-  - Error handling with proper exit codes
+### 1. Main Entry Point (`main.swift`)
+- **Purpose**: CLI argument parsing and command dispatch
+- **Location**: Lines 77-117
+- **Functionality**: Handles command-line arguments and routes execution to appropriate command handlers
 
 ### 2. Attestation Command Handler (`cmdAttest`)
-- **Location**: `main.swift:31-52`
-- **Purpose**: Generates signed attestation blobs with hardware security state
-- **Features**:
-  - Secure Enclave availability checking
-  - Optional encryption key binding (`--encryption-key`)
-  - Optional binary hash inclusion (`--binary-hash`)
-  - JSON output with sorted keys for deterministic serialization
+- **Purpose**: Generates signed attestation blobs using Secure Enclave
+- **Location**: Lines 31-52
+- **Key Features**: 
+  - Validates Secure Enclave availability
+  - Creates ephemeral identity and attestation service
+  - Supports optional encryption key binding and binary hash verification
+  - Outputs JSON-formatted attestation
 
 ### 3. Info Command Handler (`cmdInfo`)
-- **Location**: `main.swift:54-73`  
-- **Purpose**: Displays Secure Enclave availability and generates ephemeral public key
-- **Output**: JSON object containing:
-  - `secure_enclave_available` boolean
-  - `key_persistence` set to "ephemeral"
-  - `public_key` (base64-encoded P-256 public key) when available
+- **Purpose**: Reports Secure Enclave availability and device capabilities
+- **Location**: Lines 54-73
+- **Output**: JSON with device security status and ephemeral public key
 
-### 4. Argument Parser
-- **Location**: `main.swift:87-104`
-- **Purpose**: Manual argument parsing for `--encryption-key` and `--binary-hash` options
-- **Implementation**: Simple state machine that processes argv array
-- **Error Handling**: Unknown options trigger usage display and exit(1)
+### 4. Usage Documentation (`printUsage`)
+- **Purpose**: Provides user-facing help and command documentation
+- **Location**: Lines 16-29
+- **Features**: Comprehensive usage instructions for both commands
 
-### 5. WebSocket Bridge Stub (`WebSocketBridge.swift`)
-- **Location**: `WebSocketBridge.swift:1-3`
-- **Purpose**: Placeholder file indicating removed TLS bridge functionality
-- **Context**: Originally contained WebSocket bridging code, removed due to Apple keychain restrictions
+### 5. WebSocket Bridge (Deprecated)
+- **Purpose**: Originally intended for TLS bridging (now removed)
+- **Location**: `WebSocketBridge.swift`
+- **Status**: Contains only a comment explaining removal due to Apple keychain restrictions
 
 ## Data Flows
 
 ```mermaid
 graph TD
     A[CLI Invocation] --> B{Command Type}
-    B -->|attest| C[Parse Optional Args]
-    B -->|info| D[Check SE Availability]
+    B -->|attest| C[Validate SE Available]
+    B -->|info| D[Check SE Status]
     B -->|invalid| E[Print Usage & Exit]
     
-    C --> F[Check Secure Enclave]
-    F -->|unavailable| G[Error & Exit]
-    F -->|available| H[Create Identity]
+    C --> F[Create SE Identity]
+    F --> G[Initialize Attestation Service]
+    G --> H[Generate Attestation]
+    H --> I[Encode JSON Response]
+    I --> J[Output to STDOUT]
     
-    H --> I[Create Attestation Service]
-    I --> J[Generate Attestation Blob]
-    J --> K[Sign with SE Key]
-    K --> L[Encode as JSON]
-    L --> M[Print to stdout]
+    D --> K[Get Device Info]
+    K --> L[Include Public Key if Available]
+    L --> M[Format JSON Response]
+    M --> N[Output to STDOUT]
     
-    D --> N{SE Available?}
-    N -->|yes| O[Create Ephemeral Identity]
-    N -->|no| P[Create Basic Info]
-    O --> Q[Build Info Object]
-    P --> Q
-    Q --> R[Serialize to JSON]
-    R --> S[Print to stdout]
-    
-    E --> T[Exit 1]
-    G --> T
-    M --> U[Exit 0]
-    S --> U
+    subgraph "Secure Enclave Operations"
+        F
+        G
+        H
+        K
+    end
 ```
+
+The primary data flow centers around **ephemeral attestation generation**:
+
+1. **Command Processing**: CLI arguments are parsed to determine operation type
+2. **Security Validation**: Secure Enclave availability is checked before proceeding
+3. **Identity Generation**: Fresh cryptographic identity is created in the Secure Enclave
+4. **Attestation Creation**: Signed attestation blob is generated with optional metadata binding
+5. **JSON Serialization**: Results are formatted as structured JSON for interoperability
+6. **Standard Output**: Final attestation or device info is written to STDOUT
 
 ## External Dependencies
 
-### Swift Platform Dependencies
+### System Libraries
 
-- **Foundation** (built-in): Core Swift framework providing fundamental data types, collections, and operating system services. Used for `Data`, `String`, `JSONEncoder`, `CommandLine`, and process management.
-  
-- **CryptoKit** (built-in): Apple's cryptography framework providing Secure Enclave integration. Used for `SecureEnclave.isAvailable` checks and the `SecureEnclaveIdentity` class from the internal dependency.
+- **CryptoKit** (Apple System Framework) [cryptography]: Provides cryptographic primitives and Secure Enclave integration. Used for hardware-backed key generation and attestation signing. Imported in: `main.swift`.
 
-### System Dependencies
+- **Foundation** (Apple System Framework) [runtime]: Core Swift runtime and data handling capabilities. Provides JSON encoding/decoding, string manipulation, and process management. Used for CLI argument handling and data serialization. Imported in: `main.swift`.
 
-The CLI relies on several system utilities for attestation data collection:
+### Build Dependencies
 
-- **system_profiler** (`/usr/sbin/system_profiler`): Used to gather hardware information (chip name, serial number)
-- **csrutil** (`/usr/bin/csrutil`): System Integrity Protection status checking
-- **diskutil** (`/usr/sbin/diskutil`): Authenticated Root Volume and system volume integrity verification
-- **rdma_ctl** (`/usr/bin/rdma_ctl`): RDMA (Remote Direct Memory Access) status checking
+- **swift-tools-version: 5.9** [build-tool]: Swift Package Manager version constraint requiring Swift 5.9 or later for compilation.
+
+- **macOS(.v13)** [platform]: Platform constraint requiring macOS 13.0 or later, ensuring Secure Enclave APIs are available.
 
 ## Internal Dependencies
 
-### EigenInferenceEnclave Library Usage
+### EigenInferenceEnclave Library
 
-The CLI component directly integrates with the EigenInferenceEnclave library through the following key interfaces:
+The CLI component has a single direct dependency on the `EigenInferenceEnclave` library, using several key types and services:
 
-- **SecureEnclaveIdentity**: 
-  - Used in `cmdAttest` (line 37) and `cmdInfo` (line 62) for creating ephemeral P-256 signing keys
-  - Provides `publicKeyBase64` property for key export
-  - Handles Secure Enclave availability checking
+- **SecureEnclaveIdentity**: Used for creating ephemeral cryptographic identities backed by the Secure Enclave hardware. Instantiated in both `cmdAttest()` and `cmdInfo()` functions (lines 37, 62).
 
-- **AttestationService**:
-  - Instantiated in `cmdAttest` (line 38) with the ephemeral identity
-  - `createAttestation()` method generates signed attestation blobs
-  - Supports optional encryption key binding and binary hash inclusion
+- **AttestationService**: Core service for generating signed attestation blobs. Initialized with a SecureEnclaveIdentity and provides the `createAttestation()` method with support for encryption key binding and binary hash verification (line 38-39).
 
-- **SecureEnclave.isAvailable**:
-  - Global availability check used before any Secure Enclave operations
-  - Prevents runtime failures on unsupported hardware (Intel Macs)
+- **SecureEnclave.isAvailable**: Static property used to verify hardware capability before attempting Secure Enclave operations. Checked in both command handlers (lines 32, 55).
 
-The CLI acts as a thin wrapper around the library, providing command-line access to the core attestation functionality without adding significant business logic.
+The integration pattern shows a clean separation where the CLI acts as a thin wrapper around the core enclave functionality, handling only user interface concerns while delegating all cryptographic operations to the underlying library.
 
 ## API Surface
 
@@ -131,60 +112,50 @@ The CLI acts as a thin wrapper around the library, providing command-line access
 
 The CLI exposes two primary commands:
 
-#### 1. `eigeninference-enclave attest [options]`
-- **Purpose**: Generate signed hardware attestation blob
+**`attest` Command**
+- **Purpose**: Generate signed attestation with optional metadata binding
 - **Options**:
-  - `--encryption-key <base64>`: Bind X25519 encryption public key to attestation
-  - `--binary-hash <hex>`: Include SHA-256 hash of provider binary
-- **Output**: JSON object containing `SignedAttestation` with hardware/software security state
-- **Exit Codes**: 0 on success, 1 on error (SE unavailable, invalid args, etc.)
+  - `--encryption-key <base64>`: Bind X25519 public key to attestation
+  - `--binary-hash <hex>`: Include SHA-256 hash for binary integrity verification
+- **Output**: JSON attestation blob to STDOUT
+- **Error Handling**: Exits with code 1 on failure, errors to STDERR
 
-#### 2. `eigeninference-enclave info`
-- **Purpose**: Display Secure Enclave availability and ephemeral key info
-- **Output**: JSON object with availability status and public key
-- **Use Case**: System diagnostics and integration testing
+**`info` Command**
+- **Purpose**: Report device security capabilities
+- **Output**: JSON with secure enclave availability and ephemeral public key
+- **Fields**:
+  - `secure_enclave_available`: Boolean indicating hardware availability
+  - `key_persistence`: Always "ephemeral"
+  - `public_key`: Base64-encoded ephemeral public key (if available)
+
+### Exit Codes
+
+- **0**: Successful execution
+- **1**: Error conditions (missing Secure Enclave, invalid arguments, processing failures)
 
 ### Output Format
 
-Both commands output structured JSON to stdout:
+All successful operations output structured JSON to STDOUT with consistent formatting:
+- ISO 8601 date encoding for timestamps
+- Sorted keys for deterministic output
+- UTF-8 encoding
 
-**Attest Command Output**:
-```json
-{
-  "attestation": {
-    "authenticatedRootEnabled": true,
-    "binaryHash": "optional-hex-hash",
-    "chipName": "Apple M4 Max", 
-    "encryptionPublicKey": "optional-base64-x25519-key",
-    "hardwareModel": "Mac16,1",
-    "osVersion": "15.3.0",
-    "publicKey": "base64-p256-public-key",
-    "rdmaDisabled": true,
-    "secureBootEnabled": true,
-    "secureEnclaveAvailable": true,
-    "serialNumber": "hardware-serial",
-    "sipEnabled": true,
-    "systemVolumeHash": "apfs-snapshot-hash",
-    "timestamp": "2024-04-30T12:00:00Z"
-  },
-  "signature": "base64-der-encoded-ecdsa-signature"
-}
-```
+## External Systems
 
-**Info Command Output**:
-```json
-{
-  "key_persistence": "ephemeral",
-  "public_key": "base64-p256-public-key",
-  "secure_enclave_available": true
-}
-```
+The component integrates with **Apple's Secure Enclave hardware security module** at runtime. This is a hardware-based trusted execution environment that:
 
-### Integration Patterns
+- Provides tamper-resistant key storage and cryptographic operations
+- Ensures attestation keys cannot be extracted from the device
+- Enables hardware-backed attestation that proves code execution authenticity
 
-The CLI is designed for integration with the broader EigenInference ecosystem:
+The CLI requires **macOS 13.0 or later** and compatible Apple Silicon hardware to access Secure Enclave functionality.
 
-- **Provider Registration**: The `attest` command output is included in provider registration messages to the coordinator
-- **Key Binding**: Encryption keys from the provider's X25519 identity can be bound to the attestation
-- **Binary Integrity**: Provider binary hashes can be included for coordinator verification
-- **Ephemeral Keys**: All keys are generated fresh per invocation - no persistent state
+## Component Interactions
+
+The EigenInferenceEnclaveCLI serves as a **command-line interface bridge** between external systems and the d-inference enclave infrastructure. Based on the code structure and attestation capabilities, it likely integrates with:
+
+1. **Provider Binaries**: The `--binary-hash` option suggests integration with ML inference providers that need their binary integrity verified as part of attestation.
+
+2. **Encryption Key Exchange**: The `--encryption-key` option indicates integration with systems requiring encrypted communication channels, where the attestation binds the communication keys to the hardware identity.
+
+3. **Attestation Verification Systems**: The JSON output format is designed for consumption by remote verification services that need to validate the authenticity of the enclave environment.

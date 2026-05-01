@@ -3,147 +3,154 @@
   "source_file": "/tmp/d-inference/service_analyses/coordinator.md",
   "source_repo": "",
   "source_commit": "",
-  "citation_count": 20,
+  "citation_count": 21,
   "citations": [
     {
-      "file_path": "cmd/coordinator/main.go",
+      "file_path": "coordinator/cmd/coordinator/main.go",
       "start_line": 1,
       "end_line": 24,
-      "claim": "The coordinator runs in a GCP Confidential VM with hardware-encrypted memory and acts as central routing layer",
-      "section": "Overview"
-    },
-    {
-      "file_path": "internal/api/server.go",
-      "start_line": 99,
-      "end_line": 207,
-      "claim": "Server struct implements hexagonal architecture with clear separation between external interfaces and business logic",
+      "claim": "The coordinator is the central routing and trust layer in the Darkbloom network that accepts provider WebSocket connections, verifies Secure Enclave attestations, and routes OpenAI-compatible requests",
       "section": "Architecture"
     },
     {
-      "file_path": "internal/registry/registry.go",
-      "start_line": 330,
-      "end_line": 362,
-      "claim": "Registry manages 1000+ concurrent providers with trust levels and intelligent routing",
+      "file_path": "coordinator/cmd/coordinator/main.go",
+      "start_line": 8,
+      "end_line": 11,
+      "claim": "The coordinator runs in a GCP Confidential VM (AMD SEV-SNP) with hardware-encrypted memory and reads requests for routing but never logs prompt content",
+      "section": "Architecture"
+    },
+    {
+      "file_path": "coordinator/internal/api/server.go",
+      "start_line": 98,
+      "end_line": 213,
+      "claim": "Server is the main HTTP/WS server that ties together the provider registry, key store, payment ledger, billing service, and HTTP routing with various configuration options",
       "section": "Key Components"
     },
     {
-      "file_path": "internal/store/interface.go",
-      "start_line": 22,
-      "end_line": 354,
-      "claim": "Store interface abstracts persistence layer supporting PostgreSQL and in-memory backends",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "internal/payments/payments.go",
+      "file_path": "coordinator/internal/registry/registry.go",
       "start_line": 1,
-      "end_line": 22,
-      "claim": "Payment system uses double-entry accounting with micro-USD precision for blockchain compatibility",
+      "end_line": 18,
+      "claim": "The registry manages the set of connected provider agents, their capabilities, and routes inference requests using round-robin among idle providers with trust level filtering",
       "section": "Key Components"
     },
     {
-      "file_path": "go.mod",
-      "start_line": 5,
+      "file_path": "coordinator/internal/store/interface.go",
+      "start_line": 1,
       "end_line": 14,
-      "claim": "Primary runtime dependencies include WebSocket, PostgreSQL, JWT, and cryptographic libraries",
+      "claim": "Store provides storage backends with MemoryStore for development and PostgresStore for production, managing double-entry ledger in micro-USD",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/attestation/attestation.go",
+      "start_line": 1,
+      "end_line": 25,
+      "claim": "Attestation verifier checks signed attestation blobs using P-256 ECDSA keys from Apple Secure Enclave, validating hardware identity and security state",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/billing/billing.go",
+      "start_line": 1,
+      "end_line": 10,
+      "claim": "Billing service provides unified payment processing with Stripe Checkout for deposits and Stripe Connect Express for provider payouts",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/protocol/messages.go",
+      "start_line": 1,
+      "end_line": 19,
+      "claim": "Protocol defines WebSocket message types for coordinator-provider communication including registration, heartbeats, inference requests with optional X25519/NaCl-box encryption",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/api/consumer.go",
+      "start_line": 1,
+      "end_line": 15,
+      "claim": "Consumer handlers implement OpenAI-compatible endpoints with sender-sealed requests, trusted routing in Confidential VM, and re-encryption to providers",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/payments/payments.go",
+      "start_line": 1,
+      "end_line": 14,
+      "claim": "Payment ledger tracks consumer balances and provider payouts with all amounts in micro-USD, supporting Stripe payments and settlements",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/go.mod",
+      "start_line": 9,
+      "end_line": 9,
+      "claim": "PostgreSQL connectivity via jackc/pgx/v5 driver",
       "section": "External Dependencies"
     },
     {
-      "file_path": "internal/api/server.go",
-      "start_line": 766,
-      "end_line": 937,
-      "claim": "API routes include OpenAI-compatible inference endpoints and administrative interfaces",
+      "file_path": "coordinator/go.mod",
+      "start_line": 13,
+      "end_line": 13,
+      "claim": "WebSocket communication via nhooyr.io/websocket library",
+      "section": "External Dependencies"
+    },
+    {
+      "file_path": "coordinator/go.mod",
+      "start_line": 6,
+      "end_line": 12,
+      "claim": "Datadog integration for monitoring via datadog-go and dd-trace-go libraries, JWT authentication, UUID generation, and crypto libraries",
+      "section": "External Dependencies"
+    },
+    {
+      "file_path": "coordinator/internal/api/server.go",
+      "start_line": 846,
+      "end_line": 1016,
+      "claim": "API surface includes OpenAI-compatible consumer endpoints, authentication/billing endpoints, provider WebSocket, admin operations, and public stats",
       "section": "API Surface"
     },
     {
-      "file_path": "internal/registry/registry.go",
-      "start_line": 1112,
-      "end_line": 1245,
-      "claim": "Scoring algorithm considers provider load, hardware specs, trust level, and model cache state",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "internal/api/consumer.go",
-      "start_line": 38,
-      "end_line": 64,
-      "claim": "Request timeouts and retry logic handle provider failures and capacity constraints",
+      "file_path": "coordinator/internal/api/consumer.go",
+      "start_line": 523,
+      "end_line": 622,
+      "claim": "Inference request flow includes balance reservation, model validation, provider routing with retry logic, and streaming response handling",
       "section": "Data Flows"
     },
     {
-      "file_path": "cmd/coordinator/main.go",
-      "start_line": 78,
+      "file_path": "coordinator/cmd/coordinator/main.go",
+      "start_line": 83,
       "end_line": 131,
-      "claim": "Supports both PostgreSQL for production and in-memory store for development with explicit safety checks",
+      "claim": "Data persistence supports PostgreSQL for production and in-memory store for development with explicit opt-in via EIGENINFERENCE_ALLOW_MEMORY_STORE",
       "section": "External Systems"
     },
     {
-      "file_path": "internal/registry/registry.go",
-      "start_line": 727,
-      "end_line": 840,
-      "claim": "Provider registration includes model catalog filtering and hardware attestation validation",
-      "section": "Data Flows"
+      "file_path": "coordinator/cmd/coordinator/main.go",
+      "start_line": 315,
+      "end_line": 350,
+      "claim": "Stripe billing integration with webhook secrets, success/cancel URLs, and Connect Express configuration for provider payouts",
+      "section": "External Systems"
     },
     {
-      "file_path": "internal/api/server.go",
-      "start_line": 1040,
-      "end_line": 1094,
-      "claim": "Authentication supports both Privy JWTs and API keys with different access levels",
-      "section": "API Surface"
-    },
-    {
-      "file_path": "internal/ratelimit/ratelimit.go",
-      "start_line": 1,
-      "end_line": 50,
-      "claim": "Rate limiting uses per-account token buckets with separate tiers for inference vs financial operations",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "cmd/coordinator/main.go",
-      "start_line": 184,
+      "file_path": "coordinator/cmd/coordinator/main.go",
+      "start_line": 183,
       "end_line": 207,
-      "claim": "Datadog integration provides APM tracing, metrics, and log forwarding",
+      "claim": "Datadog APM tracer integration with service/environment configuration and DogStatsD metrics client",
       "section": "External Systems"
     },
     {
-      "file_path": "cmd/coordinator/main.go",
+      "file_path": "coordinator/cmd/coordinator/main.go",
       "start_line": 410,
       "end_line": 451,
-      "claim": "MDM integration enables independent provider security verification via MicroMDM",
+      "claim": "MicroMDM integration for independent provider security verification with callback handling for MDA certificate storage",
       "section": "External Systems"
     },
     {
-      "file_path": "cmd/coordinator/main.go",
-      "start_line": 314,
-      "end_line": 367,
-      "claim": "End-to-end encryption uses X25519 keys derived from BIP39 mnemonic for coordinator identity",
+      "file_path": "coordinator/internal/registry/registry.go",
+      "start_line": 47,
+      "end_line": 54,
+      "claim": "Trust levels include none (no attestation), self_signed (provider's own key), and hardware (MDM + MDA + SE key bound to Apple-verified hardware)",
       "section": "Key Components"
     },
     {
-      "file_path": "internal/registry/registry.go",
-      "start_line": 1604,
-      "end_line": 1634,
-      "claim": "Background eviction loop removes stale providers every 30 seconds based on heartbeat timeout",
+      "file_path": "coordinator/internal/api/consumer.go",
+      "start_line": 38,
+      "end_line": 64,
+      "claim": "Inference timeout is 600 seconds (10 minutes) to allow 32k tokens at ~55 tok/s on slower hardware, with retry logic up to 3 attempts",
       "section": "Key Components"
-    },
-    {
-      "file_path": "cmd/coordinator/main.go",
-      "start_line": 557,
-      "end_line": 605,
-      "claim": "Model catalog seeding includes hardcoded models with size and architecture metadata",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "Dockerfile",
-      "start_line": 24,
-      "end_line": 31,
-      "claim": "Deployment includes MicroMDM and step-ca integration with environment configuration",
-      "section": "External Systems"
-    },
-    {
-      "file_path": "internal/api/server.go",
-      "start_line": 989,
-      "end_line": 997,
-      "claim": "Middleware stack includes CORS, panic recovery, and structured request logging",
-      "section": "Architecture"
     }
   ]
 }

@@ -3,105 +3,84 @@
   "source_file": "/tmp/d-inference/service_analyses/decrypt-test.md",
   "source_repo": "",
   "source_commit": "",
-  "citation_count": 14,
+  "citation_count": 11,
   "citations": [
     {
       "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
       "start_line": 1,
       "end_line": 9,
-      "claim": "Component serves as a cross-language compatibility testing tool for NaCl Box decryption",
-      "section": "Overview"
+      "claim": "The component is a minimal NaCl Box decryptor for cross-language compatibility testing with specific CLI usage pattern",
+      "section": "API Surface"
     },
     {
       "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
       "start_line": 15,
       "end_line": 23,
-      "claim": "Main entry point validates exactly 3 CLI arguments with usage message",
+      "claim": "The main function handles command-line argument parsing and validates exactly 3 arguments",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+      "start_line": 25,
+      "end_line": 36,
+      "claim": "Base64 decoding layer processes all three input parameters with comprehensive error handling",
       "section": "Key Components"
     },
     {
       "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
       "start_line": 38,
       "end_line": 58,
-      "claim": "Input validation ensures 32-byte keys and minimum 24-byte ciphertext per NaCl specifications",
+      "claim": "Key size validation ensures ephemeral public key and provider private key are exactly 32 bytes, ciphertext at least 24 bytes",
       "section": "Key Components"
     },
     {
       "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
-      "start_line": 60,
-      "end_line": 65,
-      "claim": "Key material is converted from byte arrays to crypto_box types for NaCl operations",
+      "start_line": 63,
+      "end_line": 68,
+      "claim": "Cryptographic operations construct SalsaBox and extract nonce from ciphertext",
       "section": "Key Components"
     },
     {
       "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
-      "start_line": 67,
-      "end_line": 76,
-      "claim": "Decryption extracts nonce from ciphertext prefix and performs AEAD decryption",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
-      "start_line": 77,
+      "start_line": 70,
       "end_line": 81,
-      "claim": "Output handler validates UTF-8 and writes plaintext to stdout",
+      "claim": "Decryption and output processing converts result to UTF-8 and outputs to stdout",
       "section": "Key Components"
     },
     {
       "file_path": "coordinator/internal/e2e/testdata/decrypt/Cargo.toml",
       "start_line": 6,
       "end_line": 8,
-      "claim": "Component depends on crypto_box 0.9 for NaCl operations and base64 0.22 for encoding",
+      "claim": "External dependencies are crypto_box 0.9 for cryptographic operations and base64 0.22 for encoding",
       "section": "External Dependencies"
     },
     {
       "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
       "start_line": 10,
       "end_line": 13,
-      "claim": "Uses base64 STANDARD engine and crypto_box AEAD traits for cryptographic operations",
+      "claim": "Dependencies are imported for base64 operations and cryptographic primitives",
       "section": "External Dependencies"
     },
     {
       "file_path": "coordinator/internal/e2e/cross_compat_test.go",
       "start_line": 15,
       "end_line": 22,
-      "claim": "Go tests verify cross-language encryption compatibility by building and invoking this Rust binary",
+      "claim": "The component is used for cross-language encryption compatibility testing between Go coordinator and Rust provider crypto implementations",
       "section": "Component Interactions"
     },
     {
       "file_path": "coordinator/internal/e2e/cross_compat_test.go",
-      "start_line": 44,
-      "end_line": 47,
-      "claim": "Test suite builds release binary and executes it with encrypted payloads",
+      "start_line": 34,
+      "end_line": 44,
+      "claim": "The test builds the Rust decryptor binary and locates it for execution",
       "section": "Component Interactions"
     },
     {
       "file_path": "coordinator/internal/e2e/cross_compat_test.go",
-      "start_line": 88,
-      "end_line": 128,
-      "claim": "Cross-language test encrypts with Go e2e package and decrypts with this Rust utility",
-      "section": "Component Interactions"
-    },
-    {
-      "file_path": "coordinator/internal/e2e/cross_compat_test.go",
-      "start_line": 56,
-      "end_line": 83,
-      "claim": "Test scenarios include JSON, empty, Unicode, large, and multiple round-trip payloads",
-      "section": "Cross-Language Compatibility Testing"
-    },
-    {
-      "file_path": "coordinator/internal/e2e/e2e.go",
-      "start_line": 64,
-      "end_line": 78,
-      "claim": "Go encryption uses NaCl Box with nonce prefix format compatible with this Rust decryptor",
-      "section": "Cross-Language Compatibility Testing"
-    },
-    {
-      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
-      "start_line": 25,
-      "end_line": 36,
-      "claim": "All inputs are base64 decoded with error handling and process exit on failure",
-      "section": "Data Flows"
+      "start_line": 114,
+      "end_line": 122,
+      "claim": "The binary is executed with base64-encoded arguments and outputs plaintext to stdout",
+      "section": "API Surface"
     }
   ]
 }

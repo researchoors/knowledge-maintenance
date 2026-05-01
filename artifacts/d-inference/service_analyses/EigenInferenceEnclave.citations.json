@@ -3,147 +3,112 @@
   "source_file": "/tmp/d-inference/service_analyses/EigenInferenceEnclave.md",
   "source_repo": "",
   "source_commit": "",
-  "citation_count": 20,
+  "citation_count": 15,
   "citations": [
     {
-      "file_path": "Sources/EigenInferenceEnclave/SecureEnclaveIdentity.swift",
-      "start_line": 36,
-      "end_line": 38,
-      "claim": "SecureEnclaveIdentity manages hardware-bound P-256 signing keys",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "Sources/EigenInferenceEnclave/SecureEnclaveIdentity.swift",
-      "start_line": 46,
-      "end_line": 49,
-      "claim": "Creates new identity by generating P-256 key in Secure Enclave",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
-      "start_line": 44,
-      "end_line": 59,
-      "claim": "AttestationBlob contains hardware identity and security state fields",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
-      "start_line": 100,
-      "end_line": 131,
-      "claim": "AttestationService creates attestations with deterministic JSON encoding",
-      "section": "Data Flows"
-    },
-    {
-      "file_path": "Sources/EigenInferenceEnclave/Bridge.swift",
-      "start_line": 36,
-      "end_line": 41,
-      "claim": "FFI bridge provides C-callable functions with proper memory management",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "Sources/EigenInferenceEnclave/Bridge.swift",
-      "start_line": 79,
-      "end_line": 90,
-      "claim": "FFI sign function takes raw data and returns base64-encoded signature",
-      "section": "API Surface"
-    },
-    {
-      "file_path": "Sources/EigenInferenceEnclaveCLI/main.swift",
-      "start_line": 31,
-      "end_line": 52,
-      "claim": "CLI attest command generates ephemeral attestations with optional parameters",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
-      "start_line": 175,
-      "end_line": 194,
-      "claim": "getChipName() uses system_profiler to extract Apple Silicon chip information",
-      "section": "External Dependencies"
-    },
-    {
-      "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
-      "start_line": 260,
-      "end_line": 273,
-      "claim": "checkSIPEnabled() calls csrutil status to determine SIP state",
-      "section": "External Dependencies"
-    },
-    {
-      "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
-      "start_line": 118,
-      "end_line": 126,
-      "claim": "JSON encoder uses sortedKeys for deterministic output matching Go implementation",
-      "section": "Data Flows"
-    },
-    {
-      "file_path": "Sources/EigenInferenceEnclave/SecureEnclaveIdentity.swift",
-      "start_line": 100,
-      "end_line": 103,
-      "claim": "Sign operation returns DER-encoded ECDSA signature compatible with Go crypto/ecdsa",
-      "section": "API Surface"
-    },
-    {
-      "file_path": "Sources/EigenInferenceEnclave/SecureEnclaveIdentity.swift",
-      "start_line": 75,
-      "end_line": 77,
-      "claim": "Public key is exported as raw 64-byte representation (X||Y without prefix)",
-      "section": "API Surface"
-    },
-    {
-      "file_path": "include/eigeninference_enclave.h",
-      "start_line": 17,
-      "end_line": 17,
-      "claim": "FFI provides Secure Enclave availability check function",
-      "section": "API Surface"
-    },
-    {
-      "file_path": "include/eigeninference_enclave.h",
-      "start_line": 80,
-      "end_line": 84,
-      "claim": "Full attestation function supports optional encryption key and binary hash binding",
-      "section": "API Surface"
-    },
-    {
-      "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
-      "start_line": 139,
-      "end_line": 157,
-      "claim": "Static verify method re-encodes attestation for signature validation",
-      "section": "Data Flows"
-    },
-    {
-      "file_path": "Package.swift",
-      "start_line": 7,
-      "end_line": 10,
-      "claim": "Package provides both static library and executable CLI tool products",
+      "file_path": "enclave/Package.swift",
+      "start_line": 4,
+      "end_line": 19,
+      "claim": "The component is a Swift package with library and executable products targeting macOS 13+",
       "section": "Architecture"
     },
     {
-      "file_path": "Tests/EigenInferenceEnclaveTests/SecureEnclaveTests.swift",
-      "start_line": 18,
-      "end_line": 24,
-      "claim": "Identity creation produces 64-byte raw P-256 public keys",
+      "file_path": "enclave/Sources/EigenInferenceEnclave/SecureEnclaveIdentity.swift",
+      "start_line": 36,
+      "end_line": 49,
+      "claim": "SecureEnclaveIdentity manages hardware-bound P-256 keys with tamper-resistant storage",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclave/Bridge.swift",
+      "start_line": 36,
+      "end_line": 41,
+      "claim": "FFI bridge provides C-callable functions for Rust integration with opaque pointer management",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclave/Attestation.swift",
+      "start_line": 44,
+      "end_line": 59,
+      "claim": "AttestationBlob contains hardware identity and security state fields in alphabetical order",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclave/Attestation.swift",
+      "start_line": 100,
+      "end_line": 131,
+      "claim": "AttestationService creates signed attestation blobs with deterministic JSON encoding",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+      "start_line": 31,
+      "end_line": 52,
+      "claim": "CLI tool provides attest command for generating ephemeral attestations",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclave/Attestation.swift",
+      "start_line": 175,
+      "end_line": 195,
+      "claim": "System information collected via system_profiler for chip identification",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclave/SecureEnclaveIdentity.swift",
+      "start_line": 26,
+      "end_line": 28,
+      "claim": "Component imports CryptoKit and Foundation for cryptographic and system operations",
+      "section": "External Dependencies"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclave/Bridge.swift",
+      "start_line": 1,
+      "end_line": 25,
+      "claim": "FFI bridge enables Rust integration through C ABI with documented memory management",
       "section": "API Surface"
     },
     {
-      "file_path": "Tests/EigenInferenceEnclaveTests/SecureEnclaveTests.swift",
-      "start_line": 83,
-      "end_line": 98,
-      "claim": "Attestation service creates verifiable signed attestation blobs",
+      "file_path": "enclave/Sources/EigenInferenceEnclave/SecureEnclaveIdentity.swift",
+      "start_line": 100,
+      "end_line": 103,
+      "claim": "Signing operations occur in Secure Enclave hardware with DER-encoded output",
       "section": "Data Flows"
     },
     {
-      "file_path": "Tests/EigenInferenceEnclaveTests/AttestationTests.swift",
-      "start_line": 52,
-      "end_line": 68,
-      "claim": "JSON output uses sorted keys for deterministic encoding",
-      "section": "Data Flows"
+      "file_path": "enclave/Sources/EigenInferenceEnclave/Attestation.swift",
+      "start_line": 162,
+      "end_line": 169,
+      "claim": "Hardware model retrieved via sysctl hw.model parameter",
+      "section": "External Dependencies"
     },
     {
-      "file_path": "Sources/EigenInferenceEnclave/Attestation.swift",
-      "start_line": 235,
-      "end_line": 253,
-      "claim": "RDMA check ensures remote memory access is disabled for security",
-      "section": "Security Model"
+      "file_path": "enclave/Sources/EigenInferenceEnclave/Attestation.swift",
+      "start_line": 292,
+      "end_line": 312,
+      "claim": "Authenticated Root Volume status checked via diskutil for volume sealing verification",
+      "section": "External Dependencies"
+    },
+    {
+      "file_path": "enclave/Tests/EigenInferenceEnclaveTests/SecureEnclaveTests.swift",
+      "start_line": 123,
+      "end_line": 146,
+      "claim": "FFI bridge functions tested for identity creation, key export, and memory management",
+      "section": "API Surface"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclave/SecureEnclaveIdentity.swift",
+      "start_line": 74,
+      "end_line": 90,
+      "claim": "Public keys exported in multiple formats: raw bytes, base64, and hex",
+      "section": "API Surface"
+    },
+    {
+      "file_path": "enclave/Sources/EigenInferenceEnclaveCLI/main.swift",
+      "start_line": 16,
+      "end_line": 29,
+      "claim": "CLI provides attest and info commands with optional key binding parameters",
+      "section": "API Surface"
     }
   ]
 }

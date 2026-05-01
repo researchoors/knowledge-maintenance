@@ -1,162 +1,91 @@
 # decrypt-test Component Analysis
 
-## Overview
-
-The `decrypt-test` component is a minimal Rust CLI service designed for cross-language cryptographic compatibility testing between the Go coordinator and Rust provider components in the d-inference system. It serves as a verification tool to ensure that encrypted payloads created by the Go e2e encryption package can be correctly decrypted by the Rust crypto_box crate, validating the cryptographic interoperability of the system.
-
 ## Architecture
 
-The component follows a **simple command-line utility pattern** with:
-- Single-purpose binary design focused on cryptographic verification
-- Direct CLI argument processing without complex parsing frameworks  
-- Minimal error handling with immediate exit on failures
-- Stateless execution model (no persistent state or configuration)
+The decrypt-test component follows a simple command-line utility architecture with a linear execution pattern. The tool is designed as a minimal standalone binary that performs a single cryptographic operation: decrypting NaCl Box encrypted data using X25519 elliptic curve cryptography. The architecture is straightforward with input validation, key construction, and decryption operations in sequence.
 
-The architecture is deliberately minimal to reduce complexity and focus purely on the cryptographic operation validation.
+The component serves as a cross-language compatibility testing tool, allowing Go-based encryption in the coordinator to be verified against Rust's crypto_box implementation, ensuring cryptographic interoperability between different language implementations of the same protocol.
 
 ## Key Components
 
-### 1. **Main Entry Point** (`src/main.rs:15-81`)
-- **Purpose**: CLI argument parsing, validation, and orchestration of the decryption process
-- **Key Features**: 
-  - Three-argument validation (ephemeral public key, ciphertext, provider private key)
-  - Base64 decoding of all input parameters
-  - Comprehensive input validation with descriptive error messages
-  - Process exit codes for automation compatibility
+### Main Function
+The entry point handles command-line argument parsing and orchestrates the entire decryption process. It validates exactly 3 arguments are provided and coordinates the base64 decoding, key validation, and decryption operations.
 
-### 2. **Cryptographic Input Validation** (`src/main.rs:38-58`)
-- **Purpose**: Ensures all cryptographic inputs meet NaCl Box specifications
-- **Validations**:
-  - Ephemeral public key must be exactly 32 bytes (X25519 standard)
-  - Provider private key must be exactly 32 bytes (X25519 standard)
-  - Ciphertext must be at least 24 bytes (minimum: nonce + encrypted data)
+### Base64 Decoding Layer
+Utilizes the standard base64 engine to decode all three input parameters: ephemeral public key, ciphertext, and provider private key. Each decoding operation includes comprehensive error handling with descriptive error messages.
 
-### 3. **Key Material Processing** (`src/main.rs:60-65`)
-- **Purpose**: Converts byte arrays to crypto_box types for NaCl operations
-- **Operations**:
-  - Converts byte arrays to fixed-size arrays using `try_into()`
-  - Creates `PublicKey` and `SecretKey` instances from raw bytes
-  - Establishes `SalsaBox` for the decryption operation
+### Key Size Validation
+Implements strict validation ensuring the ephemeral public key and provider private key are exactly 32 bytes each, conforming to X25519 key specifications. The ciphertext must be at least 24 bytes to accommodate the required nonce.
 
-### 4. **Decryption Engine** (`src/main.rs:67-76`)
-- **Purpose**: Performs NaCl Box decryption using XSalsa20-Poly1305
-- **Process**:
-  - Extracts 24-byte nonce from ciphertext prefix
-  - Uses remaining bytes as authenticated ciphertext
-  - Performs AEAD decryption with the derived shared secret
+### Cryptographic Operations
+Constructs a SalsaBox instance from the ephemeral public key and provider private key, then performs authenticated decryption using the first 24 bytes of ciphertext as nonce and remaining bytes as encrypted payload.
 
-### 5. **Output Handler** (`src/main.rs:77-81`)
-- **Purpose**: Converts decrypted bytes to UTF-8 and outputs to stdout
-- **Features**:
-  - UTF-8 validation with error reporting
-  - Direct stdout output without buffering
-  - Clean output format for test automation
+### Error Handling System
+Provides comprehensive error handling with descriptive messages for each failure mode, including base64 decoding errors, key size validation failures, ciphertext length issues, decryption failures, and UTF-8 conversion errors.
+
+### Output Processing
+Converts the decrypted bytes to UTF-8 string and outputs directly to stdout, enabling easy consumption by calling processes in testing scenarios.
 
 ## Data Flows
 
-### Primary Decryption Flow
-
 ```mermaid
 graph TD
-    A[CLI Args Input] --> B[Base64 Decode All Inputs]
-    B --> C{Validate Input Lengths}
-    C -->|Invalid| D[Exit Code 1]
-    C -->|Valid| E[Convert to Crypto Types]
-    E --> F[Extract Nonce from Ciphertext]
-    F --> G[Create SalsaBox Instance]
-    G --> H[Perform AEAD Decryption]
-    H -->|Failed| I[Exit Code 1]
-    H -->|Success| J[Validate UTF-8]
-    J -->|Invalid| K[Exit Code 1] 
-    J -->|Valid| L[Output to Stdout]
-```
-
-### Error Handling Flow
-
-```mermaid
-graph TD
-    A[Any Error Condition] --> B[Print Error to Stderr]
-    B --> C[Call std::process::exit(1)]
-    C --> D[Process Terminates]
+    A[Command Line Args] --> B[Argument Count Validation]
+    B --> C[Base64 Decode Ephemeral Public Key]
+    B --> D[Base64 Decode Ciphertext]  
+    B --> E[Base64 Decode Provider Private Key]
+    C --> F[Key Size Validation]
+    D --> G[Ciphertext Length Validation]
+    E --> F
+    F --> H[Construct SalsaBox]
+    G --> I[Extract Nonce & Payload]
+    H --> J[Decrypt Payload]
+    I --> J
+    J --> K[UTF-8 Conversion]
+    K --> L[Output to Stdout]
     
-    E[Success Path] --> F[Print Result to Stdout]
-    F --> G[Implicit Exit Code 0]
+    C --> M[Decode Error]
+    D --> M
+    E --> M
+    F --> N[Size Error]
+    G --> N
+    J --> O[Decryption Error]
+    K --> P[UTF-8 Error]
+    
+    M --> Q[Exit Code 1]
+    N --> Q
+    O --> Q
+    P --> Q
 ```
+
+The data flow shows a linear pipeline with multiple validation checkpoints. Input validation occurs early to catch malformed data before expensive cryptographic operations. All error paths lead to process exit with code 1 and descriptive error messages to stderr.
 
 ## External Dependencies
 
 ### External Libraries
 
-- **crypto_box** (0.9) [crypto]: Provides NaCl Box (X25519 + XSalsa20-Poly1305) encryption/decryption primitives. Used for the core cryptographic operations including key types (`PublicKey`, `SecretKey`), the encryption box (`SalsaBox`), and AEAD trait implementations. Imported and used throughout `src/main.rs:12-13, 63-75`.
+- **crypto_box** (0.9) [crypto]: Provides NaCl-compatible cryptographic primitives including X25519 elliptic curve Diffie-Hellman, XSalsa20 stream cipher, and Poly1305 message authentication. Used for constructing PublicKey, SecretKey, and SalsaBox instances, and performing authenticated encryption/decryption. Imported in: `src/main.rs` lines 12-13.
 
-- **base64** (0.22) [serialization]: Provides base64 encoding/decoding functionality using the standard alphabet. Used to decode all CLI arguments from base64 format as required by the cross-language testing protocol. Imported and used in `src/main.rs:10-11, 25-36`.
-
-### Standard Library Dependencies
-- **std::env**: For command-line argument access
-- **std::process**: For controlled process termination with exit codes
+- **base64** (0.22) [serialization]: Provides base64 encoding and decoding functionality using the standard base64 alphabet. Used to decode all three command-line arguments from base64 format into raw bytes for cryptographic operations. Imported in: `src/main.rs` lines 10-11, specifically using the STANDARD engine.
 
 ## API Surface
 
 ### Command-Line Interface
 
-```bash
+The component exposes a single command-line interface:
+```
 decrypt-test <ephemeral_public_key_b64> <ciphertext_b64> <provider_private_key_b64>
 ```
 
 **Parameters:**
-- `ephemeral_public_key_b64`: Base64-encoded 32-byte X25519 public key from coordinator's ephemeral session
-- `ciphertext_b64`: Base64-encoded encrypted payload (24-byte nonce || encrypted data)  
-- `provider_private_key_b64`: Base64-encoded 32-byte X25519 private key
+- `ephemeral_public_key_b64`: Base64-encoded 32-byte X25519 public key from the coordinator's ephemeral session
+- `ciphertext_b64`: Base64-encoded data containing 24-byte nonce concatenated with NaCl Box encrypted payload
+- `provider_private_key_b64`: Base64-encoded 32-byte X25519 private key for decryption
 
 **Output:**
-- **Success**: Decrypted plaintext written to stdout
-- **Failure**: Error message to stderr, process exits with code 1
+- Success: Decrypted plaintext written to stdout
+- Failure: Error message to stderr and exit code 1
 
-**Exit Codes:**
-- `0`: Successful decryption and output
-- `1`: Any error (invalid arguments, decode failure, decryption failure, UTF-8 error)
+### Integration Points
 
-## External Systems
-
-This component operates as a standalone utility with no external system dependencies:
-- **No network communication**
-- **No database connections** 
-- **No file system persistence**
-- **No cloud service integrations**
-
-It operates purely on command-line inputs and produces command-line outputs.
-
-## Component Interactions
-
-### Test Integration
-- **Target**: Go test suite (`coordinator/internal/e2e/cross_compat_test.go`)
-- **Type**: Process execution 
-- **Protocol**: Command-line interface with arguments
-- **Description**: The Go test harness builds this Rust binary, encrypts test payloads using the Go e2e package, then shells out to this utility to verify cross-language cryptographic compatibility.
-
-### Build Dependencies
-- **Target**: Cargo build system
-- **Type**: Compilation dependency
-- **Description**: Built as a release binary during Go tests using `cargo build --release` for performance optimization in the test suite.
-
-## Cross-Language Compatibility Testing
-
-This component is specifically designed to validate the cryptographic interoperability between:
-
-1. **Go Encryption** (`coordinator/internal/e2e/e2e.go`): Uses `golang.org/x/crypto/nacl/box` 
-2. **Rust Decryption** (this component): Uses `crypto_box` crate
-
-The test scenarios include:
-- JSON payloads (typical inference requests)
-- Empty payloads (edge case handling)
-- Unicode content (character encoding compatibility)  
-- Large payloads (64KB+ for chunked encryption verification)
-- Multiple round trips (nonce uniqueness and determinism checks)
-
-## Security Considerations
-
-- **Input Validation**: Comprehensive validation of all cryptographic inputs
-- **Memory Safety**: Rust's memory safety prevents buffer overflows
-- **No Key Persistence**: Private keys are only held in memory during execution
-- **Constant-Time Operations**: Uses established crypto_box library with timing attack mitigations
-- **Forward Secrecy**: Supports ephemeral key usage patterns
+The component is specifically designed for integration with Go-based end-to-end tests in the coordinator. The cross-language compatibility test builds this binary and shells out to it, passing encrypted payloads created by Go's `golang.org/x/crypto/nacl/box` package to verify cryptographic compatibility between language implementations.
