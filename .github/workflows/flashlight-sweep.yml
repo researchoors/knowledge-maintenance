@@ -161,6 +161,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
           OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
+          FLASHLIGHT_REPO_TOKEN: ${{ secrets.FLASHLIGHT_REPO_TOKEN }}
         run: |
           ARGS="--repo https://github.com/${{ matrix.repo }}.git"
           ARGS="$ARGS --output ${{ matrix.artifacts_path }}"
