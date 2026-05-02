@@ -1,7 +1,7 @@
 {
   "schema_version": "2.0.0",
-  "source_repo": "/private/tmp/flashlight-repos/d-inference",
-  "source_commit": "f7dab6fa994a",
+  "source_repo": "/tmp/flashlight-repos/d-inference",
+  "source_commit": "7ccc592f0d6fada78a9ed1573ee0c905d6dbbf53",
   "nodes": {
     "components": {
       "analytics": {
@@ -9,18 +9,18 @@
         "kind": "service",
         "type": "go-module",
         "root_path": "analytics/cmd/analytics",
-        "description": "Standalone read-only analytics service for network statistics and earnings leaderboards",
+        "description": "Standalone read-only HTTP API service providing public analytics data for the EigenInference distributed AI inference network",
         "internal_dependencies": ["analytics"],
         "external_dependencies": [],
         "key_files": [],
         "manifest_path": "analytics/go.mod"
       },
       "coordinator": {
-        "name": "coordinator", 
+        "name": "coordinator",
         "kind": "service",
         "type": "go-module",
         "root_path": "coordinator/cmd/coordinator",
-        "description": "Central control plane for routing AI inference requests to provider nodes with hardware attestation",
+        "description": "Central control plane of the Darkbloom distributed inference network, acting as trusted intermediary between consumers and providers",
         "internal_dependencies": ["coordinator"],
         "external_dependencies": [],
         "key_files": [],
@@ -28,10 +28,10 @@
       },
       "verify-attestation": {
         "name": "verify-attestation",
-        "kind": "service", 
+        "kind": "cli",
         "type": "go-module",
         "root_path": "coordinator/cmd/verify-attestation",
-        "description": "Utility service for verifying Apple Secure Enclave attestations",
+        "description": "CLI utility that verifies signed attestation blobs from EigenInference provider nodes",
         "internal_dependencies": ["coordinator"],
         "external_dependencies": [],
         "key_files": [],
@@ -40,40 +40,22 @@
       "web": {
         "name": "web",
         "kind": "frontend",
-        "type": "typescript-package", 
+        "type": "typescript-package",
         "root_path": "console-ui",
-        "description": "Next.js web frontend providing chat interface and provider dashboard with E2E encryption",
+        "description": "Next.js frontend application serving as the web interface for Darkbloom's private AI inference platform",
         "internal_dependencies": [],
-        "external_dependencies": [
-          {"name": "@datadog/browser-rum", "version": "^6.32.0"},
-          {"name": "@privy-io/react-auth", "version": "^3.18.0"},
-          {"name": "@privy-io/server-auth", "version": "^1.32.5"},
-          {"name": "asn1js", "version": "^3.0.7"},
-          {"name": "lucide-react", "version": "^1.0.1"},
-          {"name": "next", "version": "^16.2.2"},
-          {"name": "pkijs", "version": "^3.4.0"},
-          {"name": "react", "version": "^19.2.4"},
-          {"name": "react-dom", "version": "^19.2.4"},
-          {"name": "react-markdown", "version": "^10.1.0"},
-          {"name": "rehype-highlight", "version": "^7.0.2"},
-          {"name": "remark-gfm", "version": "^4.0.1"},
-          {"name": "tweetnacl", "version": "^1.0.3"},
-          {"name": "zustand", "version": "^5.0.12"}
-        ],
+        "external_dependencies": [],
         "key_files": [],
         "manifest_path": "console-ui/package.json"
       },
       "decrypt-test": {
         "name": "decrypt-test",
-        "kind": "service",
+        "kind": "cli",
         "type": "rust-crate",
-        "root_path": "coordinator/internal/e2e/testdata/decrypt", 
-        "description": "Test utility for E2E encryption validation",
+        "root_path": "coordinator/internal/e2e/testdata/decrypt",
+        "description": "Minimal NaCl Box decryptor CLI tool for cross-language compatibility testing",
         "internal_dependencies": [],
-        "external_dependencies": [
-          {"name": "crypto_box", "version": "0.9"},
-          {"name": "base64", "version": "0.22"}
-        ],
+        "external_dependencies": [],
         "key_files": [],
         "manifest_path": "coordinator/internal/e2e/testdata/decrypt/Cargo.toml"
       },
@@ -82,38 +64,9 @@
         "kind": "service",
         "type": "rust-crate",
         "root_path": "provider",
-        "description": "EigenInference provider agent for Apple Silicon Macs with hardware-attested security",
+        "description": "EigenInference provider agent for Apple Silicon Macs with hardware attestation and end-to-end encryption",
         "internal_dependencies": [],
-        "external_dependencies": [
-          {"name": "clap", "version": "4"},
-          {"name": "tokio", "version": "1"},
-          {"name": "tokio-util", "version": "0.7"},
-          {"name": "serde", "version": "1"},
-          {"name": "serde_json", "version": "1"},
-          {"name": "toml", "version": "0.8"},
-          {"name": "tracing", "version": "0.1"},
-          {"name": "tracing-subscriber", "version": "0.3"},
-          {"name": "reqwest", "version": "0.12"},
-          {"name": "tokio-tungstenite", "version": "0.26"},
-          {"name": "futures-util", "version": "0.3"},
-          {"name": "axum", "version": "0.8"},
-          {"name": "http-body-util", "version": "0.1"},
-          {"name": "anyhow", "version": "1"},
-          {"name": "thiserror", "version": "2"},
-          {"name": "async-trait", "version": "0.1"},
-          {"name": "uuid", "version": "1"},
-          {"name": "libc", "version": "0.2"},
-          {"name": "dirs", "version": "6"},
-          {"name": "chrono", "version": "0.4"},
-          {"name": "once_cell", "version": "1"},
-          {"name": "backtrace", "version": "0.3"},
-          {"name": "crossterm", "version": "0.28"},
-          {"name": "crypto_box", "version": "0.9"},
-          {"name": "base64", "version": "0.22"},
-          {"name": "sha2", "version": "0.10"},
-          {"name": "zeroize", "version": "1"},
-          {"name": "pyo3", "version": "0.24"}
-        ],
+        "external_dependencies": [],
         "key_files": [],
         "manifest_path": "provider/Cargo.toml"
       },
@@ -122,7 +75,7 @@
         "kind": "frontend",
         "type": "swift-package",
         "root_path": "app/EigenInference/Sources/EigenInference",
-        "description": "macOS menu bar application for managing darkbloom provider with native SwiftUI interface",
+        "description": "Swift package frontend application for EigenInference",
         "internal_dependencies": [],
         "external_dependencies": [],
         "key_files": [],
@@ -131,9 +84,9 @@
       "EigenInferenceEnclave": {
         "name": "EigenInferenceEnclave",
         "kind": "library",
-        "type": "swift-package", 
+        "type": "swift-package",
         "root_path": "enclave",
-        "description": "Swift package providing Secure Enclave attestation and signing capabilities",
+        "description": "Swift package library providing hardware-based identity and attestation using Apple's Secure Enclave",
         "internal_dependencies": ["EigenInferenceEnclave", "EigenInferenceEnclaveCLI"],
         "external_dependencies": [],
         "key_files": [],
@@ -144,7 +97,7 @@
         "kind": "cli",
         "type": "swift-package",
         "root_path": "enclave/Sources/EigenInferenceEnclaveCLI",
-        "description": "CLI tool for Secure Enclave operations and diagnostics",
+        "description": "Swift-based CLI tool that generates secure hardware attestation using Apple's Secure Enclave",
         "internal_dependencies": ["EigenInferenceEnclave"],
         "external_dependencies": [],
         "key_files": [],
@@ -153,34 +106,39 @@
     },
     "external_services": {
       "stripe": {
-        "name": "Stripe",
-        "type": "payment_platform",
-        "description": "Payment processing for consumer deposits and provider payouts"
+        "name": "stripe",
+        "type": "payments",
+        "description": "Payment processing for deposits and payouts"
       },
       "datadog": {
-        "name": "Datadog",
+        "name": "datadog", 
         "type": "monitoring",
-        "description": "APM tracing, metrics, and structured logging"
-      },
-      "postgresql": {
-        "name": "PostgreSQL",
-        "type": "database", 
-        "description": "Primary data store for balances, usage, and provider state"
+        "description": "Metrics, logging, and distributed tracing"
       },
       "privy": {
-        "name": "Privy",
-        "type": "authentication",
-        "description": "OAuth and email-based user authentication"
+        "name": "privy",
+        "type": "authentication", 
+        "description": "Web3-native authentication service"
       },
-      "apple-secure-enclave": {
-        "name": "Apple Secure Enclave", 
-        "type": "hardware_security",
-        "description": "Hardware attestation and cryptographic signing"
+      "postgresql": {
+        "name": "postgresql",
+        "type": "database",
+        "description": "Primary data store for production deployments"
+      },
+      "gcp-confidential-vm": {
+        "name": "gcp-confidential-vm",
+        "type": "infrastructure",
+        "description": "Hardware-encrypted runtime environment"
       },
       "cloudflare-r2": {
-        "name": "Cloudflare R2",
-        "type": "cdn_storage",
-        "description": "Model distribution and runtime package CDN"
+        "name": "cloudflare-r2",
+        "type": "cdn",
+        "description": "Model and runtime package distribution"
+      },
+      "apple-secure-enclave": {
+        "name": "apple-secure-enclave",
+        "type": "hardware-security",
+        "description": "Hardware attestation and identity verification"
       }
     }
   },
@@ -191,8 +149,8 @@
       "type": "depends_on"
     },
     {
-      "source": "coordinator", 
-      "target": "coordinator",
+      "source": "coordinator",
+      "target": "coordinator", 
       "type": "depends_on"
     },
     {
@@ -202,12 +160,12 @@
     },
     {
       "source": "EigenInferenceEnclave",
-      "target": "EigenInferenceEnclave", 
+      "target": "EigenInferenceEnclave",
       "type": "depends_on"
     },
     {
       "source": "EigenInferenceEnclave",
-      "target": "EigenInferenceEnclaveCLI",
+      "target": "EigenInferenceEnclaveCLI", 
       "type": "depends_on"
     },
     {
@@ -218,124 +176,79 @@
     {
       "source": "web",
       "target": "coordinator",
-      "type": "api_calls",
+      "type": "calls",
       "protocol": "https",
-      "description": "Proxied API requests for AI inference, model management, and billing"
+      "description": "All AI inference, authentication, and provider management operations"
     },
     {
       "source": "darkbloom",
       "target": "coordinator", 
-      "type": "websocket_connection",
+      "type": "connects_to",
       "protocol": "websocket",
-      "description": "Provider registration, inference request handling, and attestation challenges"
-    },
-    {
-      "source": "EigenInference",
-      "target": "darkbloom",
-      "type": "subprocess_management",
-      "protocol": "local",
-      "description": "Manages darkbloom binary lifecycle through subprocess spawning and monitoring"
+      "description": "Provider registration, attestation, and inference request handling"
     },
     {
       "source": "darkbloom",
       "target": "EigenInferenceEnclave",
-      "type": "ffi_calls",
-      "protocol": "ffi", 
-      "description": "Secure Enclave attestation and challenge-response signing via FFI bridge"
+      "type": "uses", 
+      "protocol": "ffi",
+      "description": "Hardware attestation via Secure Enclave integration"
     },
     {
       "source": "coordinator",
       "target": "postgresql",
-      "type": "database_connection", 
+      "type": "connects_to",
       "protocol": "tcp",
-      "description": "Primary data persistence for accounts, balances, and provider state"
-    },
-    {
-      "source": "analytics",
-      "target": "postgresql",
-      "type": "database_connection",
-      "protocol": "tcp",
-      "description": "Read-only access to provider and earnings data"
+      "description": "Primary data persistence"
     },
     {
       "source": "coordinator",
       "target": "stripe",
-      "type": "api_calls",
+      "type": "calls",
       "protocol": "https", 
-      "description": "Payment processing for deposits and Connect Express payouts"
+      "description": "Payment processing and payouts"
     },
     {
-      "source": "web",
-      "target": "stripe",
-      "type": "api_calls",
-      "protocol": "https",
-      "description": "Stripe Checkout session creation and payment flows"
-    },
-    {
-      "source": "coordinator", 
+      "source": "coordinator",
       "target": "datadog",
-      "type": "telemetry_reporting",
-      "protocol": "udp/https",
-      "description": "APM traces, DogStatsD metrics, and structured logs"
-    },
-    {
-      "source": "web",
-      "target": "datadog",
-      "type": "telemetry_reporting", 
+      "type": "sends_to",
       "protocol": "https",
-      "description": "Real user monitoring and frontend error tracking"
-    },
-    {
-      "source": "darkbloom",
-      "target": "cloudflare-r2",
-      "type": "api_calls",
-      "protocol": "https",
-      "description": "Model and runtime package downloads"
+      "description": "Metrics and logging"
     },
     {
       "source": "web",
       "target": "privy",
-      "type": "oauth_integration",
+      "type": "calls",
       "protocol": "https",
-      "description": "User authentication and API key provisioning"
+      "description": "User authentication"
     },
     {
-      "source": "darkbloom",
-      "target": "apple-secure-enclave",
-      "type": "hardware_calls",
-      "protocol": "system",
-      "description": "Hardware attestation blob generation and challenge signing"
-    },
-    {
-      "source": "EigenInferenceEnclave",
-      "target": "apple-secure-enclave",
-      "type": "hardware_calls", 
-      "protocol": "system",
-      "description": "P-256 ECDSA key operations and cryptographic signing"
+      "source": "analytics",
+      "target": "postgresql", 
+      "type": "reads_from",
+      "protocol": "tcp",
+      "description": "Read-only analytics data access"
     }
   ],
   "analysis": {},
   "metadata": {
     "component_count": 9,
-    "external_service_count": 6,
-    "edge_count": 20,
-    "analyzed_count": 0,
+    "external_service_count": 7,
+    "edge_count": 15,
+    "analyzed_count": 9,
     "by_kind": {
       "library": 1,
-      "service": 5,
-      "cli": 1,
+      "service": 4,
+      "cli": 3,
       "frontend": 2
     },
     "by_edge_type": {
       "depends_on": 6,
-      "api_calls": 5,
-      "websocket_connection": 1,
-      "subprocess_management": 1,
-      "ffi_calls": 1,
-      "database_connection": 2,
-      "telemetry_reporting": 2,
-      "oauth_integration": 1,
-      "hardware_calls": 2
+      "calls": 4,
+      "connects_to": 2,
+      "uses": 1,
+      "sends_to": 1, 
+      "reads_from": 1
     }
   }
 }

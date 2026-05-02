@@ -3,105 +3,77 @@
   "source_file": "/tmp/d-inference/service_analyses/verify-attestation.md",
   "source_repo": "",
   "source_commit": "",
-  "citation_count": 14,
+  "citation_count": 10,
   "citations": [
     {
       "file_path": "coordinator/cmd/verify-attestation/main.go",
-      "start_line": 1,
-      "end_line": 8,
-      "claim": "Simple package structure importing only fmt, os, and internal attestation library",
+      "start_line": 10,
+      "end_line": 34,
+      "claim": "The component reads a fixed attestation file and delegates verification to the coordinator's attestation package, outputting human-readable results with appropriate exit codes",
       "section": "Architecture"
     },
     {
       "file_path": "coordinator/cmd/verify-attestation/main.go",
-      "start_line": 10,
-      "end_line": 16,
-      "claim": "File reading from fixed path /tmp/eigeninference_attestation.json with error handling",
-      "section": "Key Components"
+      "start_line": 11,
+      "end_line": 15,
+      "claim": "File read errors are handled with stderr output and exit code 1",
+      "section": "Error Handling"
     },
     {
       "file_path": "coordinator/cmd/verify-attestation/main.go",
       "start_line": 17,
-      "end_line": 22,
-      "claim": "JSON parsing and verification delegation to attestation.VerifyJSON",
-      "section": "Key Components"
+      "end_line": 21,
+      "claim": "JSON parsing uses attestation.VerifyJSON() and handles errors with exit code 1",
+      "section": "Data Flows"
     },
     {
       "file_path": "coordinator/cmd/verify-attestation/main.go",
       "start_line": 23,
-      "end_line": 26,
-      "claim": "Hardware identity extraction and display from verification result",
-      "section": "Key Components"
+      "end_line": 25,
+      "claim": "Hardware information is extracted and displayed including chip name and hardware model",
+      "section": "API Surface"
     },
     {
       "file_path": "coordinator/cmd/verify-attestation/main.go",
       "start_line": 27,
-      "end_line": 34,
-      "claim": "Verification status display and exit code management",
-      "section": "Key Components"
+      "end_line": 33,
+      "claim": "Verification results are output with success message for valid attestations or failure message with exit code 1 for invalid ones",
+      "section": "API Surface"
+    },
+    {
+      "file_path": "coordinator/cmd/verify-attestation/main.go",
+      "start_line": 7,
+      "end_line": 7,
+      "claim": "The component depends on the coordinator's attestation package for core verification functionality",
+      "section": "Internal Dependencies"
     },
     {
       "file_path": "coordinator/cmd/verify-attestation/main.go",
       "start_line": 28,
       "end_line": 29,
-      "claim": "Cross-language verification success message indicating Swift to Go validation",
-      "section": "API Surface"
-    },
-    {
-      "file_path": "coordinator/cmd/verify-attestation/main.go",
-      "start_line": 11,
-      "end_line": 11,
-      "claim": "Fixed file path for attestation input at /tmp/eigeninference_attestation.json",
-      "section": "External Systems"
-    },
-    {
-      "file_path": "coordinator/cmd/verify-attestation/main.go",
-      "start_line": 14,
-      "end_line": 14,
-      "claim": "Exit code 1 for file read errors",
-      "section": "External Systems"
-    },
-    {
-      "file_path": "coordinator/cmd/verify-attestation/main.go",
-      "start_line": 20,
-      "end_line": 20,
-      "claim": "Exit code 1 for verification failures",
-      "section": "External Systems"
-    },
-    {
-      "file_path": "coordinator/cmd/verify-attestation/main.go",
-      "start_line": 32,
-      "end_line": 32,
-      "claim": "Exit code 1 for invalid attestations",
-      "section": "External Systems"
-    },
-    {
-      "file_path": "coordinator/internal/attestation/attestation.go",
-      "start_line": 1,
-      "end_line": 25,
-      "claim": "Attestation package provides cross-language verification for Secure Enclave signed blobs",
-      "section": "Internal Dependencies"
+      "claim": "The component demonstrates cross-language verification between Swift Secure Enclave and Go coordinator implementations",
+      "section": "Overview"
     },
     {
       "file_path": "coordinator/internal/attestation/attestation.go",
       "start_line": 233,
       "end_line": 240,
-      "claim": "VerifyJSON function used by verify-attestation for attestation verification",
+      "claim": "VerifyJSON function parses attestation JSON and delegates to core verification logic",
       "section": "Internal Dependencies"
     },
     {
       "file_path": "coordinator/internal/attestation/attestation.go",
       "start_line": 127,
-      "end_line": 131,
-      "claim": "Verification checks P-256 ECDSA signatures and security requirements",
-      "section": "Internal Dependencies"
+      "end_line": 231,
+      "claim": "The Verify function performs comprehensive P-256 ECDSA signature validation and security requirement checks",
+      "section": "Key Components"
     },
     {
-      "file_path": "coordinator/go.mod",
-      "start_line": 1,
-      "end_line": 4,
-      "claim": "Go module definition with Go 1.25.0 requirement",
-      "section": "External Dependencies"
+      "file_path": "coordinator/internal/attestation/attestation.go",
+      "start_line": 94,
+      "end_line": 111,
+      "claim": "VerificationResult structure contains hardware info, security status, and validation outcomes used by the CLI output",
+      "section": "API Surface"
     }
   ]
 }

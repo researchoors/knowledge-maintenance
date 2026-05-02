@@ -1,362 +1,232 @@
-# Darkbloom Component Analysis
+Perfect! Now I have a comprehensive understanding of the darkbloom component. Let me write the analysis.
 
-## Overview
-
-The darkbloom component is a sophisticated provider agent written in Rust that serves as the local inference runtime for Apple Silicon Macs in the EigenInference distributed inference network. It acts as a bridge between the global coordinator and local hardware, managing ML model execution with enterprise-grade security features.
+# Darkbloom Provider Agent Analysis
 
 ## Architecture
 
-The component follows a **multi-layered service architecture** with several key design patterns:
+Darkbloom is an **EigenInference provider agent** designed specifically for Apple Silicon Macs that implements a **hardened inference runtime** with **end-to-end encryption** and **hardware attestation** capabilities. The architecture follows a **security-first design** with multiple layers of protection to ensure inference privacy while connecting to the EigenInference coordinator network.
 
-1. **Hardened Runtime Security**: Implements multiple layers of protection including PT_DENY_ATTACH, SIP verification, and Secure Enclave integration
-2. **Hypervisor Isolation**: Uses Apple's Hypervisor.framework for memory isolation of inference workloads  
-3. **Multi-Backend Support**: Supports both subprocess (vllm-mlx) and in-process (PyO3) inference engines
-4. **Distributed Coordination**: WebSocket-based communication with coordinator for job routing and attestation
+The system implements a **hybrid architecture** combining:
+- **Local HTTP proxy mode** (legacy, debug-only)
+- **Coordinator-mediated inference** (production)  
+- **In-process Python embedding** (Phase 3 security)
+- **Hardware attestation** via Apple Secure Enclave
 
 ## Key Components
 
-### 1. Main Entry Point (`main.rs`)
-- **Purpose**: CLI command handler and application bootstrapping
-- **Key Features**: Command parsing, hardware detection, security initialization
-- **Integration**: Coordinates all subsystems and manages application lifecycle
-- **Lines**: 7,244 lines covering installation, serving, model management
+### 1. **Main Orchestrator** (`src/main.rs`)
+**Purpose**: Central command dispatcher and application entry point  
+**Functionality**: Implements comprehensive CLI interface with 19 subcommands, handles model catalog management, automated installation flow, and runtime verification. Manages download progress with resume capability, fallback catalog for offline operation, and security posture verification.
 
-### 2. Hardware Detection (`hardware.rs`) 
-- **Purpose**: Apple Silicon capability detection and system metrics collection
-- **Key Features**: Memory/GPU detection, thermal monitoring, performance metrics
-- **Integration**: Provides capabilities to coordinator for job routing decisions
-- **API**: Exposes `HardwareInfo` and `SystemMetrics` structs
+### 2. **Coordinator Client** (`src/coordinator.rs`)  
+**Purpose**: WebSocket connection manager for coordinator communication  
+**Functionality**: Implements automatic reconnection with exponential backoff, handles provider registration with hardware attestation, processes inference request routing, and manages periodic heartbeats with runtime statistics.
 
-### 3. Security Module (`security.rs`)
-- **Purpose**: Runtime hardening and threat protection  
-- **Key Features**: PT_DENY_ATTACH, SIP verification, memory wiping, core dump disable
-- **Integration**: Called at startup and before each inference request
-- **Lines**: 1,443 lines of security implementations
+### 3. **Backend Manager** (`src/backend/mod.rs`, `src/backend/vllm_mlx.rs`)
+**Purpose**: Inference engine lifecycle management  
+**Functionality**: Manages vllm-mlx and mlx-lm backends with health monitoring, automatic restart on failures, and capacity reporting. Supports both subprocess and in-process execution modes.
 
-### 4. Coordinator Client (`coordinator.rs`)
-- **Purpose**: WebSocket connection to distributed coordinator
-- **Key Features**: Registration, heartbeats, attestation challenges, job routing
-- **Integration**: Receives inference jobs and reports capacity/health status
-- **Lines**: 1,527 lines managing distributed communication
+### 4. **In-Process Engine** (`src/inference.rs`) 
+**Purpose**: Phase 3 security implementation using embedded Python  
+**Functionality**: Runs inference entirely within the hardened Rust process via PyO3, implements locked Python import paths, blocks dangerous modules, and provides single-process privacy guarantees.
 
-### 5. Backend Management (`backend/mod.rs`)
-- **Purpose**: Inference engine lifecycle and health monitoring
-- **Key Features**: Process management, automatic restart, health checks
-- **Integration**: Manages vllm-mlx subprocesses or in-process Python engines
-- **API**: `Backend` trait with `start()`, `stop()`, `health()` methods
+### 5. **Security Hardening** (`src/security.rs`)
+**Purpose**: Runtime protection implementation  
+**Functionality**: Implements PT_DENY_ATTACH debugger blocking, SIP verification, RDMA safety checks, core dump prevention, and environment variable scrubbing.
 
-### 6. Cryptographic Layer (`crypto.rs`)
-- **Purpose**: End-to-end encryption for inference requests
-- **Key Features**: X25519 key generation, NaCl encryption/decryption
-- **Integration**: Encrypts responses back to coordinator using ephemeral keys
-- **Lines**: 462 lines implementing E2E crypto protocols
+### 6. **Hardware Detection** (`src/hardware.rs`)
+**Purpose**: Apple Silicon capability discovery  
+**Functionality**: Detects chip family/tier, memory configuration, GPU cores, system metrics (thermal state, memory pressure), and determines memory bandwidth from lookup tables.
 
-### 7. Model Management (`models.rs`)
-- **Purpose**: HuggingFace cache scanning and model discovery
-- **Key Features**: MLX model detection, memory filtering, weight hashing
-- **Integration**: Reports available models to coordinator based on hardware capacity
-- **Lines**: 1,082 lines of model management logic
+### 7. **Model Discovery** (`src/models.rs`)
+**Purpose**: Local model cache management  
+**Functionality**: Scans HuggingFace cache for MLX models, computes SHA-256 weight fingerprints, estimates memory requirements, and filters by hardware constraints.
 
-### 8. Hypervisor Integration (`hypervisor.rs`) 
-- **Purpose**: Memory isolation using Apple's Hypervisor.framework
-- **Key Features**: VM creation, memory mapping, Stage 2 page table isolation
-- **Integration**: Protects inference memory from DMA attacks
-- **Lines**: 346 lines of low-level hypervisor management
+### 8. **Cryptographic Engine** (`src/crypto.rs`)
+**Purpose**: End-to-end encryption implementation  
+**Functionality**: Generates ephemeral X25519 keypairs, implements NaCl Box encryption/decryption, and manages secure key lifecycle with memory wiping.
 
-### 9. Inference Proxy (`proxy.rs`)
-- **Purpose**: Request forwarding and response streaming
-- **Key Features**: HTTP proxying, SSE streaming, encryption handling  
-- **Integration**: Bridges coordinator requests to local backends
-- **Lines**: 1,710 lines handling request/response flows
+### 9. **Secure Enclave Interface** (`src/secure_enclave_key.rs`)
+**Purpose**: Hardware attestation via Apple Secure Enclave  
+**Functionality**: Creates ephemeral SE signing keys, implements challenge-response attestation, and provides hardware identity binding.
 
-### 10. Service Management (`service.rs`)
-- **Purpose**: macOS launchd integration for background operation
-- **Key Features**: Plist generation, daemon lifecycle management
-- **Integration**: Enables provider to run as system service
-- **Lines**: 210 lines of launchd configuration
+### 10. **Telemetry System** (`src/telemetry/`)
+**Purpose**: Structured event collection and reporting  
+**Functionality**: Implements async batching, disk overflow handling, stderr scraping, and panic hook integration with coordinator reporting.
 
-### 11. Telemetry System (`telemetry/mod.rs`)
-- **Purpose**: Observability and error reporting pipeline  
-- **Key Features**: Structured logging, panic capture, backend scraping
-- **Integration**: Reports operational metrics to coordinator
-- **Architecture**: Multi-source event collection with async batching
+### 11. **Service Management** (`src/service.rs`)
+**Purpose**: macOS launchd integration  
+**Functionality**: Creates user agents with explicit control (no auto-start), manages process lifecycle, and provides background operation capability.
 
-### 12. Secure Enclave Integration (`secure_enclave_key.rs`)
-- **Purpose**: Hardware-backed attestation using Apple Secure Enclave
-- **Key Features**: Ephemeral signing keys, attestation generation, challenge-response
-- **Integration**: Proves provider authenticity to coordinator for trust establishment
+### 12. **HTTP Proxy Server** (`src/server.rs`)
+**Purpose**: Legacy local-only inference proxy  
+**Functionality**: OpenAI-compatible API proxy (debug-only), quarantined behind environment flags, transparent streaming support.
 
 ## Data Flows
 
-### Inference Request Flow
+### Inference Request Flow (Coordinator Mode)
 ```mermaid
 graph TD
-    A[Coordinator WebSocket] --> B[coordinator.rs Event Handler]
-    B --> C[Security Check - SIP Verification]
-    C --> D{Request Type}
-    D -->|Encrypted| E[crypto.rs Decrypt]
-    D -->|Plaintext| F[proxy.rs Handler]
-    E --> F
-    F --> G{Backend Type}
-    G -->|Subprocess| H[vllm-mlx HTTP]
-    G -->|In-Process| I[PyO3 Python Engine]
-    H --> J[Response Streaming]
-    I --> J
-    J --> K[coordinator.rs WebSocket Send]
+    A[Coordinator] -->|WebSocket: InferenceRequest| B[Provider]
+    B -->|Decrypt E2E payload| C[Request Handler]
+    C -->|Route to backend| D[vllm-mlx/mlx-lm]
+    D -->|Stream response| E[Chunk Handler]
+    E -->|Encrypt chunks| F[WebSocket Client]
+    F -->|Send encrypted chunks| A
+    E -->|Final usage stats| G[Completion Handler]
+    G -->|SE signature| F
 ```
 
-### Model Loading Flow  
+### Hardware Attestation Flow
 ```mermaid
 graph TD
-    A[Model Selection] --> B[models.rs Resolve Path]
-    B --> C[HuggingFace Cache Lookup]
-    C --> D[backend.rs Start Process]
-    D --> E[Health Check Loop] 
-    E --> F{Model Loaded?}
-    F -->|No| E
-    F -->|Yes| G[Warmup Request]
-    G --> H[Ready for Inference]
+    A[Coordinator] -->|AttestationChallenge| B[Provider]
+    B -->|Generate nonce signature| C[Secure Enclave]
+    C -->|P256 signature| D[Challenge Handler]
+    D -->|Recompute runtime hashes| E[Security Module]
+    E -->|Verify SIP/RDMA status| F[Attestation Response]
+    F -->|Signed attestation blob| A
 ```
 
-### Attestation Flow
+### Model Loading and Verification Flow  
 ```mermaid
 graph TD
-    A[Coordinator Challenge] --> B[secure_enclave_key.rs]
-    B --> C[Apple Secure Enclave FFI]
-    C --> D[Sign Nonce + Metadata]  
-    D --> E[Return Attestation]
-    E --> F[coordinator.rs Send Response]
-    F --> G[Coordinator Verification]
+    A[Model Cache] -->|Scan HF cache| B[Model Discovery]
+    B -->|Filter by memory| C[Available Models]
+    C -->|Compute weight hash| D[SHA-256 Fingerprint]
+    D -->|Load into backend| E[vllm-mlx Engine]
+    E -->|Warmup request| F[GPU Cache Priming]
+    F -->|Report capacity| G[Coordinator Registration]
 ```
 
 ## External Dependencies
 
 ### Runtime Dependencies
 
-- **tokio** (1.x) [async-runtime]: Core async runtime powering all concurrent operations. Used throughout for task spawning, timers, and async I/O. Primary integration in coordinator WebSocket handling and backend health monitoring.
+- **tokio** (1.0) [async-runtime]: Core async runtime powering all I/O operations. Used throughout for WebSocket connections, HTTP clients, and concurrent task management. Imported in: all async modules.
 
-- **reqwest** (0.12) [networking]: HTTP client for coordinator API calls and backend health checks. Used in coordinator registration, model downloads, and backend status polling. Integrated in `coordinator.rs`, `proxy.rs`, and `backend/mod.rs`.
+- **reqwest** (0.12) [networking]: HTTP client for coordinator API calls, health checks, and model downloads. Features include JSON parsing and streaming support. Imported in: `src/main.rs`, `src/coordinator.rs`, `src/backend/mod.rs`.
 
-- **tokio-tungstenite** (0.26) [networking]: WebSocket client for real-time coordinator communication. Handles bidirectional message passing for job routing and heartbeats. Core integration in `coordinator.rs` connection management.
+- **tokio-tungstenite** (0.26) [networking]: WebSocket client implementation for coordinator communication with TLS support. Handles connection lifecycle and message framing. Imported in: `src/coordinator.rs`.
 
-- **axum** (0.8) [web-framework]: HTTP server for local debugging mode and health endpoints. Used when `--local` flag enables legacy HTTP proxy mode. Integration in `server.rs` for local development.
+- **axum** (0.8) [web-framework]: HTTP server framework for local API proxy mode. Provides routing, middleware, and streaming response handling. Imported in: `src/server.rs`.
 
-- **serde** (1.0) [serialization]: JSON serialization for all protocol messages and configuration. Used across `protocol.rs`, `config.rs`, and coordinator communication. Essential for API compatibility.
+- **serde** (1.0) [serialization]: JSON serialization/deserialization for protocol messages, configuration, and API responses. Used via derive macros across all data structures. Imported in: `src/protocol.rs`, `src/config.rs`, `src/models.rs`, `src/hardware.rs`.
 
-- **serde_json** (1.0) [serialization]: JSON processing for inference requests/responses and coordinator protocols. Heavy usage in `proxy.rs` for request forwarding and response parsing.
+- **serde_json** (1.0) [serialization]: JSON processing companion to serde for dynamic value handling and raw value preservation. Imported in: `src/main.rs`, `src/protocol.rs`, `src/coordinator.rs`.
 
-- **anyhow** (1.0) [error-handling]: Unified error handling across all modules. Provides context-aware error propagation from system calls, network operations, and business logic failures.
+- **toml** (0.8) [serialization]: Configuration file format parsing for provider settings stored in `~/.config/eigeninference/provider.toml`. Imported in: `src/config.rs`.
 
-- **tracing** (0.1) [logging]: Structured logging framework with hierarchical spans. Integrated with custom telemetry layer for operational observability. Used throughout for debugging and monitoring.
+- **tracing** (0.1) [logging]: Structured logging framework with span support for debugging and telemetry. Provides hierarchical event tracking. Imported in: all modules.
 
-- **tracing-subscriber** (0.3) [logging]: Log processing and filtering with JSON output support. Configured in `main.rs` with environment-based filtering for production deployments.
+- **tracing-subscriber** (0.3) [logging]: Log formatting and filtering implementation with environment-based configuration and JSON output support. Imported in: `src/main.rs`.
 
-- **clap** (4.x) [cli]: Command-line interface with derive macros for subcommands. Handles complex CLI including `serve`, `install`, `models`, `doctor` workflows. Integration in `main.rs` command parsing.
+- **clap** (4.0) [cli]: Command-line argument parsing with derive macros for the comprehensive CLI interface supporting 19 subcommands. Imported in: `src/main.rs`.
 
-- **crypto_box** (0.9) [crypto]: NaCl-compatible X25519 + XSalsa20-Poly1305 encryption for end-to-end security. Implements ephemeral key pairs and request/response encryption. Core usage in `crypto.rs`.
+- **anyhow** (1.0) [error-handling]: Error handling with context chains and source preservation for debugging complex failure paths. Imported in: all modules for `Result<()>` returns.
 
-- **base64** (0.22) [serialization]: Base64 encoding for cryptographic keys and binary data in JSON protocols. Used for public key exchange and attestation blob encoding.
+- **async-trait** (0.1) [async-trait]: Enables async methods in traits, specifically used for the `Backend` trait abstraction. Imported in: `src/backend/mod.rs`.
 
-- **sha2** (0.10) [crypto]: SHA-256 hashing for integrity verification of Python runtime, model weights, and templates. Critical for attestation and tamper detection. Used in `security.rs`.
+- **futures-util** (0.3) [async-runtime]: Stream processing utilities for WebSocket message handling and download progress tracking. Imported in: `src/main.rs`, `src/coordinator.rs`.
 
-- **uuid** (1.x) [misc]: RFC 4122 UUID generation for request tracking and session identification. Used in coordinator protocol for request correlation.
+- **uuid** (1.0) [other]: UUID generation for request tracking and unique identification in distributed inference requests. Imported in: `src/coordinator.rs`.
 
-- **chrono** (0.4) [misc]: Date/time handling for timestamps in telemetry events and coordinator heartbeats. Integration in protocol message timestamps.
+- **chrono** (0.4) [other]: Date/time handling for timestamps in attestation challenges and log entries. Imported in: `src/main.rs`.
 
-- **dirs** (6.x) [misc]: Cross-platform directory discovery for config files, cache, and data storage. Provides `~/.darkbloom` and HuggingFace cache paths.
+- **once_cell** (1.0) [other]: Thread-safe lazy static initialization for global telemetry client and configuration. Imported in: `src/telemetry/mod.rs`.
 
-- **once_cell** (1.x) [concurrency]: Thread-safe lazy initialization for global state like telemetry client and HTTP clients. Used for singleton pattern implementations.
+- **dirs** (6.0) [other]: Cross-platform directory path resolution for config, cache, and home directories. Imported in: `src/main.rs`, `src/config.rs`, `src/models.rs`.
 
-- **futures-util** (0.3) [async-runtime]: Stream utilities for WebSocket message processing and async combinators. Used in `coordinator.rs` for stream handling.
+- **tokio-util** (0.7) [async-runtime]: Additional async utilities for codec implementations and stream processing helpers. Imported in: `src/main.rs`.
 
-- **http-body-util** (0.1) [web-framework]: HTTP body utilities for Axum server integration in local development mode.
+### Cryptography Dependencies
 
-- **tokio-util** (0.7) [async-runtime]: Additional async utilities including cancellation tokens for graceful shutdown and timeout handling.
+- **crypto_box** (0.9) [crypto]: NaCl Box implementation providing X25519 key exchange with XSalsa20-Poly1305 AEAD for end-to-end encryption. Imported in: `src/crypto.rs`.
 
-- **libc** (0.2) [system]: Low-level system call bindings for security hardening (PT_DENY_ATTACH, RLIMIT_CORE). Critical for macOS security features.
+- **base64** (0.22) [crypto]: Base64 encoding for key serialization and encrypted payload transport in JSON messages. Imported in: `src/crypto.rs`, `src/security.rs`.
 
-- **crossterm** (0.28) [terminal]: Terminal control for interactive model picker in CLI workflows. Used for raw key input in model selection.
+- **sha2** (0.10) [crypto]: SHA-256 hashing for model weight fingerprinting, binary integrity verification, and runtime hash computation. Imported in: `src/main.rs`, `src/security.rs`, `src/inference.rs`.
 
-- **zeroize** (1.x) [security]: Secure memory wiping to prevent plaintext from lingering in freed memory. Used for cryptographic key cleanup.
+- **zeroize** (1.0) [crypto]: Secure memory wiping to prevent decrypted plaintext from lingering in freed memory after use. Imported in: `src/crypto.rs`.
 
-- **async-trait** (0.1) [async]: Enables async functions in trait definitions for Backend trait abstraction.
+### Platform-Specific Dependencies (macOS)
 
-- **thiserror** (2.x) [error-handling]: Derive macros for custom error types with automatic Display/Error implementations.
+- **security-framework** (3.0) [crypto]: macOS Security.framework bindings for Keychain access and certificate management. Imported in: `src/secure_enclave_key.rs`.
 
-- **backtrace** (0.3) [debugging]: Stack trace capture for panic handling and telemetry error reporting.
+- **security-framework-sys** (2.0) [crypto]: Low-level Security.framework system bindings for direct API access. Imported in: `src/secure_enclave_key.rs`.
 
-### Target-Specific Dependencies (macOS)
+- **core-foundation** (0.10) [other]: Core Foundation framework bindings for macOS system integration. Imported in: `src/secure_enclave_key.rs`.
 
-- **security-framework** (3.x) [system]: macOS Keychain Services and Security.framework bindings for certificate and key management.
+- **libc** (0.2) [other]: C standard library bindings for system calls including PT_DENY_ATTACH, setrlimit, and process management. Imported in: `src/main.rs`, `src/security.rs`.
 
-- **security-framework-sys** (2.x) [system]: Low-level FFI bindings for Security.framework system calls.
+### Optional Dependencies
 
-- **core-foundation** (0.10) [system]: Core Foundation framework bindings for macOS system integration and memory management.
+- **pyo3** (0.24) [other]: Python interpreter embedding for in-process inference execution. Optional behind `python` feature flag for Phase 3 security. Imported in: `src/inference.rs`.
 
-### Optional Features
-
-- **pyo3** (0.24) [python]: Python interpreter embedding for in-process inference engine (Phase 3). Links CPython directly into provider process for zero-IPC inference. Behind `python` feature flag (enabled by default).
+- **crossterm** (0.28) [cli]: Terminal UI library for raw key input in interactive model picker interface. Imported in: `src/main.rs`.
 
 ### Development Dependencies
 
-- **tempfile** (3.x) [testing]: Temporary file creation for unit tests and integration tests.
+- **tempfile** (3.0) [testing]: Temporary file management for configuration and cache testing scenarios. Used in: `src/config.rs` tests.
 
-- **assert_cmd** (2.x) [testing]: CLI testing utilities for command-line interface validation.
-
-- **predicates** (3.x) [testing]: Predicate functions for advanced test assertions and output validation.
-
-- **tower** (0.5) [testing]: Service abstraction utilities for testing HTTP service layers.
+- **tower** (0.5) [testing]: Service abstraction utilities for HTTP server testing with request/response mocking. Used in: `src/server.rs` tests.
 
 ## API Surface
 
-### Public CLI Interface
-
-The component exposes a comprehensive command-line interface:
-
-**Core Commands:**
-- `darkbloom init` - Hardware detection and configuration initialization
-- `darkbloom serve` - Start inference service with coordinator connection
-- `darkbloom install` - One-command setup with MDM enrollment and model download
-- `darkbloom start/stop` - Background service lifecycle management
-
-**Model Management:**
-- `darkbloom models list` - Display available local models
-- `darkbloom models download --model <id>` - Download specific models
-- `darkbloom models remove <id>` - Remove cached models
-
-**Maintenance:**
-- `darkbloom status` - Hardware and connection status
-- `darkbloom doctor` - Comprehensive system diagnostics
-- `darkbloom update` - Self-update to latest version
-- `darkbloom logs` - View service logs with real-time streaming
-
-**Security:**
-- `darkbloom enroll` - MDM device enrollment for attestation
+### CLI Commands (19 subcommands)
+- `darkbloom init` - Initialize provider configuration and hardware detection
+- `darkbloom serve` - Start serving inference requests (local or coordinator mode)  
+- `darkbloom install` - One-command setup: MDM enrollment, model download, service start
+- `darkbloom models {list|download|remove}` - Model lifecycle management
+- `darkbloom status` - Hardware and connection status reporting
+- `darkbloom doctor` - Comprehensive diagnostic tool
+- `darkbloom start/stop/logs` - Service lifecycle management
 - `darkbloom login/logout` - Account linking for earnings
+- `darkbloom update` - Automatic binary and runtime updates
 
-### Configuration Interface
+### WebSocket Protocol (Coordinator Communication)
+- **ProviderMessage::Register** - Initial registration with hardware info and attestation
+- **ProviderMessage::Heartbeat** - Periodic status updates with system metrics
+- **ProviderMessage::InferenceResponseChunk** - Streaming inference output
+- **ProviderMessage::AttestationResponse** - Challenge-response authentication
+- **CoordinatorMessage::InferenceRequest** - Encrypted inference routing
+- **CoordinatorMessage::AttestationChallenge** - Security verification
 
-Configuration via TOML files at `~/.darkbloom/provider.toml`:
-
-```toml
-[provider]
-auto_update = true
-
-[backend]  
-port = 8100
-model = "mlx-community/Qwen2.5-3B-Instruct-4bit"
-idle_timeout_mins = 30
-
-[coordinator]
-url = "wss://api.darkbloom.dev/ws/provider"
-heartbeat_interval_secs = 30
-
-[schedule]
-enabled = false
-active_hours = "09:00-17:00"
-active_days = ["monday", "tuesday", "wednesday", "thursday", "friday"]
-```
-
-### Protocol Interface
-
-WebSocket-based communication with coordinator using JSON messages:
-
-**Provider → Coordinator:**
-- `Register` - Initial registration with hardware info and attestation
-- `Heartbeat` - Periodic status updates with capacity metrics  
-- `InferenceAccepted/ResponseChunk/Complete/Error` - Inference lifecycle events
-- `AttestationResponse` - Response to security challenges
-
-**Coordinator → Provider:**
-- `InferenceRequest` - Job assignment with encrypted payloads
-- `Cancel` - Request cancellation
-- `AttestationChallenge` - Security verification requests
+### HTTP API (Local Mode)
+- `GET /health` - Backend health status
+- `GET /v1/models` - Available model listing  
+- `POST /v1/chat/completions` - OpenAI-compatible inference endpoint
 
 ## External Systems
 
-### Cloud Infrastructure
+### Infrastructure Dependencies
 
-**Coordinator API (api.darkbloom.dev)**
-- Category: Distributed coordination service
-- Purpose: Job routing, provider discovery, and network orchestration
-- Integration: WebSocket connection for real-time communication, REST API for registration and updates
-- Protocol: JSON over WebSocket with TLS, periodic heartbeats every 30 seconds
+- **EigenInference Coordinator** (api.darkbloom.dev): Central orchestration service for provider registration, inference routing, and payment processing
+- **Cloudflare R2 CDN** (pub-*.r2.dev): Model distribution, runtime packages, and template delivery with global edge caching  
+- **Apple MDM Infrastructure**: Device attestation enrollment and security policy enforcement
+- **Tempo Blockchain**: pathUSD payment settlement for inference earnings
 
-**R2 CDN (Cloudflare)**  
-- Category: Content delivery network
-- Purpose: Model weight distribution, runtime updates, and template storage
-- Integration: HTTPS downloads with resume support and integrity verification
-- URLs: `pub-7cbee059c80c46ec9c071dbee2726f8a.r2.dev` (models), `pub-3d1cb668259340eeb2276e1d375c846d.r2.dev` (runtime)
+### Cloud Services Integration
 
-**Telemetry Pipeline**
-- Category: Observability and monitoring
-- Purpose: Error reporting, performance metrics, and operational insights  
-- Integration: Batched HTTPS POST with structured JSON events, disk overflow for reliability
-
-### Hardware Integration
-
-**Apple Secure Enclave**
-- Category: Hardware security module  
-- Purpose: Cryptographic attestation and identity verification
-- Integration: FFI calls to Security.framework for signing and key generation
-- Protocol: Challenge-response authentication with ephemeral key pairs
-
-**Apple Hypervisor.framework**
-- Category: Virtualization and memory isolation
-- Purpose: Stage 2 page table isolation for inference memory protection
-- Integration: Direct FFI for VM creation and memory mapping (16MB alignment requirement)
-- Security: Protects against DMA attacks and memory inspection
-
-**Metal GPU Framework**
-- Category: GPU compute acceleration
-- Purpose: Model inference execution on Apple Silicon Neural Engine and GPU
-- Integration: Via MLX framework through Python backends (vllm-mlx, mlx-lm)
-- Memory: Shared GPU memory pool managed through hypervisor isolation
-
-### System Integration
-
-**macOS Launch Services**
-- Category: System service management
-- Purpose: Background daemon execution and automatic restart
-- Integration: Plist generation for launchd, KeepAlive configuration
-- File: `~/Library/LaunchAgents/io.darkbloom.provider.plist`
-
-**HuggingFace Model Hub**
-- Category: ML model repository
-- Purpose: Model discovery and local caching
-- Integration: Scans `~/.cache/huggingface/hub` for MLX-compatible models
-- Protocol: Local filesystem operations with model validation
-
-**macOS MDM (Mobile Device Management)**
-- Category: Enterprise device management
-- Purpose: Security policy enforcement and device attestation
-- Integration: Profile-based enrollment for security verification
-- Requirement: SIP (System Integrity Protection) enabled for trust model
+- **Apple Secure Enclave**: Hardware attestation and challenge-response authentication
+- **macOS Security Framework**: Keychain integration and certificate validation
+- **HuggingFace Model Hub**: Model discovery and metadata retrieval (fallback only)
 
 ## Component Interactions
 
-Since darkbloom has no internal dependencies within the d-inference codebase, all interactions are with external systems and hardware:
+### Internal Component Communication
 
-**→ Coordinator Service**
-- Type: WebSocket client 
-- Protocol: JSON message passing with TLS encryption
-- Description: Real-time job routing, capacity reporting, and security attestation
-- Frequency: Continuous connection with 30-second heartbeats
+- **Main ↔ Coordinator Client**: Event-driven communication via mpsc channels for inference requests, attestation challenges, and connection state changes
+- **Main ↔ Backend Manager**: Direct async calls for health checks, capacity queries, and lifecycle management  
+- **Main ↔ Telemetry System**: Fire-and-forget event emission with async batching and overflow handling
+- **Backend Manager ↔ HTTP Backends**: REST API communication for health checks, model queries, and inference requests
+- **Coordinator Client ↔ Crypto Engine**: Key exchange for E2E encryption of inference payloads and responses
 
-**→ Python Runtime (vllm-mlx)**  
-- Type: Subprocess management
-- Protocol: HTTP API (OpenAI-compatible) and process lifecycle
-- Description: Manages inference backend processes with health monitoring and auto-restart
-- Integration: Local HTTP proxy on ports 8100+ with streaming response handling
+### External Component Dependencies
 
-**→ MLX Framework**
-- Type: In-process Python embedding (optional)
-- Protocol: PyO3 FFI for direct Python interpreter control  
-- Description: Zero-IPC inference execution with embedded Python runtime
-- Security: Hardened process isolation with PT_DENY_ATTACH protection
+**None** - Darkbloom is designed as a standalone provider agent with no internal dependencies on other d-inference components. All external communication occurs through:
+- WebSocket connections to the coordinator
+- HTTP calls to CDN endpoints  
+- Local file system operations for model cache and configuration management
 
-**→ Apple System Services**
-- Type: System FFI and framework integration
-- Protocol: Objective-C/Swift FFI through Security.framework and Hypervisor.framework
-- Description: Hardware attestation, memory isolation, and security policy enforcement
-- Critical Path: Required for trust establishment and secure inference execution
+This isolation enables independent deployment, testing, and updates without coupling to other system components.

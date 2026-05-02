@@ -3,119 +3,112 @@
   "source_file": "/tmp/d-inference/service_analyses/analytics.md",
   "source_repo": "",
   "source_commit": "",
-  "citation_count": 16,
+  "citation_count": 15,
   "citations": [
     {
       "file_path": "analytics/cmd/analytics/main.go",
       "start_line": 19,
-      "end_line": 28,
-      "claim": "The service entry point initializes structured logging and loads configuration with error handling",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "analytics/cmd/analytics/main.go",
-      "start_line": 84,
-      "end_line": 93,
-      "claim": "Backend selection pattern allows memory or PostgreSQL storage based on configuration",
-      "section": "Architecture"
-    },
-    {
-      "file_path": "analytics/internal/config/config.go",
-      "start_line": 17,
-      "end_line": 24,
-      "claim": "Configuration structure includes address, backend type, database URL, CORS origin, and pseudonym secret",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "analytics/internal/config/config.go",
-      "start_line": 47,
-      "end_line": 65,
-      "claim": "Backend-specific validation ensures required parameters for PostgreSQL mode",
+      "end_line": 82,
+      "claim": "The main application orchestrates service initialization with graceful shutdown",
       "section": "Key Components"
     },
     {
       "file_path": "analytics/internal/httpapi/server.go",
-      "start_line": 24,
-      "end_line": 41,
-      "claim": "Health check endpoint tests backend connectivity and returns status with timestamp",
-      "section": "API Surface"
+      "start_line": 22,
+      "end_line": 101,
+      "claim": "HTTP API handler implements three main endpoints with CORS support",
+      "section": "Key Components"
     },
     {
       "file_path": "analytics/internal/httpapi/server.go",
       "start_line": 57,
       "end_line": 99,
-      "claim": "Earnings leaderboard endpoint supports scope, window, and limit query parameters with validation",
+      "claim": "Earnings leaderboard endpoint with query parameter validation",
       "section": "API Surface"
     },
     {
       "file_path": "analytics/internal/leaderboard/store.go",
-      "start_line": 19,
-      "end_line": 24,
-      "claim": "Leaderboard supports account and node scopes for different aggregation levels",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "analytics/internal/leaderboard/store.go",
-      "start_line": 27,
-      "end_line": 33,
-      "claim": "Time window filtering supports 24h, 7d, 30d, and all-time periods",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "analytics/internal/leaderboard/store.go",
-      "start_line": 144,
+      "start_line": 104,
       "end_line": 185,
-      "claim": "Service layer handles query normalization, validation, and pseudonym generation for leaderboard entries",
-      "section": "Data Flows"
+      "claim": "Leaderboard service contains core business logic for data aggregation",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "analytics/internal/leaderboard/store.go",
+      "start_line": 96,
+      "end_line": 102,
+      "claim": "Store interface provides data access abstraction",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "analytics/internal/leaderboard/store.go",
+      "start_line": 306,
+      "end_line": 340,
+      "claim": "Memory store implementation with mock data for development",
+      "section": "Key Components"
     },
     {
       "file_path": "analytics/internal/leaderboard/store.go",
       "start_line": 477,
       "end_line": 496,
-      "claim": "PostgreSQL store implementation uses connection pooling and validates connectivity on initialization",
-      "section": "External Systems"
-    },
-    {
-      "file_path": "analytics/internal/leaderboard/store.go",
-      "start_line": 517,
-      "end_line": 546,
-      "claim": "PostgreSQL overview query uses CTEs for efficient provider and earnings statistics aggregation",
-      "section": "External Systems"
-    },
-    {
-      "file_path": "analytics/internal/pseudonym/alias.go",
-      "start_line": 21,
-      "end_line": 33,
-      "claim": "Pseudonym generator uses HMAC-SHA256 with kind prefixing to create deterministic human-readable aliases",
+      "claim": "PostgreSQL store implementation for production",
       "section": "Key Components"
     },
     {
       "file_path": "analytics/internal/pseudonym/alias.go",
-      "start_line": 35,
-      "end_line": 107,
-      "claim": "Alias format uses predefined adjectives, animals, and numbers for human-readable pseudonyms",
+      "start_line": 10,
+      "end_line": 33,
+      "claim": "Pseudonym generator uses HMAC-SHA256 for deterministic aliases",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "analytics/internal/config/config.go",
+      "start_line": 17,
+      "end_line": 68,
+      "claim": "Configuration management with environment variables and validation",
       "section": "Key Components"
     },
     {
       "file_path": "analytics/go.mod",
       "start_line": 5,
-      "end_line": 5,
-      "claim": "Primary external dependency is pgx/v5 for PostgreSQL connectivity",
+      "end_line": 13,
+      "claim": "External dependencies including pgx PostgreSQL driver",
       "section": "External Dependencies"
+    },
+    {
+      "file_path": "analytics/cmd/analytics/main.go",
+      "start_line": 84,
+      "end_line": 93,
+      "claim": "Dual backend support with memory and PostgreSQL options",
+      "section": "Data Flows"
+    },
+    {
+      "file_path": "analytics/internal/leaderboard/store.go",
+      "start_line": 514,
+      "end_line": 563,
+      "claim": "PostgreSQL store queries providers and provider_earnings tables",
+      "section": "External Systems"
     },
     {
       "file_path": "analytics/README.md",
       "start_line": 3,
-      "end_line": 12,
-      "claim": "Service is designed to sit beside coordinator as standalone read-only analytics service",
-      "section": "Overview"
+      "end_line": 11,
+      "claim": "Service is designed to sit beside coordinator as standalone analytics API",
+      "section": "Component Interactions"
     },
     {
-      "file_path": "analytics/README.md",
-      "start_line": 71,
-      "end_line": 81,
-      "claim": "PostgreSQL mode requires read-only user with SELECT privileges on analytics tables",
-      "section": "External Systems"
+      "file_path": "analytics/internal/httpapi/server.go",
+      "start_line": 104,
+      "end_line": 117,
+      "claim": "CORS middleware supports configurable origin allowlist",
+      "section": "API Surface"
+    },
+    {
+      "file_path": "analytics/internal/leaderboard/store.go",
+      "start_line": 56,
+      "end_line": 79,
+      "claim": "Leaderboard response structure with earnings, rankings, and metadata",
+      "section": "API Surface"
     }
   ]
 }

@@ -3,105 +3,91 @@
   "source_file": "/tmp/d-inference/service_analyses/decrypt-test.md",
   "source_repo": "",
   "source_commit": "",
-  "citation_count": 14,
+  "citation_count": 12,
   "citations": [
     {
       "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
       "start_line": 1,
       "end_line": 9,
-      "claim": "Component serves as a cross-language compatibility testing tool for NaCl Box decryption",
+      "claim": "The component is a minimal NaCl Box decryptor for cross-language compatibility testing",
       "section": "Overview"
     },
     {
       "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
       "start_line": 15,
       "end_line": 23,
-      "claim": "Main entry point validates exactly 3 CLI arguments with usage message",
+      "claim": "The CLI validates exactly three command-line arguments with specific error handling",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+      "start_line": 25,
+      "end_line": 36,
+      "claim": "Base64 decoding is performed on all three arguments with comprehensive error handling",
       "section": "Key Components"
     },
     {
       "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
       "start_line": 38,
-      "end_line": 58,
-      "claim": "Input validation ensures 32-byte keys and minimum 24-byte ciphertext per NaCl specifications",
+      "end_line": 51,
+      "claim": "Key validation ensures both public and private keys are exactly 32 bytes",
       "section": "Key Components"
     },
     {
       "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
-      "start_line": 60,
+      "start_line": 52,
+      "end_line": 58,
+      "claim": "Ciphertext validation requires minimum 24 bytes for the nonce",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+      "start_line": 63,
       "end_line": 65,
-      "claim": "Key material is converted from byte arrays to crypto_box types for NaCl operations",
+      "claim": "SalsaBox is created using X25519 public and private keys for NaCl compatibility",
       "section": "Key Components"
     },
     {
       "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
       "start_line": 67,
-      "end_line": 76,
-      "claim": "Decryption extracts nonce from ciphertext prefix and performs AEAD decryption",
+      "end_line": 68,
+      "claim": "24-byte nonce is extracted from the ciphertext prefix",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
+      "start_line": 70,
+      "end_line": 75,
+      "claim": "Decryption uses the SalsaBox with extracted nonce and remaining ciphertext",
       "section": "Key Components"
     },
     {
       "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
       "start_line": 77,
       "end_line": 81,
-      "claim": "Output handler validates UTF-8 and writes plaintext to stdout",
+      "claim": "Output is converted to UTF-8 and printed to stdout",
       "section": "Key Components"
     },
     {
       "file_path": "coordinator/internal/e2e/testdata/decrypt/Cargo.toml",
       "start_line": 6,
       "end_line": 8,
-      "claim": "Component depends on crypto_box 0.9 for NaCl operations and base64 0.22 for encoding",
+      "claim": "Dependencies include crypto_box 0.9 for NaCl cryptography and base64 0.22 for encoding",
       "section": "External Dependencies"
     },
     {
       "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
       "start_line": 10,
       "end_line": 13,
-      "claim": "Uses base64 STANDARD engine and crypto_box AEAD traits for cryptographic operations",
+      "claim": "Imports base64 standard engine and crypto_box types for key handling and AEAD operations",
       "section": "External Dependencies"
     },
     {
-      "file_path": "coordinator/internal/e2e/cross_compat_test.go",
-      "start_line": 15,
-      "end_line": 22,
-      "claim": "Go tests verify cross-language encryption compatibility by building and invoking this Rust binary",
-      "section": "Component Interactions"
-    },
-    {
-      "file_path": "coordinator/internal/e2e/cross_compat_test.go",
-      "start_line": 44,
-      "end_line": 47,
-      "claim": "Test suite builds release binary and executes it with encrypted payloads",
-      "section": "Component Interactions"
-    },
-    {
-      "file_path": "coordinator/internal/e2e/cross_compat_test.go",
-      "start_line": 88,
-      "end_line": 128,
-      "claim": "Cross-language test encrypts with Go e2e package and decrypts with this Rust utility",
-      "section": "Component Interactions"
-    },
-    {
-      "file_path": "coordinator/internal/e2e/cross_compat_test.go",
-      "start_line": 56,
-      "end_line": 83,
-      "claim": "Test scenarios include JSON, empty, Unicode, large, and multiple round-trip payloads",
-      "section": "Cross-Language Compatibility Testing"
-    },
-    {
-      "file_path": "coordinator/internal/e2e/e2e.go",
-      "start_line": 64,
-      "end_line": 78,
-      "claim": "Go encryption uses NaCl Box with nonce prefix format compatible with this Rust decryptor",
-      "section": "Cross-Language Compatibility Testing"
-    },
-    {
       "file_path": "coordinator/internal/e2e/testdata/decrypt/src/main.rs",
-      "start_line": 25,
-      "end_line": 36,
-      "claim": "All inputs are base64 decoded with error handling and process exit on failure",
-      "section": "Data Flows"
+      "start_line": 3,
+      "end_line": 9,
+      "claim": "CLI usage pattern takes three Base64-encoded arguments for decryption testing",
+      "section": "API Surface"
     }
   ]
 }

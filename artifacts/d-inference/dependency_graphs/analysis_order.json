@@ -18,8 +18,8 @@
   "level_count": 2,
   "by_kind": {
     "library": 4,
-    "service": 5,
-    "cli": 1,
+    "service": 4,
+    "cli": 2,
     "frontend": 2
   }
 }

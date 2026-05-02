@@ -1,239 +1,175 @@
-# Analytics Service Analysis
+# Analytics Service Component Analysis
 
-## Overview
-
-The analytics service is a standalone, read-only HTTP service that provides public analytics data for the d-inference network. It serves as a dedicated analytics backend, separate from the main coordinator, offering leaderboards and network overview statistics with pseudonymous privacy protection.
+The analytics service is a standalone read-only HTTP API service that provides public analytics data for the EigenInference distributed AI inference network. It serves network overview statistics and earnings leaderboards with pseudonymized user/node identities.
 
 ## Architecture
 
-The analytics service follows a **layered architecture** pattern with clear separation of concerns:
+The analytics service follows a **layered architecture pattern** with clean separation between HTTP handling, business logic, and data persistence. The architecture consists of:
 
-- **HTTP API Layer**: REST endpoints with CORS support and input validation
-- **Service Layer**: Business logic for data aggregation and transformation
-- **Storage Layer**: Abstracted storage interface supporting memory and PostgreSQL backends
-- **Pseudonym Layer**: Privacy-preserving alias generation using HMAC-based deterministic pseudonyms
+- **HTTP API Layer**: Handles HTTP requests and responses with CORS support
+- **Service Layer**: Contains business logic for data aggregation and formatting
+- **Store Layer**: Provides data access abstraction with pluggable backends
+- **Pseudonym Layer**: Generates deterministic aliases for anonymization
 
-The service is designed to be deployment-flexible, supporting both development (in-memory) and production (PostgreSQL) modes.
+```mermaid
+graph TD
+    Client[HTTP Client] --> API[HTTP API Layer]
+    API --> Service[Leaderboard Service]
+    Service --> Store[Store Interface]
+    Service --> Alias[Pseudonym Generator]
+    Store --> Memory[Memory Store]
+    Store --> Postgres[PostgreSQL Store]
+    
+    subgraph "Data Sources"
+        Memory --> MockData[Mock Provider/Earnings Data]
+        Postgres --> PGTables[providers & provider_earnings tables]
+    end
+```
 
 ## Key Components
 
 ### 1. Main Application (`cmd/analytics/main.go`)
-- **Purpose**: Entry point with service initialization and graceful shutdown
-- **Key Features**: 
-  - Configurable backend selection (memory/postgres)
-  - Signal-based graceful shutdown with 10-second timeout
-  - HTTP server with comprehensive timeouts and security headers
-- **Integration**: Coordinates all internal modules and manages application lifecycle
+The application entry point that orchestrates service initialization, configuration loading, and graceful shutdown. Sets up HTTP server with timeouts and signal handling for clean shutdown.
 
-### 2. Configuration Management (`internal/config/config.go`)
-- **Purpose**: Environment-based configuration with validation and defaults
-- **Key Features**:
-  - Environment variable parsing with sensible defaults
-  - Backend-specific validation (PostgreSQL requires database URL and secret)
-  - Automatic random secret generation for memory mode
-  - Active node window configuration for determining "online" status
-- **Configuration Options**: Address, backend type, database URL, CORS origin, pseudonym secret, active node window
+### 2. HTTP API Handler (`internal/httpapi/server.go`)
+Implements the REST API with three endpoints:
+- `GET /healthz` - Health check with backend status
+- `GET /v1/overview` - Network statistics overview
+- `GET /v1/leaderboard/earnings` - Earnings leaderboard with filtering
 
-### 3. HTTP API Server (`internal/httpapi/server.go`)
-- **Purpose**: RESTful API with JSON responses and comprehensive error handling
-- **Endpoints**:
-  - `GET /healthz`: Health check with backend status
-  - `GET /v1/overview`: Network statistics and earnings overview
-  - `GET /v1/leaderboard/earnings`: Configurable earnings leaderboard
-- **Features**: CORS middleware, query parameter validation, context timeouts, structured error responses
+### 3. Leaderboard Service (`internal/leaderboard/store.go`)
+Core business logic service that:
+- Aggregates earnings data by account or node
+- Applies time window filtering (24h, 7d, 30d, all)
+- Formats currency values and generates rankings
+- Integrates with pseudonym generator for privacy
 
-### 4. Leaderboard Service (`internal/leaderboard/store.go`)
-- **Purpose**: Core analytics business logic with dual storage backends
-- **Key Features**:
-  - Account vs node-level aggregation scopes
-  - Time window filtering (24h, 7d, 30d, all-time)
-  - Earnings ranking with tie-breaking logic
-  - USD formatting and human-readable time displays
-  - Mock data generation for development mode
-- **Data Models**: Overview stats, leaderboard entries with earnings/token metrics
+### 4. Data Store Interface (`internal/leaderboard/store.go`)
+Dual-backend storage abstraction supporting:
+- **Memory Store**: In-memory mock data for development/testing
+- **PostgreSQL Store**: Production database backend with connection pooling
 
-### 5. Memory Store Implementation
-- **Purpose**: Development backend with realistic mock data
-- **Key Features**:
-  - Pre-populated provider snapshots and earnings events
-  - Active node calculation based on configurable time windows
-  - In-memory aggregation with proper sorting and ranking
-  - Clock injection for deterministic testing
+### 5. Pseudonym Generator (`internal/pseudonym/alias.go`)
+Cryptographic alias generator using HMAC-SHA256 to create deterministic pseudonyms in the format "Adjective Animal Number" (e.g., "Golden Fox 123").
 
-### 6. PostgreSQL Store Implementation
-- **Purpose**: Production backend with efficient SQL queries
-- **Key Features**:
-  - Connection pooling with pgx/v5
-  - Dynamic SQL generation based on query parameters
-  - Optimized aggregation queries with CTEs
-  - Proper error handling and connection management
-
-### 7. Pseudonym Generator (`internal/pseudonym/alias.go`)
-- **Purpose**: Privacy-preserving deterministic alias generation
-- **Key Features**:
-  - HMAC-SHA256 based deterministic pseudonyms
-  - Kind-prefixed hashing (account vs node separation)
-  - Human-readable format: "Adjective Animal Number" (e.g., "Golden Fox 423")
-  - Secret-backed to prevent reverse mapping without key
-- **Privacy**: Same stable ID always produces same alias, but no reverse lookup possible
-
-### 8. Test Coverage
-- **HTTP API Tests**: Endpoint behavior, error handling, CORS validation
-- **Pseudonym Tests**: Deterministic behavior, kind separation
-- **Service Integration**: Mock-based testing with clock injection
+### 6. Configuration Manager (`internal/config/config.go`)
+Environment-based configuration with validation for different deployment modes (memory vs PostgreSQL).
 
 ## Data Flows
 
-### 1. Leaderboard Request Flow
-
+### Request Processing Flow
 ```mermaid
 sequenceDiagram
-    participant Client
-    participant Handler as HTTP Handler
-    participant Service as Leaderboard Service
-    participant Store as Storage Backend
-    participant Aliaser as Pseudonym Generator
+    participant C as Client
+    participant H as HTTP Handler
+    participant S as Service
+    participant ST as Store
+    participant P as Pseudonym Gen
     
-    Client->>Handler: GET /v1/leaderboard/earnings?scope=account&window=7d
-    Handler->>Handler: Parse & validate parameters
-    Handler->>Service: EarningsLeaderboard(ctx, query)
-    Service->>Store: EarningsLeaderboard(ctx, query)
-    Store->>Store: Execute aggregation query
-    Store-->>Service: []rawEntry
-    Service->>Aliaser: Generate aliases for each entry
-    Aliaser-->>Service: Deterministic pseudonym
-    Service->>Service: Format USD values, calculate rankings
-    Service-->>Handler: Leaderboard with formatted entries
-    Handler-->>Client: JSON response with leaderboard
+    C->>H: GET /v1/leaderboard/earnings?scope=account&window=7d
+    H->>H: Parse & validate query params
+    H->>S: EarningsLeaderboard(ctx, query)
+    S->>ST: EarningsLeaderboard(ctx, query)
+    ST->>ST: Apply time filters & aggregation
+    ST-->>S: []rawEntry
+    loop For each entry
+        S->>P: Alias(scope, stableID)
+        P-->>S: "Golden Fox 123"
+    end
+    S->>S: Format currency & calculate metrics
+    S-->>H: Leaderboard with formatted entries
+    H->>H: Serialize to JSON
+    H-->>C: HTTP 200 + JSON response
 ```
 
-### 2. Overview Statistics Flow
-
+### Dual Backend Architecture
 ```mermaid
-sequenceDiagram
-    participant Client
-    participant Handler as HTTP Handler
-    participant Service as Leaderboard Service
-    participant Store as Storage Backend
+graph LR
+    Config[Config Loader] --> Decision{Backend Type?}
+    Decision -->|memory| MemStore[Memory Store<br/>Mock Data]
+    Decision -->|postgres| PGStore[PostgreSQL Store<br/>Real Data]
     
-    Client->>Handler: GET /v1/overview
-    Handler->>Service: Overview(ctx)
-    Service->>Store: Overview(ctx)
-    
-    alt PostgreSQL Backend
-        Store->>Store: Execute CTE query for provider/earning stats
-    else Memory Backend
-        Store->>Store: Iterate providers for active node count
-        Store->>Store: Aggregate earnings with time filtering
+    subgraph "Memory Backend"
+        MemStore --> MockProviders[Hardcoded Providers]
+        MemStore --> MockEarnings[Hardcoded Earnings]
     end
     
-    Store-->>Service: Overview struct with raw metrics
-    Service->>Service: Format USD amounts, set generated timestamp
-    Service-->>Handler: Formatted overview
-    Handler-->>Client: JSON overview response
-```
-
-### 3. Backend Selection and Initialization Flow
-
-```mermaid
-flowchart TD
-    A[Service Start] --> B[Load Configuration]
-    B --> C{Backend Type?}
-    
-    C -->|memory| D[Initialize Memory Store]
-    C -->|postgres| E[Initialize PostgreSQL Store]
-    
-    D --> F[Generate/Load Pseudonym Secret]
-    E --> G[Validate Database Connection]
-    G --> H[Require Pseudonym Secret]
-    
-    F --> I[Create Leaderboard Service]
-    H --> I
-    I --> J[Setup HTTP Handler]
-    J --> K[Start HTTP Server]
-    K --> L[Listen for Signals]
+    subgraph "PostgreSQL Backend"
+        PGStore --> ProvidersTable[providers table]
+        PGStore --> EarningsTable[provider_earnings table]
+    end
 ```
 
 ## External Dependencies
 
 ### External Libraries
 
-- **github.com/jackc/pgx/v5** (v5.8.0) [database]: High-performance PostgreSQL driver and connection pooling. Used exclusively for PostgreSQL backend operations including connection management, query execution, and result scanning. Integrated in `internal/leaderboard/store.go` PostgresStore implementation.
+- **github.com/jackc/pgx/v5** (v5.8.0) [database]: PostgreSQL driver and connection pool library. Primary database client for production mode. Used in `PostgresStore` for connecting to and querying PostgreSQL databases. Imported in: `internal/leaderboard/store.go`.
 
-- **github.com/jackc/pgpassfile** (v1.0.0) [database]: PostgreSQL password file parsing support, indirect dependency of pgx/v5. Used for connection authentication when reading from `.pgpass` files.
+- **github.com/jackc/pgpassfile** (v1.0.0) [database]: PostgreSQL password file parsing support. Transitive dependency of pgx for credential management. Automatically used by pgx driver.
 
-- **github.com/jackc/pgservicefile** (v0.0.0-20240606120523-5a60cdf6a761) [database]: PostgreSQL service file parsing support, indirect dependency of pgx/v5. Used for connection parameter resolution from service files.
+- **github.com/jackc/pgservicefile** (v0.0.0-20240606120523-5a60cdf6a761) [database]: PostgreSQL service file support. Transitive dependency for connection configuration. Automatically used by pgx driver.
 
-- **github.com/jackc/puddle/v2** (v2.2.2) [database]: Connection pool implementation used internally by pgx/v5. Provides resource pooling and lifecycle management for database connections.
+- **github.com/jackc/puddle/v2** (v2.2.2) [database]: Generic connection pool implementation. Used internally by pgx for PostgreSQL connection pooling. Provides concurrent-safe connection management.
 
-- **golang.org/x/sync** (v0.20.0) [concurrency]: Extended synchronization primitives, indirect dependency. Provides advanced concurrency patterns used by the PostgreSQL driver.
+- **golang.org/x/sync** (v0.20.0) [concurrency]: Extended Go synchronization primitives. Transitive dependency used by connection pooling and concurrent operations in pgx.
 
-- **golang.org/x/text** (v0.35.0) [internationalization]: Text processing and Unicode support, indirect dependency of pgx/v5. Used for character encoding and text normalization in database operations.
+- **golang.org/x/text** (v0.35.0) [text-processing]: Unicode and text processing utilities. Transitive dependency for text handling in database operations and Go standard library extensions.
 
-Development/Testing Dependencies:
-- **github.com/stretchr/testify** (v1.11.1) [testing]: Testing framework with assertions and test utilities. Used throughout test files for HTTP endpoint testing and mock verification.
+The service primarily uses Go's standard library for HTTP handling (`net/http`), logging (`log/slog`), JSON serialization (`encoding/json`), and cryptographic operations (`crypto/hmac`, `crypto/sha256`). The only direct external dependency is the PostgreSQL driver for production database connectivity.
 
 ## Internal Dependencies
 
-The analytics service is designed as a standalone component with no internal dependencies from the d-inference codebase. This isolation is intentional to allow the analytics service to:
-- Evolve independently without affecting coordinator functionality
-- Scale separately from the main inference infrastructure
-- Maintain its own release cycle and deployment strategy
-- Connect to the same PostgreSQL database as the coordinator but through read-only access
+This component has a direct dependency on the `analytics` module itself, which appears to be a self-reference in the go.mod file. The component is structured as a standalone service without dependencies on other components in the codebase, making it completely autonomous.
 
 ## API Surface
 
-### Public HTTP Endpoints
+The analytics service exposes three HTTP endpoints:
 
-**Health Check**
-- `GET /healthz`: Returns service health status with backend connectivity check
-- Response: JSON with status, backend type, and timestamp
+### Health Check Endpoint
+- **Path**: `GET /healthz`
+- **Purpose**: Service health monitoring with backend connectivity status
+- **Response**: JSON with status, backend type, and timestamp
 
-**Network Overview**
-- `GET /v1/overview`: Comprehensive network statistics
-- Response: Registered nodes, active nodes, linked accounts, trust levels, total/24h earnings, job counts
+### Network Overview Endpoint
+- **Path**: `GET /v1/overview`
+- **Purpose**: Aggregate network statistics
+- **Response**: JSON with registered/active nodes, linked accounts, total earnings, and 24h metrics
 
-**Earnings Leaderboard**
-- `GET /v1/leaderboard/earnings`: Configurable earnings rankings
-- Query Parameters:
+### Earnings Leaderboard Endpoint
+- **Path**: `GET /v1/leaderboard/earnings`
+- **Parameters**:
   - `scope`: `account` (default) or `node` - aggregation level
-  - `window`: `24h`, `7d` (default), `30d`, or `all` - time period
-  - `limit`: 1-100 (default 25) - maximum entries returned
-- Response: Ranked entries with earnings, tokens, models served, pseudonymous aliases
+  - `window`: `24h`, `7d` (default), `30d`, or `all` - time filter
+  - `limit`: 1-100 (default 25) - result count limit
+- **Purpose**: Ranked earnings data with pseudonymized identities
+- **Response**: JSON with leaderboard entries including earnings, job counts, token usage, and activity timestamps
 
-### CORS Configuration
-- Configurable `Access-Control-Allow-Origin` header
-- Supports `GET` and `OPTIONS` methods
-- Allows `Content-Type` header
+All endpoints support CORS headers configurable via `ANALYTICS_ALLOW_ORIGIN` environment variable.
 
 ## External Systems
 
-### Database Integration
-- **PostgreSQL**: Production data store accessing `providers` and `provider_earnings` tables
-- **Connection Details**: Uses read-only database user with `SELECT`-only privileges
-- **Query Patterns**: Complex CTEs for efficient aggregation, parameterized queries for security
-- **Connection Management**: pgxpool for connection pooling with automatic reconnection
+### PostgreSQL Database
+The service connects to PostgreSQL in production mode, reading from two tables:
+- **providers**: Node registration and status information
+- **provider_earnings**: Individual earning events with token usage and timestamps
+
+The service uses a dedicated read-only database user with `SELECT` privileges only, ensuring data security and preventing accidental writes.
 
 ### Configuration Sources
-- **Environment Variables**: All configuration through standard environment variables
-- **Secrets Management**: External pseudonym secret required for production PostgreSQL mode
-- **Runtime Detection**: Backend selection determines data source and operational mode
+The service reads configuration from environment variables:
+- Database connection strings
+- Server binding address and CORS settings  
+- Backend selection (memory vs PostgreSQL)
+- Pseudonym secret for deterministic alias generation
+- Active node time window threshold
 
 ## Component Interactions
 
-The analytics service operates as an isolated read-only component with the following interaction patterns:
+The analytics service operates as a completely standalone component with no direct interactions with other services in the codebase. It functions as a read-only analytics API that:
 
-### Database Sharing Pattern
-- Shares PostgreSQL database with coordinator but through separate read-only credentials
-- Accesses same `providers` and `provider_earnings` tables but cannot modify data
-- Designed to avoid impacting coordinator performance through read-only queries
+- **Reads from**: PostgreSQL database (in production) or uses mock data (in development)
+- **Serves to**: External clients via HTTP API (web frontends, monitoring tools, public API consumers)
+- **Isolation**: Deliberately isolated from the main coordinator service to prevent analytics queries from impacting inference performance
 
-### Deployment Isolation
-- Runs as independent HTTP service on configurable port (default :8090)
-- Can be deployed separately from coordinator with different scaling characteristics
-- Memory backend allows development/testing without database dependencies
-
-### Future Integration Points
-- Designed to serve public-facing dashboards and UIs
-- JSON API suitable for frontend consumption with CORS support
-- Pseudonymous data safe for public exposure without privacy concerns
+This isolation allows the analytics service to be deployed, scaled, and maintained independently of the core inference infrastructure.
