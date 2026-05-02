@@ -81,8 +81,12 @@ def main() -> None:
     parser.add_argument("--book", type=Path, default=Path("spec"))
     args = parser.parse_args()
 
+    assert (args.book / "mermaid.min.js").exists(), "missing mdbook-mermaid runtime asset: mermaid.min.js"
+    assert (args.book / "mermaid-init.js").exists(), "missing mdbook-mermaid runtime asset: mermaid-init.js"
+
     repo_root = Path.cwd()
     src = args.book / "src"
+
     errors = verify_summary_links(src) + verify_source_comments(src, repo_root) + verify_spec_prose(src, repo_root)
     if errors:
         print("spec verification failed:", file=sys.stderr)

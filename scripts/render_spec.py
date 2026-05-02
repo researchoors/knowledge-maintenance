@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
+import subprocess
 from collections import defaultdict
 from html import escape
 from pathlib import Path
@@ -73,9 +75,29 @@ src = "src"
 
 [output.html]
 git-repository-url = "https://github.com/researchoors/darkbloom-spec"
+additional-js = ["mermaid.min.js", "mermaid-init.js"]
+
+[preprocessor]
+
+[preprocessor.mermaid]
+command = "mdbook-mermaid"
 """,
         encoding="utf-8",
     )
+
+
+def ensure_mermaid_assets(book_dir: Path) -> None:
+    if (book_dir / "mermaid.min.js").exists() and (book_dir / "mermaid-init.js").exists():
+        return
+
+    mdbook_mermaid = shutil.which("mdbook-mermaid")
+    if mdbook_mermaid is None:
+        raise RuntimeError(
+            "mdbook-mermaid is required to generate Mermaid assets. "
+            "Install it with `cargo install mdbook-mermaid --locked`."
+        )
+
+    subprocess.run([mdbook_mermaid, "install", str(book_dir)], check=True)
 
 
 def write_summary(src: Path) -> None:
@@ -584,6 +606,7 @@ def main() -> None:
     src.mkdir(parents=True, exist_ok=True)
 
     write_book_toml(args.book)
+    ensure_mermaid_assets(args.book)
     write_summary(src)
     write_intro(src, payload)
     write_overview(src)
