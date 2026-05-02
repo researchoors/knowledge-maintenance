@@ -1,0 +1,8 @@
+[book]
+title = "DarkBloom Spec"
+authors = ["DarkBloom Spec Pipeline"]
+language = "en"
+src = "src"
+
+[output.html]
+git-repository-url = "https://github.com/Layr-Labs/darkbloom-spec"

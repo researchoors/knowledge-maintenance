@@ -1,0 +1,150 @@
+name: DarkBloom Spec Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      refresh_artifacts:
+        description: "Run github-flashlight before deriving facts/spec"
+        type: boolean
+        default: true
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: darkbloom-spec-pipeline
+  cancel-in-progress: false
+
+env:
+  AUTOMATION_BRANCH: automation/darkbloom-spec
+  SOURCE_REPO: Layr-Labs/d-inference
+  ARTIFACTS_PATH: artifacts/d-inference
+
+jobs:
+  maintain-spec:
+    name: autonomous evidence, facts, and spec candidate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Lock down runner egress
+        uses: ironsh/iron-proxy-action@v1
+        with:
+          egress-rules: egress-rules.yaml
+          warn: "false"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install project and flashlight
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+          python -m pip install --upgrade github-flashlight
+
+      - name: Prepare automation branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$AUTOMATION_BRANCH" origin/main
+
+      - name: Refresh flashlight artifacts
+        if: ${{ github.event_name == 'schedule' || inputs.refresh_artifacts }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.FLASHLIGHT_REPO_TOKEN || github.token }}
+        run: |
+          flashlight "$SOURCE_REPO" --output "$ARTIFACTS_PATH"
+          if ! git diff --quiet -- "$ARTIFACTS_PATH"; then
+            git add "$ARTIFACTS_PATH"
+            git commit -m "chore: refresh DarkBloom flashlight artifacts"
+          else
+            echo "No flashlight artifact changes"
+          fi
+
+      - name: Extract facts and render spec
+        run: |
+          python scripts/extract_facts.py --artifacts "$ARTIFACTS_PATH" --out facts/darkbloom.facts.json
+          python scripts/render_spec.py --facts facts/darkbloom.facts.json --book spec
+          python scripts/verify_spec.py --book spec
+          if ! git diff --quiet -- facts spec; then
+            git add facts spec
+            git commit -m "docs: regenerate DarkBloom formal specification"
+          else
+            echo "No derived spec changes"
+          fi
+
+      - name: Install and build mdBook
+        run: |
+          if ! command -v mdbook >/dev/null 2>&1; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+            . "$HOME/.cargo/env"
+            cargo install mdbook --locked
+          fi
+          mdbook build spec
+
+      - name: Run tests
+        run: pytest
+
+      - name: Push candidate branch
+        run: |
+          if [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)" ]; then
+            echo "No candidate commits to push"
+            exit 0
+          fi
+          git push --force-with-lease origin "$AUTOMATION_BRANCH"
+
+      - name: Open or update human-gated PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)" ]; then
+            echo "No PR needed"
+            exit 0
+          fi
+
+          body_file=$(mktemp)
+          cat > "$body_file" <<'EOF'
+          Autonomous DarkBloom spec maintenance candidate.
+
+          This PR is intentionally human-gated because `spec/` is the canonical formal specification. The flashlight artifacts and fact extraction are autonomous evidence/derivation steps; reviewers should focus on the formal spec diff and use `facts/darkbloom.facts.json` plus `artifacts/d-inference/**` for provenance.
+
+          Pipeline contract:
+          - flashlight artifacts are captured first when source changes are requested or scheduled
+          - facts are extracted from committed artifacts with source file/line pointers
+          - spec pages are rendered from facts and verified before this PR is opened/updated
+          - runner egress is enforced by `ironsh/iron-proxy-action` using `egress-rules.yaml`
+          - merge remains human-gated; automation never auto-merges canonical spec changes
+
+          Validation in workflow:
+          - `python scripts/extract_facts.py`
+          - `python scripts/render_spec.py`
+          - `python scripts/verify_spec.py`
+          - `mdbook build spec`
+          - `pytest`
+          EOF
+
+          if gh pr view "$AUTOMATION_BRANCH" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh pr edit "$AUTOMATION_BRANCH" --repo "$GITHUB_REPOSITORY" \
+              --title "docs: regenerate DarkBloom formal specification" \
+              --body-file "$body_file" \
+              --add-label automated \
+              --add-label spec || true
+          else
+            gh pr create --repo "$GITHUB_REPOSITORY" \
+              --head "$AUTOMATION_BRANCH" \
+              --base main \
+              --title "docs: regenerate DarkBloom formal specification" \
+              --body-file "$body_file" \
+              --label automated \
+              --label spec
+          fi
+
+      - name: Iron proxy traffic summary
+        uses: ironsh/iron-proxy-action/summary@v1
+        if: always()

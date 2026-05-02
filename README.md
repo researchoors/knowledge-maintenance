@@ -18,6 +18,29 @@ Knowledge graph maintenance for [d-inference (DarkBloom)](https://github.com/Lay
 3. Runs deterministic checks: stale references, missing components, stale edges, kind mismatches
 4. If discrepancies found, opens/updates a GitHub issue with the report
 
+### DarkBloom Spec Pipeline
+
+The generated spec lives under [`spec/`](spec/) as an mdBook scaffold. It is derived from the committed flashlight artifacts under [`artifacts/d-inference`](artifacts/d-inference), not from hand-written claims.
+
+Local regeneration:
+
+```bash
+python scripts/extract_facts.py
+python scripts/render_spec.py
+python scripts/verify_spec.py
+# Optional, if mdbook is installed:
+mdbook build spec
+```
+
+Pipeline contract:
+
+1. **Evidence is autonomous**: `.github/workflows/darkbloom-spec.yml` can run `github-flashlight` and open/update an artifact-only PR (`automation/darkbloom-artifacts`).
+2. **Facts/spec are autonomous derived commits**: the workflow extracts `facts/darkbloom.facts.json`, renders `spec/src/*.md`, verifies source comments and mdBook summary links, runs tests, and opens/updates a separate derived PR (`automation/darkbloom-derived-spec`).
+3. **Runner egress is controlled**: autonomous jobs install [`ironsh/iron-proxy-action`](https://github.com/ironsh/iron-proxy-action), enforce default-deny outbound HTTP(S), and use [`egress-rules.yaml`](egress-rules.yaml) as the explicit allowlist. The action summary is uploaded on every run for auditability.
+4. **Canonical merge is human-gated**: automation opens PRs only. It does not auto-merge. Reviewers decide when artifact truth and derived spec updates become canonical.
+
+Every generated normative bullet includes a source comment like `<!-- source: artifacts/...#L1-L2 fact: abc123 -->` so reviewers can trace spec text back to flashlight evidence.
+
 ## Setup
 
 ```bash
