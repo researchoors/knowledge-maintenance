@@ -256,6 +256,28 @@ flowchart TB
     SE --> Apple
 ```
 
+## Key system actors
+
+The architecture uses the following actors as protocol terms. These terms are used consistently by the flow diagrams,
+requirements, and lifecycle sections.
+
+| Actor | Formal definition | Primary responsibilities |
+|---|---|---|
+| Consumer | A user, application, or API client that submits inference work to DarkBloom. | Creates inference requests, receives streamed responses, and funds billable usage. |
+| Web/API surface | The consumer-facing HTTP and browser surface that accepts OpenAI-compatible requests and presents account/provider state. | Authenticates consumers, forwards inference requests, relays streams, and displays trust or billing state. |
+| Coordinator | The control-plane authority for provider registry, request routing, trust-state checks, and accounting coordination. | Selects eligible providers, issues assignments, records usage, verifies trust evidence, and coordinates settlement. |
+| Provider | An independently operated Apple Silicon machine or provider runtime that offers local inference capacity. | Enrolls with the coordinator, advertises models/capacity, executes assigned requests, and streams results. |
+| Inference backend | The local execution engine controlled by a provider. | Loads models, performs token generation, reports completion/failure, and returns usage metadata to the provider runtime. |
+| Secure Enclave | The hardware-backed key and signing environment on a provider machine. | Produces or protects attestation-related signatures and provider identity material. |
+| Attestation verifier | The coordinator-side verifier for provider trust evidence. | Validates challenge freshness, enclave-bound key material, and derived provider trust state. |
+| Provider registry | The coordinator-owned record of provider identity, capability, liveness, and trust state. | Determines provider eligibility for routing and stores enrollment/heartbeat/attestation state. |
+| Payment ledger | The accounting subsystem that records billable usage and settlement state. | Reserves or finalizes usage, reconciles consumer charges, and records provider settlement. |
+| External payment rail | A third-party payment service such as Stripe. | Performs external charge, invoice, and reconciliation operations initiated from ledger state. |
+| Analytics service | An observational subsystem for operational data and reporting. | Consumes derived state for monitoring and analysis without becoming a routing authority. |
+
+{bullet("system.role.coordinator", "The coordinator MUST be the protocol authority for provider eligibility, routing decisions, trust-state checks, and accounting coordination.")}
+{bullet("system.role.provider", "A provider MUST be treated as independently operated infrastructure until enrollment and attestation establish its current eligibility state.")}
+
 ## Core system flows
 
 DarkBloom separates user-facing inference traffic from provider trust establishment and settlement. A provider first enrolls
