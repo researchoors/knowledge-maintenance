@@ -35,7 +35,7 @@ jobs:
           fetch-depth: 0
 
       - name: Lock down runner egress
-        uses: ironsh/iron-proxy-action@v1
+        uses: ironsh/iron-proxy-action@v0.1.4
         with:
           egress-rules: egress-rules.yaml
           warn: "false"
@@ -169,5 +169,5 @@ jobs:
           fi
 
       - name: Iron proxy traffic summary
-        uses: ironsh/iron-proxy-action/summary@v1
+        uses: ironsh/iron-proxy-action/summary@v0.1.4
         if: always()
