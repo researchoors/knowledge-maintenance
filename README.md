@@ -28,10 +28,11 @@ Local regeneration:
 python scripts/extract_facts.py
 python scripts/render_spec.py
 python scripts/verify_spec.py
+cargo install mdbook mdbook-mermaid --locked  # first run only
 mdbook build spec
 ```
 
-CI uploads the built mdBook (`spec/book`) as the `darkbloom-spec-mdbook` workflow artifact on every run. After changes are merged to `main`, the same workflow deploys the built book to GitHub Pages.
+CI uploads the built mdBook (`spec/book`) as the `darkbloom-spec-mdbook` workflow artifact on every run. The book uses `mdbook-mermaid` so architecture, lifecycle, and sequence diagrams render as diagrams rather than fenced code blocks. After changes are merged to `main`, the same workflow deploys the built book to GitHub Pages.
 
 Pipeline contract:
 

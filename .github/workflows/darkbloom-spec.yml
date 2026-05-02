@@ -88,6 +88,10 @@ jobs:
             . "$HOME/.cargo/env"
             cargo install mdbook --locked
           fi
+          if ! command -v mdbook-mermaid >/dev/null 2>&1; then
+            . "$HOME/.cargo/env" 2>/dev/null || true
+            cargo install mdbook-mermaid --locked
+          fi
           mdbook build spec
 
       - name: Upload mdBook preview artifact
