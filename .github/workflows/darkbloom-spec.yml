@@ -48,7 +48,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev]"
-          python -m pip install --upgrade github-flashlight
+          python -m pip install --upgrade git+https://github.com/Layr-Labs/github-flashlight.git
 
       - name: Prepare automation branch
         run: |
