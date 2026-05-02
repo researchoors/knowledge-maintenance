@@ -1,0 +1,64 @@
+# Operations
+
+This page is generated from extracted flashlight facts.
+
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L10 fact: 6cebcf93d216 --> - **Privacy-First Design**: End-to-end encryption ensures provider nodes cannot see plaintext requests or responses.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L112 fact: 78a65795aa59 --> - **Go**: Backend services (coordinator, analytics) with high-performance networking.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L114 fact: 7c3e0ff99924 --> - **Rust**: Provider agent with system-level security and performance.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L119 fact: 2e538681bf4f --> - **WebSocket**: Real-time provider communication with binary protocol support.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L12 fact: 5f6a3f12c0c5 --> - **Economic Incentives**: Provider compensation and consumer billing through integrated payment processing.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L123 fact: 3c0b4be17866 --> - **Stripe**: Payment processing with Connect Express for provider payouts.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L135 fact: 41515c840caa --> **Architecture Pattern**: Hexagonal architecture with clear separation of concerns.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L137 fact: caaae7f0f7c8 --> **Core Responsibilities**:.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L138 fact: 9480b703ed1a --> - **Provider Registry**: Manages 1,000+ concurrent provider connections with trust levels.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L139 fact: 423a74dc5977 --> - **Request Routing**: Intelligent job assignment based on hardware specs, trust level, and model availability.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L140 fact: 7c1a3a049079 --> - **Payment Ledger**: Double-entry accounting system with micro-USD precision.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L141 fact: a61742b660e5 --> - **Attestation Engine**: Hardware trust verification using Apple MDA.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L142 fact: 46ad2560c5a9 --> - **Rate Limiting**: Per-account token bucket limiting with separate tiers.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L145 fact: 11c9e5ed46db --> - Runs in GCP Confidential VM (AMD SEV-SNP) for hardware-encrypted memory.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L146 fact: 9e7e91df9dc8 --> - OpenAI-compatible REST endpoints for consumer integration.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L147 fact: 676e16d4106c --> - WebSocket binary protocol for provider communication.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L148 fact: 4a1c1c038fb6 --> - Multi-tier request queuing for capacity overflow handling.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L149 fact: 5faf016f1d5e --> - End-to-end encryption proxy without plaintext access.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L151 fact: 2aa4fa81f328 --> **External Integrations**:.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L152 fact: 9cc700143cf7 --> - **PostgreSQL**: Primary persistence with connection pooling.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L153 fact: 573a29fef19c --> - **Stripe**: Consumer deposits via Checkout, provider withdrawals via Connect.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L154 fact: 09a4313c4fa1 --> - **Datadog**: APM tracing, metrics, and structured logging.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L155 fact: 9023ed865c96 --> - **Privy**: JWT-based user authentication and session management.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L159 fact: dbcbb52fee95 --> **Architecture Pattern**: Multi-layered service architecture with security-first design.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L161 fact: ee8851d52b98 --> **Core Responsibilities**:.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L162 fact: 67fb887eb876 --> - **Security Hardening**: PT_DENY_ATTACH, SIP verification, memory wiping.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L163 fact: f60c3fdf53fe --> - **Model Management**: HuggingFace cache scanning and MLX model detection.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L164 fact: 4ce7d4ce04da --> - **Inference Backend**: Manages vllm-mlx subprocesses or in-process Python engines.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L165 fact: 97472b9b75ba --> - **Coordinator Communication**: WebSocket client with automatic reconnection.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L166 fact: b74956b16191 --> - **Hardware Attestation**: Secure Enclave integration for identity verification.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L169 fact: d3b2003a192b --> - Hypervisor.framework integration for memory isolation.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L170 fact: 8804491730eb --> - End-to-end encryption with X25519 ephemeral keys.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L171 fact: fec0c4f0e34a --> - Comprehensive CLI with 15+ subcommands for lifecycle management.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L172 fact: dcf4062e3098 --> - Telemetry pipeline with async batching and disk overflow.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L173 fact: d44e15572058 --> - Auto-update mechanism with integrity verification.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L175 fact: d93538e89f51 --> **Hardware Integration**:.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L176 fact: 1b9a412baf82 --> - **Apple Secure Enclave**: Hardware-backed attestation and signing.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L177 fact: 766f444c36f4 --> - **Hypervisor.framework**: Stage 2 page table isolation (16MB alignment).
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L178 fact: 3653a45307e5 --> - **Metal GPU**: Apple Silicon Neural Engine acceleration via MLX.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L186 fact: ded89fcfd8ec --> - **Provider Dashboard**: Hardware attestation monitoring and earnings tracking.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L187 fact: 6a38acb2e6ca --> - **Payment System**: Stripe-integrated billing and withdrawal management.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L199 fact: c6f362ef4214 --> - Privacy-conscious analytics with user consent management.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L203 fact: d6b0db187f35 --> **Architecture Pattern**: MVVM with Coordinator Pattern for process management.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L206 fact: 57672d6ed555 --> - **Provider Lifecycle**: Wraps and manages darkbloom binary as subprocess.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L208 fact: 8808e6440848 --> - **Configuration Management**: Shared TOML configuration with CLI tools.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L209 fact: e5d5e21bd316 --> - **Status Monitoring**: Real-time polling of provider health and earnings.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L235 fact: fc116717b767 --> **Architecture Pattern**: Layered architecture with privacy-preserving design.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L237 fact: d65bc00bbbc2 --> **Core Responsibilities**:.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L238 fact: cbddd6ff5a65 --> - **Public Analytics**: Network statistics and provider leaderboards.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L239 fact: 3890c287ebad --> - **Pseudonymization**: HMAC-based deterministic alias generation.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L240 fact: 0191c4ca6fa0 --> - **Read-Only Access**: Separate database credentials prevent data modification.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L241 fact: c5c2f5d877f9 --> - **Dual Backend Support**: Memory backend for development, PostgreSQL for production.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L244 fact: ed8d058027ea --> - OpenAPI-compatible REST endpoints with CORS support.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L245 fact: 6c5aff0668ac --> - Configurable time windows (24h, 7d, 30d, all-time) for data aggregation.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L246 fact: 06bbbbc4a8c0 --> - Connection pooling with automatic reconnection handling.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L247 fact: 1e7cc0810e16 --> - Privacy-safe data exposure with no reverse lookup capabilities.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L348 fact: a5a40019fbd5 --> 3. **Self-Signed Trust (Basic)**: Provider self-attestation without external verification.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L349 fact: 831cfd8a96fb --> 4. **No Trust (Default)**: Unverified providers queued at lowest priority.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L355 fact: c75d5816beff --> **Coordinator** | Confidential VM, rate limiting, JWT validation | DDoS, credential stuffing, memory attacks.
+- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L374 fact: 7191a61152b6 --> - **WebSocket**: Secure WebSocket (WSS) for real-time provider connections.

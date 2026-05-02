@@ -1,0 +1,27 @@
+# Egress allowlist for autonomous DarkBloom spec maintenance jobs.
+# GitHub Actions infrastructure domains are included automatically by iron-proxy-action.
+domains:
+  # Python package installation for project/dev dependencies and github-flashlight.
+  - "pypi.org"
+  - "*.pypi.org"
+  - "files.pythonhosted.org"
+  - "*.pythonhosted.org"
+
+  # Source artifact capture from the tracked repository and GitHub API/CLI calls.
+  - "github.com"
+  - "api.github.com"
+  - "raw.githubusercontent.com"
+  - "objects.githubusercontent.com"
+  - "codeload.github.com"
+  - "*.githubusercontent.com"
+
+  # Rust/mdBook installation in CI.
+  - "sh.rustup.rs"
+  - "static.rust-lang.org"
+  - "crates.io"
+  - "index.crates.io"
+  - "static.crates.io"
+
+  # Optional npm-backed tooling if future markdown/doc checks are added.
+  - "registry.npmjs.org"
+  - "*.npmjs.org"
