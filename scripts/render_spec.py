@@ -206,7 +206,8 @@ Open questions are called out explicitly where artifacts do not contain enough d
 def write_architecture(src: Path) -> None:
     content = f"""# Architecture
 
-This section specifies the major runtime domains and the way work moves through them.
+This section specifies the DarkBloom runtime architecture and the four system flows that define the protocol boundary:
+provider enrollment, enclave attestation, request execution, and payment settlement.
 
 ## Runtime domains
 
@@ -254,6 +255,154 @@ flowchart TB
     Agent --> R2
     SE --> Apple
 ```
+
+## Key system actors
+
+The architecture uses the following actors as protocol terms. These terms are used consistently by the flow diagrams,
+requirements, and lifecycle sections.
+
+| Actor | Formal definition | Primary responsibilities |
+|---|---|---|
+| Consumer | A user, application, or API client that submits inference work to DarkBloom. | Creates inference requests, receives streamed responses, and funds billable usage. |
+| Web/API surface | The consumer-facing HTTP and browser surface that accepts OpenAI-compatible requests and presents account/provider state. | Authenticates consumers, forwards inference requests, relays streams, and displays trust or billing state. |
+| Coordinator | The control-plane authority for provider registry, request routing, trust-state checks, and accounting coordination. | Selects eligible providers, issues assignments, records usage, verifies trust evidence, and coordinates settlement. |
+| Provider | An independently operated Apple Silicon machine or provider runtime that offers local inference capacity. | Enrolls with the coordinator, advertises models/capacity, executes assigned requests, and streams results. |
+| Inference backend | The local execution engine controlled by a provider. | Loads models, performs token generation, reports completion/failure, and returns usage metadata to the provider runtime. |
+| Secure Enclave | The hardware-backed key and signing environment on a provider machine. | Produces or protects attestation-related signatures and provider identity material. |
+| Attestation verifier | The coordinator-side verifier for provider trust evidence. | Validates challenge freshness, enclave-bound key material, and derived provider trust state. |
+| Provider registry | The coordinator-owned record of provider identity, capability, liveness, and trust state. | Determines provider eligibility for routing and stores enrollment/heartbeat/attestation state. |
+| Payment ledger | The accounting subsystem that records billable usage and settlement state. | Reserves or finalizes usage, reconciles consumer charges, and records provider settlement. |
+| External payment rail | A third-party payment service such as Stripe. | Performs external charge, invoice, and reconciliation operations initiated from ledger state. |
+| Analytics service | An observational subsystem for operational data and reporting. | Consumes derived state for monitoring and analysis without becoming a routing authority. |
+
+{bullet("system.role.coordinator", "The coordinator MUST be the protocol authority for provider eligibility, routing decisions, trust-state checks, and accounting coordination.")}
+{bullet("system.role.provider", "A provider MUST be treated as independently operated infrastructure until enrollment and attestation establish its current eligibility state.")}
+
+## Core system flows
+
+DarkBloom separates user-facing inference traffic from provider trust establishment and settlement. A provider first enrolls
+with the coordinator, proves hardware-backed identity through enclave attestation, advertises capacity, receives routed
+requests, streams results, and is later accounted for through the payment ledger.
+
+```mermaid
+flowchart LR
+    Enroll[Provider enrollment]
+    Attest[Enclave attestation]
+    Available[Provider available for routing]
+    Request[Inference request lifecycle]
+    Settle[Payment settlement]
+
+    Enroll --> Attest
+    Attest --> Available
+    Available --> Request
+    Request --> Settle
+    Attest -. trust evidence .-> Request
+    Request -. usage records .-> Settle
+```
+
+## Request lifecycle
+
+The request lifecycle begins when a consumer submits an OpenAI-compatible inference request. The coordinator validates the
+request, selects an eligible attested provider, forwards the assignment, and relays streamed provider output back to the
+consumer-facing API surface.
+
+```mermaid
+sequenceDiagram
+    participant Consumer as Consumer or API client
+    participant Web as Web/API surface
+    participant Coord as Coordinator
+    participant Registry as Provider registry
+    participant Provider as Provider runtime
+    participant Engine as Local inference backend
+
+    Consumer->>Web: Submit inference request
+    Web->>Coord: Forward request metadata and encrypted payload
+    Coord->>Registry: Select eligible provider
+    Registry-->>Coord: Provider identity, model, capacity, trust state
+    Coord->>Provider: Assign inference work
+    Provider->>Engine: Execute local inference
+    Engine-->>Provider: Tokens or response chunks
+    Provider-->>Coord: Stream response chunks and completion state
+    Coord-->>Web: Relay response stream
+    Web-->>Consumer: Return streamed completion
+```
+
+{bullet("protocol.consumer-flow", "The coordinator MUST route inference work only to providers that are eligible for the requested model and current trust policy.")}
+{bullet("system.role.provider", "A provider MUST manage local backend execution and stream response state back through the coordinator path.")}
+
+## Payment flow
+
+Payments are a settlement concern rather than an inference critical-path decision. The coordinator records request usage,
+associates the usage with a consumer and provider, and coordinates external payment rails and internal ledger state.
+
+```mermaid
+sequenceDiagram
+    participant Consumer
+    participant Coord as Coordinator
+    participant Ledger as Payment ledger
+    participant Stripe
+    participant Provider
+
+    Consumer->>Coord: Create funded request or account session
+    Coord->>Ledger: Reserve or record billable inference usage
+    Coord->>Provider: Route accepted inference work
+    Provider-->>Coord: Completion and usage metadata
+    Coord->>Ledger: Finalize usage record
+    Ledger->>Stripe: Charge, invoice, or reconcile external payment
+    Ledger-->>Provider: Record provider-side settlement state
+```
+
+{bullet("protocol.payment-settlement", "The coordinator MUST produce enough usage/accounting state to reconcile consumer charges and provider settlement.")}
+{bullet("protocol.payment-settlement", "Payment settlement SHOULD be derived from completed or explicitly failed inference work rather than from unverified provider availability alone.")}
+
+## Enclave attestation flow
+
+Enclave attestation binds provider identity to hardware-backed key material. The coordinator issues a freshness challenge,
+the provider signs or proves challenge material through Secure Enclave backed operations, and the coordinator records the
+result as provider trust state before routing sensitive work.
+
+```mermaid
+sequenceDiagram
+    participant Coord as Coordinator
+    participant Provider as Provider runtime
+    participant Enclave as Secure Enclave
+    participant Verifier as Attestation verifier
+    participant Registry as Provider registry
+
+    Coord->>Provider: Issue attestation challenge
+    Provider->>Enclave: Request hardware-backed signature or attestation
+    Enclave-->>Provider: Signed challenge and attestation material
+    Provider-->>Coord: Attestation response
+    Coord->>Verifier: Verify challenge freshness and key material
+    Verifier-->>Coord: Trust decision
+    Coord->>Registry: Store provider trust state
+```
+
+{bullet("security.trust-model", "The coordinator MUST verify provider attestation evidence before treating a provider as trusted for routed inference work.")}
+{bullet("security.trust-model", "Attestation responses MUST be bound to coordinator challenge freshness to prevent replay of stale trust evidence.")}
+
+## Provider enrollment flow
+
+Enrollment is the transition from an independently operated machine to an addressable provider in the coordinator registry.
+The provider connects, registers identity and capability metadata, completes trust establishment, starts heartbeating, and
+only then becomes eligible for request assignment.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Disconnected
+    Disconnected --> Connected: open coordinator connection
+    Connected --> Registered: send Register metadata
+    Registered --> Attesting: receive challenge
+    Attesting --> Trusted: attestation accepted
+    Trusted --> Available: advertise model and capacity
+    Available --> Assigned: receive inference assignment
+    Assigned --> Available: complete or fail request
+    Available --> Unavailable: heartbeat lost or capacity removed
+    Unavailable --> Connected: reconnect
+```
+
+{bullet("protocol.provider-registration", "A provider MUST register with the coordinator before it is eligible to receive inference assignments.")}
+{bullet("protocol.provider-registration", "A provider MUST advertise model and capacity metadata before the coordinator can route compatible work to it.")}
 
 ## Architectural requirements
 
