@@ -1,10 +1,11 @@
-# DarkBloom Spec
+# DarkBloom Specification
 
-This is a generated mdBook-style specification for DarkBloom / d-inference. It is derived from github-flashlight
-artifacts and is intended to make artifact truth reviewable as a formal spec.
+This book is a formal specification candidate for DarkBloom / d-inference. It is generated from committed
+`github-flashlight` artifacts and is intended to be reviewed before becoming canonical project truth.
 
-Every normative bullet in generated pages carries an HTML source comment of the form
-`<!-- source: path#lines fact: id -->`. The source comment is the evidence pointer back to flashlight output.
+The generated prose is not a direct dump of flashlight output. The renderer projects evidence into a stable protocol
+shape: actors, trust boundaries, message flows, runtime requirements, and open questions. Each normative requirement
+carries a `req` comment that points back to the artifact span used as evidence.
 
 ## Source snapshot
 
@@ -13,5 +14,7 @@ Every normative bullet in generated pages carries an HTML source comment of the 
 - Flashlight analysis timestamp: `2026-04-30T09:24:03Z`
 - Artifact path: `artifacts/d-inference`
 
-Canonical changes are merged only after human PR review. Automation may update artifacts and regenerate this derived
-spec, but it does not auto-merge.
+## Review model
+
+Automation may refresh evidence and render this book, but canonical changes are merged only after human review.
+Reviewers should treat `artifacts/d-inference/**` and `facts/darkbloom.facts.json` as provenance for the formal spec.

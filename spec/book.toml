@@ -5,4 +5,4 @@ language = "en"
 src = "src"
 
 [output.html]
-git-repository-url = "https://github.com/Layr-Labs/darkbloom-spec"
+git-repository-url = "https://github.com/researchoors/darkbloom-spec"

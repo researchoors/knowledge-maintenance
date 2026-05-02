@@ -1,64 +1,42 @@
 # Security and Trust
 
-This page is generated from extracted flashlight facts.
+DarkBloom's security model combines transport security, encrypted inference payloads, provider runtime hardening, and
+Apple Secure Enclave based attestation.
 
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L10 fact: 6cebcf93d216 --> - **Privacy-First Design**: End-to-end encryption ensures provider nodes cannot see plaintext requests or responses.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L11 fact: c4480a1afc3c --> - **Hardware Trust**: Apple Secure Enclave attestation establishes cryptographically verifiable device identity and security posture.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L114 fact: 7c3e0ff99924 --> - **Rust**: Provider agent with system-level security and performance.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L115 fact: edfa2deb0a27 --> - **Swift**: macOS native applications with Secure Enclave integration.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L118 fact: 88905510939f --> - **PostgreSQL**: Primary data store with connection pooling and ACID transactions.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L119 fact: 2e538681bf4f --> - **WebSocket**: Real-time provider communication with binary protocol support.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L120 fact: 675927400eb2 --> - **X25519 + NaCl**: End-to-end encryption with forward secrecy.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L121 fact: c212081f9721 --> - **Apple Secure Enclave**: Hardware-backed attestation and signing.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L122 fact: 686d7cfbd189 --> - **Hypervisor.framework**: Memory isolation for inference workloads.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L123 fact: 3c0b4be17866 --> - **Stripe**: Payment processing with Connect Express for provider payouts.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L126 fact: 3aee5731b773 --> - **Apple MDA**: Managed Device Attestation for hardware trust verification.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L127 fact: 9cff06c17cda --> - **PT_DENY_ATTACH**: Runtime debugging protection on macOS.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L128 fact: 329554035500 --> - **SIP Verification**: System Integrity Protection status checking.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L129 fact: 3628e213b332 --> - **TLS 1.3**: Transport encryption for all external communications.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L13 fact: 1bd0feb3ce20 --> - **Enterprise Security**: Hardware isolation, runtime hardening, and managed device attestation for production deployments.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L138 fact: 9480b703ed1a --> - **Provider Registry**: Manages 1,000+ concurrent provider connections with trust levels.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L139 fact: 423a74dc5977 --> - **Request Routing**: Intelligent job assignment based on hardware specs, trust level, and model availability.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L141 fact: a61742b660e5 --> - **Attestation Engine**: Hardware trust verification using Apple MDA.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L149 fact: 5faf016f1d5e --> - End-to-end encryption proxy without plaintext access.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L159 fact: dbcbb52fee95 --> **Architecture Pattern**: Multi-layered service architecture with security-first design.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L162 fact: 67fb887eb876 --> - **Security Hardening**: PT_DENY_ATTACH, SIP verification, memory wiping.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L166 fact: b74956b16191 --> - **Hardware Attestation**: Secure Enclave integration for identity verification.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L170 fact: 8804491730eb --> - End-to-end encryption with X25519 ephemeral keys.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L176 fact: 1b9a412baf82 --> - **Apple Secure Enclave**: Hardware-backed attestation and signing.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L182 fact: 0104a9ba4fa1 --> **Architecture Pattern**: Layered architecture with client-side security focus.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L185 fact: 09e850bc4cc4 --> - **Chat Interface**: Real-time streaming AI conversations with trust verification.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L186 fact: ded89fcfd8ec --> - **Provider Dashboard**: Hardware attestation monitoring and earnings tracking.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L188 fact: 6c4f503701f8 --> - **Certificate Verification**: Client-side X.509 validation for Apple MDA certificates.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L191 fact: 137be205e933 --> - End-to-end encryption using NaCl Box with forward secrecy.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L192 fact: 048ead5fbe8b --> - Privy authentication with automatic API key provisioning.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L193 fact: 8df15543a6d7 --> - Real-time trust badge displaying hardware attestation status.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L197 fact: e319b0e3ae0c --> - Client-side certificate chain verification against Apple Enterprise Root CA.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L199 fact: c6f362ef4214 --> - Privacy-conscious analytics with user consent management.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L215 fact: 24d4aab56011 --> - Keychain integration for secure credential storage.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L219 fact: 5c3e03365d8d --> **Architecture Pattern**: Layered architecture with hardware security boundaries.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L221 fact: 8305be700e27 --> **Core Responsibilities**:.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L222 fact: 70f2b51d759c --> - **Identity Management**: P-256 ECDSA keys stored in Secure Enclave hardware.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L223 fact: b313dd45bd06 --> - **Attestation Generation**: Signed blobs containing system security state.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L224 fact: bcbd7b5c0a30 --> - **FFI Interface**: C-callable functions for Rust integration.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L225 fact: 1123615b941c --> - **System Verification**: SIP, Secure Boot, and RDMA status checking.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L228 fact: 043f78dddea1 --> - Hardware-isolated private keys that never leave Secure Enclave.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L229 fact: 743ea21511a5 --> - Deterministic JSON encoding for cross-language signature verification.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L230 fact: 13e3a2b5f7a8 --> - Comprehensive system security state collection.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L231 fact: 779346011fd3 --> - Memory-safe FFI with proper ownership semantics.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L235 fact: fc116717b767 --> **Architecture Pattern**: Layered architecture with privacy-preserving design.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L247 fact: 1e7cc0810e16 --> - Privacy-safe data exposure with no reverse lookup capabilities.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L346 fact: 2b02f884f2ca --> 1. **Hardware Trust (Highest)**: Apple Secure Enclave attestation + MDM enrollment.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L347 fact: ca5989305512 --> 2. **Software Trust (Medium)**: SIP enabled, Secure Boot verified, runtime hardening.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L348 fact: a5a40019fbd5 --> 3. **Self-Signed Trust (Basic)**: Provider self-attestation without external verification.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L349 fact: 831cfd8a96fb --> 4. **No Trust (Default)**: Unverified providers queued at lowest priority.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L355 fact: c75d5816beff --> **Coordinator** | Confidential VM, rate limiting, JWT validation | DDoS, credential stuffing, memory attacks.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L356 fact: 4f1e471051e1 --> **Darkbloom** | PT_DENY_ATTACH, hypervisor isolation, memory wiping | Debugging, DMA attacks, key extraction.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L357 fact: d34440730edc --> **Web Console** | E2E encryption, client-side cert verification | MITM, server compromise, certificate spoofing.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L358 fact: 0f6bbebc227f --> **Secure Enclave** | Hardware key isolation, tamper resistance | Physical attacks, key extraction, cloning.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L362 fact: 94d6c58a48f4 --> **End-to-End Encryption**:.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L363 fact: 9471480ae868 --> - **Algorithm**: X25519 key exchange + XSalsa20-Poly1305 authenticated encryption.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L364 fact: f6042f3f289a --> - **Key Management**: Ephemeral keys per session, forward secrecy guaranteed.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L367 fact: c5f8e6d0f6f2 --> **Hardware Attestation**:.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L368 fact: cf71f17a2e0e --> - **Algorithm**: P-256 ECDSA signatures with Secure Enclave private keys.
-- <!-- source: artifacts/d-inference/architecture_docs/architecture.md#L370 fact: adc150a90630 --> - **Certificate Chain**: Validation against Apple Enterprise Attestation Root CA.
+## Trust model
+
+- <!-- req: security.trust-model; source: artifacts/d-inference/architecture_docs/architecture.md#L340-L376 --> Provider trust MUST be evaluated as a graduated state rather than a binary property when attestation and software security posture are available.
+- <!-- req: system.role.enclave; source: artifacts/d-inference/service_discovery/components.json#L330-L339 --> Secure Enclave components MUST protect provider signing keys used for hardware-backed attestation and identity operations.
+- <!-- req: security.crypto; source: artifacts/d-inference/service_analyses/darkbloom.md#L48-L52 --> The provider cryptographic layer MUST protect inference request/response payloads when encrypted operation is used.
+- <!-- req: runtime.provider; source: artifacts/d-inference/service_analyses/darkbloom.md#L210-L274 --> Provider runtimes SHOULD apply local hardening controls before serving assigned inference work.
+
+## Attestation flow
+
+```mermaid
+sequenceDiagram
+    participant Coordinator
+    participant Provider
+    participant Enclave as Secure Enclave
+
+    Provider->>Enclave: Create or load attestation key
+    Provider->>Coordinator: Register with attestation material
+    Coordinator->>Coordinator: Validate provider record and trust state
+    Coordinator->>Provider: AttestationChallenge
+    Provider->>Enclave: Sign challenge material
+    Enclave-->>Provider: Signature
+    Provider-->>Coordinator: AttestationResponse
+    Coordinator->>Coordinator: Verify freshness and update trust level
+```
+
+## Threat boundaries
+
+- The coordinator is trusted for routing and accounting, but encrypted inference mode limits plaintext exposure.
+- Providers are independently operated and must be attested/hardened before receiving sensitive work.
+- Web clients must not be treated as hardware-attestation authorities.
+- Analytics consumers should not receive secrets or plaintext inference payloads.
+
+## Open security questions
+
+- What exact fields are signed in provider attestation blobs?
+- What freshness window is required for challenge-response validation?
+- Which trust levels are eligible for which classes of inference workload?

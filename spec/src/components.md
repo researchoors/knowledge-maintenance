@@ -1,16 +1,25 @@
-# Components
+# Participants and Components
 
-This page is generated from extracted flashlight facts.
+This section lists implementation components discovered from the flashlight service-discovery artifact.
 
-- <!-- source: artifacts/d-inference/service_discovery/components.json#L103-L115 fact: d8ac9101b7c6 --> web is a frontend (typescript-package) rooted at `console-ui`. Next.js web frontend providing chat interface and provider dashboard with E2E encryption. (external applications: stripe, datadog, privy, apple-ca).
-- <!-- source: artifacts/d-inference/service_discovery/components.json#L172-L184 fact: f8e2be6e2a9f --> decrypt-test is a service (rust-crate) rooted at `coordinator/internal/e2e/testdata/decrypt`. Test utility for E2E encryption validation.
-- <!-- source: artifacts/d-inference/service_discovery/components.json#L193-L205 fact: 9184aaa49524 --> darkbloom is a service (rust-crate) rooted at `provider`. EigenInference provider agent for Apple Silicon Macs with hardware-attested security. (external applications: coordinator-api, cloudflare-r2, apple-secure-enclave, apple-hypervisor, huggingface-hub, macos-launchd).
-- <!-- source: artifacts/d-inference/service_discovery/components.json#L30-L42 fact: 177dc407cccd --> coordinator is a service (go-module) rooted at `coordinator/cmd/coordinator`. Central control plane for routing AI inference requests to provider nodes with hardware attestation. (internal dependencies: coordinator; external applications: postgresql, stripe, datadog, privy, apple-secure-enclave, cloudflare-r2).
-- <!-- source: artifacts/d-inference/service_discovery/components.json#L30-L42 fact: a3b986406c9d --> coordinator is a library (go-module) rooted at `coordinator`. Core coordination library with provider registry, attestation, and payment systems. (external applications: postgresql, stripe, datadog, privy, apple-secure-enclave).
-- <!-- source: artifacts/d-inference/service_discovery/components.json#L318-L330 fact: b4d8232eb93d --> EigenInference is a frontend (swift-package) rooted at `app/EigenInference/Sources/EigenInference`. macOS menu bar application for managing darkbloom provider with native SwiftUI interface. (external applications: darkbloom-coordinator, huggingface-hub, mlx-backend, macos-launch-services).
-- <!-- source: artifacts/d-inference/service_discovery/components.json#L330-L342 fact: 69001fd6eb08 --> EigenInferenceEnclave is a library (swift-package) rooted at `enclave`. Swift package root providing Secure Enclave attestation and signing capabilities. (internal dependencies: EigenInferenceEnclave, EigenInferenceEnclaveCLI; external applications: apple-secure-enclave, macos-system-tools).
-- <!-- source: artifacts/d-inference/service_discovery/components.json#L330-L342 fact: e87717d6215f --> EigenInferenceEnclave is a library (swift-package) rooted at `enclave/Sources/EigenInferenceEnclave`. Swift package providing Secure Enclave attestation and signing capabilities. (external applications: apple-secure-enclave, macos-system-tools).
-- <!-- source: artifacts/d-inference/service_discovery/components.json#L342-L354 fact: 56fbc0ef91dd --> EigenInferenceEnclaveCLI is a cli (swift-package) rooted at `enclave/Sources/EigenInferenceEnclaveCLI`. CLI tool for Secure Enclave operations and diagnostics. (internal dependencies: EigenInferenceEnclave; external applications: apple-secure-enclave, macos-system-tools).
-- <!-- source: artifacts/d-inference/service_discovery/components.json#L4-L16 fact: 76ac358bd7b1 --> analytics is a library (go-module) rooted at `analytics`. Analytics library providing read-only data access and pseudonymization. (external applications: postgresql, datadog).
-- <!-- source: artifacts/d-inference/service_discovery/components.json#L4-L16 fact: a5f303f6aa38 --> analytics is a service (go-module) rooted at `analytics/cmd/analytics`. Standalone read-only analytics service for network statistics and earnings leaderboards. (internal dependencies: analytics; external applications: postgresql).
-- <!-- source: artifacts/d-inference/service_discovery/components.json#L89-L101 fact: 8c55553f2106 --> verify-attestation is a service (go-module) rooted at `coordinator/cmd/verify-attestation`. Utility service for verifying Apple Secure Enclave attestations. (internal dependencies: coordinator; external applications: apple-secure-enclave).
+| Component | Kind | Type | Root | Role |
+|---|---:|---:|---|---|
+| `analytics` | library | go-module | `analytics` | Analytics library providing read-only data access and pseudonymization |
+| `analytics` | service | go-module | `analytics/cmd/analytics` | Standalone read-only analytics service for network statistics and earnings leaderboards |
+| `coordinator` | library | go-module | `coordinator` | Core coordination library with provider registry, attestation, and payment systems |
+| `coordinator` | service | go-module | `coordinator/cmd/coordinator` | Central control plane for routing AI inference requests to provider nodes with hardware attestation |
+| `verify-attestation` | service | go-module | `coordinator/cmd/verify-attestation` | Utility service for verifying Apple Secure Enclave attestations |
+| `web` | frontend | typescript-package | `console-ui` | Next.js web frontend providing chat interface and provider dashboard with E2E encryption |
+| `decrypt-test` | service | rust-crate | `coordinator/internal/e2e/testdata/decrypt` | Test utility for E2E encryption validation |
+| `darkbloom` | service | rust-crate | `provider` | EigenInference provider agent for Apple Silicon Macs with hardware-attested security |
+| `EigenInference` | frontend | swift-package | `app/EigenInference/Sources/EigenInference` | macOS menu bar application for managing darkbloom provider with native SwiftUI interface |
+| `EigenInferenceEnclave` | library | swift-package | `enclave/Sources/EigenInferenceEnclave` | Swift package providing Secure Enclave attestation and signing capabilities |
+| `EigenInferenceEnclaveCLI` | cli | swift-package | `enclave/Sources/EigenInferenceEnclaveCLI` | CLI tool for Secure Enclave operations and diagnostics |
+| `EigenInferenceEnclave` | library | swift-package | `enclave` | Swift package root providing Secure Enclave attestation and signing capabilities |
+
+## Component requirements
+
+- <!-- req: system.role.coordinator; source: artifacts/d-inference/service_discovery/components.json#L30-L87 --> Coordinator components MUST be treated as control-plane components for routing, attestation integration, and accounting.
+- <!-- req: system.role.provider; source: artifacts/d-inference/service_discovery/components.json#L193-L315 --> The `darkbloom` provider component MUST be treated as the provider-side runtime for Apple Silicon inference capacity.
+- <!-- req: system.role.enclave; source: artifacts/d-inference/service_discovery/components.json#L330-L339 --> The `EigenInferenceEnclave` components MUST be treated as the provider-side hardware-attestation and signing boundary.
+- <!-- req: system.role.web; source: artifacts/d-inference/service_discovery/components.json#L103-L169 --> The `web` component SHOULD be treated as the user-facing interface, not as a source of provider attestation truth.
