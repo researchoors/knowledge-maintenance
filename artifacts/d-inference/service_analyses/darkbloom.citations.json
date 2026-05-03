@@ -3,146 +3,132 @@
   "source_file": "/tmp/d-inference/service_analyses/darkbloom.md",
   "source_repo": "",
   "source_commit": "",
-  "citation_count": 20,
+  "citation_count": 18,
   "citations": [
     {
-      "file_path": "src/main.rs",
+      "file_path": "provider/src/main.rs",
       "start_line": 1,
       "end_line": 25,
-      "claim": "Darkbloom is the provider agent for Apple Silicon Macs with comprehensive architecture covering hardware detection, model management, backend lifecycle, coordinator connection, private text engine, attestation, and E2E crypto",
+      "claim": "The provider agent runs on Mac hardware and serves local inference requests from the Darkbloom coordinator",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "provider/src/main.rs",
+      "start_line": 8,
+      "end_line": 16,
+      "claim": "Architecture includes hardware detection, model scanning, backend management, coordinator connection, and Secure Enclave attestation",
       "section": "Architecture"
     },
     {
-      "file_path": "src/main.rs",
-      "start_line": 85,
-      "end_line": 97,
-      "claim": "CatalogModel struct defines the model metadata structure with fields for ID, display name, size, architecture, description, and memory requirements",
+      "file_path": "provider/src/coordinator.rs",
+      "start_line": 1,
+      "end_line": 14,
+      "claim": "WebSocket client manages provider's connection to coordinator with automatic reconnection, registration, heartbeats, and inference request handling",
       "section": "Key Components"
     },
     {
-      "file_path": "provider/Cargo.toml",
-      "start_line": 1,
-      "end_line": 10,
-      "claim": "The component is named 'darkbloom' version 0.4.7 with description 'EigenInference provider agent for Apple Silicon Macs' and builds a binary at src/main.rs",
-      "section": "Analysis Data"
-    },
-    {
-      "file_path": "src/coordinator.rs",
+      "file_path": "provider/src/security.rs",
       "start_line": 1,
       "end_line": 15,
-      "claim": "WebSocket client manages provider connection with automatic reconnection, registration, heartbeats, inference requests, attestation challenges, and result forwarding",
+      "claim": "Security module implements runtime protections including PT_DENY_ATTACH, SIP verification, and memory wiping to prevent inference data inspection",
       "section": "Key Components"
     },
     {
-      "file_path": "src/security.rs",
+      "file_path": "provider/src/hardware.rs",
       "start_line": 1,
-      "end_line": 16,
-      "claim": "Security module implements runtime protections including PT_DENY_ATTACH, SIP verification, and memory wiping to prevent inspection of inference data",
+      "end_line": 14,
+      "claim": "Hardware detection queries macOS system APIs via sysctl and system_profiler to detect Apple Silicon capabilities and memory bandwidth",
       "section": "Key Components"
     },
     {
-      "file_path": "src/backend/mod.rs",
+      "file_path": "provider/src/models.rs",
       "start_line": 1,
-      "end_line": 16,
-      "claim": "Backend management supports vllm-mlx and mlx-lm with health monitoring, automatic restart, and BackendManager wrapper for lifecycle management",
+      "end_line": 17,
+      "claim": "Model management scans HuggingFace cache for MLX models and performs SHA-256 weight fingerprinting for attestation",
       "section": "Key Components"
     },
     {
-      "file_path": "src/hardware.rs",
-      "start_line": 1,
-      "end_line": 15,
-      "claim": "Hardware detection queries macOS system APIs for memory size, CPU cores, machine model, and GPU capabilities using sysctl and system_profiler",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "src/crypto.rs",
-      "start_line": 1,
-      "end_line": 16,
-      "claim": "NodeKeyPair implements ephemeral X25519 key pairs for E2E encryption, generated fresh on each launch and protected by PT_DENY_ATTACH + Hardened Runtime + SIP",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "src/models.rs",
-      "start_line": 1,
-      "end_line": 18,
-      "claim": "Model scanning examines HuggingFace cache for MLX models, filtering by available memory with detection heuristics for directory names containing 'mlx' and quantization hints",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "src/hypervisor.rs",
-      "start_line": 1,
-      "end_line": 34,
-      "claim": "Hypervisor integration uses Apple's framework to create lightweight VM with Stage 2 page tables for memory isolation, requiring 16MB alignment and pre-allocated pools",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "src/proxy.rs",
-      "start_line": 1,
+      "file_path": "provider/src/crypto.rs",
+      "start_line": 7,
       "end_line": 11,
-      "claim": "Request proxy handles legacy/local flows between coordinator WebSocket and local backends, with E2E decryption happening before proxy handling",
+      "claim": "Ephemeral X25519 key pair generated fresh on every provider launch, protected by PT_DENY_ATTACH + Hardened Runtime + SIP",
       "section": "Key Components"
     },
     {
-      "file_path": "src/service.rs",
+      "file_path": "provider/src/inference.rs",
       "start_line": 1,
-      "end_line": 7,
-      "claim": "Service management provides launchd user agent integration with explicit user control - only runs when started via 'darkbloom start' or app toggle, no auto-start on login",
+      "end_line": 20,
+      "claim": "In-process inference engine using embedded Python runs inference inside hardened Rust process with no IPC channel to sniff",
       "section": "Key Components"
     },
     {
-      "file_path": "src/telemetry/mod.rs",
+      "file_path": "provider/src/backend/mod.rs",
+      "start_line": 1,
+      "end_line": 15,
+      "claim": "Backend management wraps inference engines with health monitoring and automatic restart using exponential backoff",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "provider/src/telemetry/mod.rs",
       "start_line": 1,
       "end_line": 13,
-      "claim": "Telemetry architecture uses multiple sources (tracing layer, panic hook, backend scraper, direct emit) feeding into mpsc queue, async batcher, and HTTPS POST to coordinator with disk overflow",
+      "claim": "Telemetry architecture includes tracing layer, panic hook, stderr scraper feeding into mpsc queue and async batcher for HTTPS transmission",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "provider/src/service.rs",
+      "start_line": 1,
+      "end_line": 6,
+      "claim": "Service management integrates with launchd as user agent, only running when user explicitly starts via darkbloom start",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "provider/src/config.rs",
+      "start_line": 1,
+      "end_line": 11,
+      "claim": "Configuration system stores TOML format at ~/.config/eigeninference/provider.toml with hardware-adapted defaults",
       "section": "Key Components"
     },
     {
       "file_path": "provider/Cargo.toml",
       "start_line": 11,
-      "end_line": 77,
-      "claim": "Dependencies include tokio for async runtime, reqwest for HTTP, tokio-tungstenite for WebSocket, axum for HTTP server, serde for serialization, crypto_box for NaCl encryption, and security-framework for macOS integration",
+      "end_line": 75,
+      "claim": "External dependencies include tokio for async runtime, reqwest for HTTP, crypto_box for NaCl encryption, and pyo3 for Python embedding",
       "section": "External Dependencies"
     },
     {
-      "file_path": "src/main.rs",
-      "start_line": 1442,
-      "end_line": 1620,
-      "claim": "CLI interface provides comprehensive subcommands including init, serve, install, models, earnings, doctor, start/stop, logs, update, login/logout, and autoupdate configuration",
-      "section": "API Surface"
-    },
-    {
-      "file_path": "src/main.rs",
+      "file_path": "provider/src/main.rs",
       "start_line": 54,
-      "end_line": 83,
-      "claim": "Build-time coordinator URLs default to production (api.darkbloom.dev) with R2 CDN URLs for model and site-packages distribution, configurable via environment variables",
+      "end_line": 84,
+      "claim": "Component connects to coordinator via WebSocket and downloads models from R2 CDN with configurable URLs",
       "section": "External Systems"
     },
     {
-      "file_path": "provider/build.rs",
-      "start_line": 59,
-      "end_line": 110,
-      "claim": "Build system integrates Swift Secure Enclave library, linking EigenInferenceEnclave static library with Foundation, Security, and CryptoKit frameworks plus Swift runtime paths",
-      "section": "External Systems"
-    },
-    {
-      "file_path": "src/protocol.rs",
-      "start_line": 1,
-      "end_line": 19,
-      "claim": "Wire protocol defines JSON-encoded WebSocket messages with provider-to-coordinator messages (Register, Heartbeat, InferenceResponse, AttestationResponse) and coordinator-to-provider messages (InferenceRequest, Cancel, AttestationChallenge)",
-      "section": "API Surface"
-    },
-    {
-      "file_path": "src/main.rs",
-      "start_line": 2118,
-      "end_line": 2200,
-      "claim": "Service startup includes single-instance enforcement via PID file, process cleanup, hypervisor VM creation, security posture verification, and core dump disable before processing any inference data",
+      "file_path": "provider/src/security.rs",
+      "start_line": 31,
+      "end_line": 54,
+      "claim": "PT_DENY_ATTACH syscall prevents debugger attachment and makes process memory unreadable when combined with SIP and Hardened Runtime",
       "section": "Data Flows"
     },
     {
-      "file_path": "src/main.rs",
-      "start_line": 2860,
-      "end_line": 2880,
-      "claim": "Coordinator connection is deliberately delayed until all backends are loaded to prevent routing requests before the provider can serve them, ensuring service readiness",
+      "file_path": "provider/src/main.rs",
+      "start_line": 2118,
+      "end_line": 2200,
+      "claim": "Service serves inference requests in main event loop with security verification, backend management, and coordinator communication",
+      "section": "Data Flows"
+    },
+    {
+      "file_path": "provider/src/inference.rs",
+      "start_line": 148,
+      "end_line": 187,
+      "claim": "Python path locking restricts imports to only approved runtime roots preventing provider from injecting malicious code",
+      "section": "Data Flows"
+    },
+    {
+      "file_path": "provider/src/protocol.rs",
+      "start_line": 29,
+      "end_line": 168,
+      "claim": "Provider-coordinator protocol includes Registration, Heartbeat, InferenceRequest, and AttestationChallenge message types over WebSocket",
       "section": "Data Flows"
     }
   ]

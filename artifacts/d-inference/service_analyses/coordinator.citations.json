@@ -3,147 +3,112 @@
   "source_file": "/tmp/d-inference/service_analyses/coordinator.md",
   "source_repo": "",
   "source_commit": "",
-  "citation_count": 20,
+  "citation_count": 15,
   "citations": [
     {
-      "file_path": "cmd/coordinator/main.go",
+      "file_path": "coordinator/cmd/coordinator/main.go",
       "start_line": 1,
       "end_line": 24,
-      "claim": "The coordinator runs in a GCP Confidential VM with hardware-encrypted memory and acts as central routing layer",
-      "section": "Overview"
-    },
-    {
-      "file_path": "internal/api/server.go",
-      "start_line": 99,
-      "end_line": 207,
-      "claim": "Server struct implements hexagonal architecture with clear separation between external interfaces and business logic",
+      "claim": "The coordinator is the central routing and trust layer in the Darkbloom network running in GCP Confidential VM with hardware-encrypted memory",
       "section": "Architecture"
     },
     {
-      "file_path": "internal/registry/registry.go",
+      "file_path": "coordinator/cmd/coordinator/main.go",
+      "start_line": 58,
+      "end_line": 145,
+      "claim": "Main function sets up core components including store, registry, server, billing, and rate limiting",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/api/server.go",
+      "start_line": 99,
+      "end_line": 213,
+      "claim": "Server struct contains registry, store, billing, rate limiters, and various configuration settings",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/api/server.go",
+      "start_line": 846,
+      "end_line": 1015,
+      "claim": "Routes method defines all HTTP endpoints including consumer inference APIs, provider WebSocket, billing endpoints, and admin management",
+      "section": "API Surface"
+    },
+    {
+      "file_path": "coordinator/internal/api/consumer.go",
+      "start_line": 38,
+      "end_line": 64,
+      "claim": "Consumer API implements OpenAI-compatible endpoints with streaming support and configurable timeouts",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/api/provider.go",
+      "start_line": 94,
+      "end_line": 131,
+      "claim": "Provider WebSocket handler manages provider connections with registration and ACME client certificate verification",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/registry/registry.go",
       "start_line": 330,
       "end_line": 362,
-      "claim": "Registry manages 1000+ concurrent providers with trust levels and intelligent routing",
+      "claim": "Registry manages connected providers with trust levels, model catalog, and request queue",
       "section": "Key Components"
     },
     {
-      "file_path": "internal/store/interface.go",
-      "start_line": 22,
-      "end_line": 354,
-      "claim": "Store interface abstracts persistence layer supporting PostgreSQL and in-memory backends",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "internal/payments/payments.go",
+      "file_path": "coordinator/internal/e2e/e2e.go",
       "start_line": 1,
-      "end_line": 22,
-      "claim": "Payment system uses double-entry accounting with micro-USD precision for blockchain compatibility",
+      "end_line": 28,
+      "claim": "E2E encryption uses NaCl Box with X25519 key exchange for request confidentiality between coordinator and providers",
       "section": "Key Components"
     },
     {
-      "file_path": "go.mod",
+      "file_path": "coordinator/internal/billing/billing.go",
+      "start_line": 1,
+      "end_line": 53,
+      "claim": "Billing service provides unified payment processing with Stripe and referral system",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/store/interface.go",
+      "start_line": 1,
+      "end_line": 23,
+      "claim": "Store interface provides dual-backend storage with MemoryStore for development and PostgreSQL for production",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/protocol/messages.go",
+      "start_line": 1,
+      "end_line": 45,
+      "claim": "Protocol package defines WebSocket message types for coordinator-provider communication",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/go.mod",
       "start_line": 5,
       "end_line": 14,
-      "claim": "Primary runtime dependencies include WebSocket, PostgreSQL, JWT, and cryptographic libraries",
+      "claim": "External dependencies include WebSocket library, PostgreSQL driver, Datadog clients, JWT parsing, and crypto primitives",
       "section": "External Dependencies"
     },
     {
-      "file_path": "internal/api/server.go",
-      "start_line": 766,
-      "end_line": 937,
-      "claim": "API routes include OpenAI-compatible inference endpoints and administrative interfaces",
-      "section": "API Surface"
-    },
-    {
-      "file_path": "internal/registry/registry.go",
-      "start_line": 1112,
-      "end_line": 1245,
-      "claim": "Scoring algorithm considers provider load, hardware specs, trust level, and model cache state",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "internal/api/consumer.go",
-      "start_line": 38,
-      "end_line": 64,
-      "claim": "Request timeouts and retry logic handle provider failures and capacity constraints",
-      "section": "Data Flows"
-    },
-    {
-      "file_path": "cmd/coordinator/main.go",
-      "start_line": 78,
-      "end_line": 131,
-      "claim": "Supports both PostgreSQL for production and in-memory store for development with explicit safety checks",
-      "section": "External Systems"
-    },
-    {
-      "file_path": "internal/registry/registry.go",
-      "start_line": 727,
-      "end_line": 840,
-      "claim": "Provider registration includes model catalog filtering and hardware attestation validation",
-      "section": "Data Flows"
-    },
-    {
-      "file_path": "internal/api/server.go",
-      "start_line": 1040,
-      "end_line": 1094,
-      "claim": "Authentication supports both Privy JWTs and API keys with different access levels",
-      "section": "API Surface"
-    },
-    {
-      "file_path": "internal/ratelimit/ratelimit.go",
-      "start_line": 1,
-      "end_line": 50,
-      "claim": "Rate limiting uses per-account token buckets with separate tiers for inference vs financial operations",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "cmd/coordinator/main.go",
-      "start_line": 184,
+      "file_path": "coordinator/cmd/coordinator/main.go",
+      "start_line": 183,
       "end_line": 207,
-      "claim": "Datadog integration provides APM tracing, metrics, and log forwarding",
+      "claim": "Datadog integration with APM tracer and client for metrics and logs",
       "section": "External Systems"
     },
     {
-      "file_path": "cmd/coordinator/main.go",
-      "start_line": 410,
-      "end_line": 451,
-      "claim": "MDM integration enables independent provider security verification via MicroMDM",
-      "section": "External Systems"
-    },
-    {
-      "file_path": "cmd/coordinator/main.go",
-      "start_line": 314,
+      "file_path": "coordinator/cmd/coordinator/main.go",
+      "start_line": 315,
       "end_line": 367,
-      "claim": "End-to-end encryption uses X25519 keys derived from BIP39 mnemonic for coordinator identity",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "internal/registry/registry.go",
-      "start_line": 1604,
-      "end_line": 1634,
-      "claim": "Background eviction loop removes stale providers every 30 seconds based on heartbeat timeout",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "cmd/coordinator/main.go",
-      "start_line": 557,
-      "end_line": 605,
-      "claim": "Model catalog seeding includes hardcoded models with size and architecture metadata",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "Dockerfile",
-      "start_line": 24,
-      "end_line": 31,
-      "claim": "Deployment includes MicroMDM and step-ca integration with environment configuration",
+      "claim": "Billing configuration includes Stripe payments and Connect Express with referral system",
       "section": "External Systems"
     },
     {
-      "file_path": "internal/api/server.go",
-      "start_line": 989,
-      "end_line": 997,
-      "claim": "Middleware stack includes CORS, panic recovery, and structured request logging",
-      "section": "Architecture"
+      "file_path": "coordinator/cmd/coordinator/main.go",
+      "start_line": 457,
+      "end_line": 485,
+      "claim": "Step-CA root certificate configuration for ACME client cert verification",
+      "section": "External Systems"
     }
   ]
 }

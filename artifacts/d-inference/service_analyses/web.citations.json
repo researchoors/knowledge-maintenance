@@ -3,154 +3,147 @@
   "source_file": "/tmp/d-inference/service_analyses/web.md",
   "source_repo": "",
   "source_commit": "",
-  "citation_count": 21,
+  "citation_count": 20,
   "citations": [
     {
-      "file_path": "package.json",
-      "start_line": 16,
-      "end_line": 30,
-      "claim": "External dependencies analysis including Next.js, React, Privy, and cryptographic libraries",
-      "section": "External Dependencies"
-    },
-    {
-      "file_path": "src/app/layout.tsx",
-      "start_line": 23,
-      "end_line": 43,
-      "claim": "Layered architecture with provider wrapping and component structure",
+      "file_path": "console-ui/package.json",
+      "start_line": 1,
+      "end_line": 46,
+      "claim": "The component is a Next.js TypeScript package with React 19 and comprehensive dependencies for chat, payments, and encryption",
       "section": "Architecture"
     },
     {
-      "file_path": "src/app/page.tsx",
+      "file_path": "console-ui/src/app/layout.tsx",
+      "start_line": 23,
+      "end_line": 44,
+      "claim": "The application uses a provider-based architecture with authentication, theme, verification mode, and telemetry providers",
+      "section": "Architecture"
+    },
+    {
+      "file_path": "console-ui/src/app/page.tsx",
       "start_line": 41,
-      "end_line": 61,
-      "claim": "Main chat interface component with state management integration",
+      "end_line": 95,
+      "claim": "The main chat page implements streaming chat with state management, authentication checks, and model loading",
       "section": "Key Components"
     },
     {
-      "file_path": "src/lib/api.ts",
+      "file_path": "console-ui/src/lib/api.ts",
       "start_line": 299,
       "end_line": 335,
-      "claim": "Streaming chat function with optional encryption support",
+      "claim": "The API client supports optional end-to-end encryption using X25519/NaCl box with coordinator key management",
       "section": "Key Components"
     },
     {
-      "file_path": "src/hooks/useAuth.ts",
-      "start_line": 21,
-      "end_line": 58,
-      "claim": "Privy-based authentication with automatic API key provisioning",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "src/lib/store.ts",
-      "start_line": 52,
-      "end_line": 74,
-      "claim": "Zustand state management with persistence for chat history",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "src/lib/encryption.ts",
+      "file_path": "console-ui/src/lib/encryption.ts",
       "start_line": 169,
       "end_line": 197,
-      "claim": "NaCl Box encryption implementation for coordinator communication",
+      "claim": "Request sealing uses ephemeral X25519 keypairs and NaCl box encryption for forward secrecy",
       "section": "Key Components"
     },
     {
-      "file_path": "src/lib/cert-verify.ts",
-      "start_line": 1,
-      "end_line": 28,
-      "claim": "Client-side X.509 certificate verification against Apple Enterprise Attestation Root CA",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "src/components/AppShell.tsx",
-      "start_line": 8,
-      "end_line": 37,
-      "claim": "App shell layout wrapper with conditional rendering based on authentication",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "src/app/api/chat/route.ts",
-      "start_line": 11,
-      "end_line": 36,
-      "claim": "Next.js API route for chat proxy with streaming and encryption support",
-      "section": "API Surface"
-    },
-    {
-      "file_path": "src/app/api/chat/route.ts",
-      "start_line": 51,
-      "end_line": 68,
-      "claim": "Trust metadata header passthrough for hardware attestation verification",
-      "section": "API Surface"
-    },
-    {
-      "file_path": "src/lib/api.ts",
-      "start_line": 530,
-      "end_line": 563,
-      "claim": "Sealed response handling for encrypted streaming events",
-      "section": "Data Flows"
-    },
-    {
-      "file_path": "src/app/page.tsx",
-      "start_line": 84,
-      "end_line": 152,
-      "claim": "Chat message handling with system prompt and trust tracking",
-      "section": "Data Flows"
-    },
-    {
-      "file_path": "src/hooks/useAuth.ts",
+      "file_path": "console-ui/src/hooks/useAuth.ts",
       "start_line": 35,
-      "end_line": 58,
-      "claim": "API key provisioning flow using Privy access tokens",
-      "section": "Data Flows"
-    },
-    {
-      "file_path": "src/components/providers/PrivyClientProvider.tsx",
-      "start_line": 78,
-      "end_line": 91,
-      "claim": "Privy authentication provider configuration with email login",
-      "section": "External Dependencies"
-    },
-    {
-      "file_path": "src/lib/encryption.ts",
-      "start_line": 15,
-      "end_line": 20,
-      "claim": "TweetNaCl library usage for X25519 and Box encryption",
-      "section": "External Dependencies"
-    },
-    {
-      "file_path": "src/components/DatadogRUM.tsx",
-      "start_line": 1,
-      "end_line": 10,
-      "claim": "Datadog Real User Monitoring integration for performance tracking",
-      "section": "External Systems"
-    },
-    {
-      "file_path": "src/lib/google-analytics.ts",
-      "start_line": 1,
-      "end_line": 30,
-      "claim": "Google Analytics 4 integration with privacy controls and consent management",
-      "section": "External Systems"
-    },
-    {
-      "file_path": "README.md",
-      "start_line": 17,
-      "end_line": 23,
-      "claim": "Environment variables configuration for coordinator URL and Privy app ID",
-      "section": "Component Interactions"
-    },
-    {
-      "file_path": "src/app/providers/ProviderDashboardContent.tsx",
-      "start_line": 71,
-      "end_line": 100,
-      "claim": "Provider dashboard for hardware attestation monitoring and earnings tracking",
+      "end_line": 59,
+      "claim": "Authentication uses Privy for email login with automatic API key provisioning from the coordinator",
       "section": "Key Components"
     },
     {
-      "file_path": "next.config.ts",
+      "file_path": "console-ui/src/lib/store.ts",
+      "start_line": 52,
+      "end_line": 77,
+      "claim": "State management uses Zustand with persistence middleware for chat history and preferences",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "console-ui/src/components/VerificationPanel.tsx",
+      "start_line": 505,
+      "end_line": 570,
+      "claim": "Hardware verification fetches Apple certificate chains and performs X.509 validation against Apple Root CA",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "console-ui/src/app/providers/ProviderDashboardContent.tsx",
+      "start_line": 78,
+      "end_line": 102,
+      "claim": "Provider dashboard fetches machine status and earnings data from the coordinator API",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "console-ui/src/app/billing/BillingContent.tsx",
+      "start_line": 92,
+      "end_line": 121,
+      "claim": "Billing system integrates with Stripe for payments and coordinator for balance/usage tracking",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "console-ui/src/app/api/chat/route.ts",
+      "start_line": 11,
+      "end_line": 96,
+      "claim": "API routes proxy requests to the coordinator while preserving streaming and encryption headers",
+      "section": "API Surface"
+    },
+    {
+      "file_path": "console-ui/src/lib/telemetry.ts",
+      "start_line": 98,
+      "end_line": 118,
+      "claim": "Telemetry system batches events with debouncing and uses sendBeacon for reliable delivery",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "console-ui/src/components/AppShell.tsx",
+      "start_line": 31,
+      "end_line": 38,
+      "claim": "AppShell provides the main layout with sidebar navigation and toast notification system",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "console-ui/src/app/page.tsx",
+      "start_line": 84,
+      "end_line": 231,
+      "claim": "Chat flow implements streaming with trust metadata, performance metrics, and error handling",
+      "section": "Data Flows"
+    },
+    {
+      "file_path": "console-ui/src/lib/api.ts",
+      "start_line": 530,
+      "end_line": 631,
+      "claim": "Streaming chat handles sealed responses with SSE event decryption and think-block parsing",
+      "section": "Data Flows"
+    },
+    {
+      "file_path": "console-ui/src/components/TrustBadge.tsx",
+      "start_line": 34,
+      "end_line": 76,
+      "claim": "Trust badges display hardware attestation levels with Apple MDA verification status",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "console-ui/next.config.ts",
       "start_line": 3,
-      "end_line": 10,
-      "claim": "Next.js configuration with TypeScript build optimization",
+      "end_line": 11,
+      "claim": "Next.js configuration handles TypeScript build issues with viem dependency tree",
       "section": "Architecture"
+    },
+    {
+      "file_path": "console-ui/src/lib/api.ts",
+      "start_line": 93,
+      "end_line": 111,
+      "claim": "Models API flattens metadata and processes attestation information for UI display",
+      "section": "API Surface"
+    },
+    {
+      "file_path": "console-ui/src/app/api/auth/keys/route.ts",
+      "start_line": 5,
+      "end_line": 28,
+      "claim": "Authentication route provisions API keys using Privy tokens or Authorization headers",
+      "section": "External Systems"
+    },
+    {
+      "file_path": "console-ui/src/lib/encryption.ts",
+      "start_line": 96,
+      "end_line": 143,
+      "claim": "Coordinator key caching uses URL-keyed storage with 1-hour TTL and rotation handling",
+      "section": "External Dependencies"
     }
   ]
 }

@@ -1,317 +1,163 @@
-# Coordinator Component Analysis
-
-## Overview
-
-The coordinator is the central control plane and trust layer for the Darkbloom (EigenInference) network. It acts as a secure routing hub that connects AI model consumers to provider nodes, handling authentication, trust verification, payment processing, and request routing. The coordinator runs in a GCP Confidential VM (AMD SEV-SNP) with hardware-encrypted memory to provide a trusted execution environment.
+# Coordinator Service Analysis
 
 ## Architecture
 
-The coordinator follows a **hexagonal architecture** pattern with clear separation between:
-- **External interfaces**: HTTP REST API for consumers, WebSocket connections for providers
-- **Core business logic**: Provider registry, attestation verification, payment ledger, request routing
-- **Storage adapters**: PostgreSQL for production persistence, in-memory store for development
-- **External integrations**: Stripe for payments, Datadog for observability, MicroMDM for device management
+The coordinator component is the central control plane of the Darkbloom (EigenInference) distributed AI inference network. It implements a **hub-and-spoke architecture** where:
 
-The architecture emphasizes trust verification through multiple layers: hardware attestation, Secure Enclave verification, runtime integrity checks, and Apple Business Manager integration.
+- **Hub**: The coordinator runs in a GCP Confidential VM with hardware-encrypted memory
+- **Spokes**: Provider agents connect via WebSocket and consumers via HTTP/HTTPS
+- **Trust Layer**: Secure Enclave attestation verifies provider authenticity
+- **Routing Engine**: Intelligent request routing based on model availability and trust level
+
+The architecture follows a **layered service pattern** with clear separation between API handling, business logic, and persistence.
 
 ## Key Components
 
-### 1. **API Server** (`internal/api/server.go`)
-- Central HTTP/WebSocket server managing all external communications
-- Implements OpenAI-compatible REST endpoints for consumers
-- Handles provider WebSocket connections with binary protocol
-- Provides admin management interface with Privy authentication
-- Supports request-response encryption with X25519 key exchange
+1. **HTTP/WebSocket Server** (`internal/api/server.go`): Core networking layer handling both consumer HTTP requests and provider WebSocket connections. Implements middleware chains for logging, CORS, rate limiting, and panic recovery.
 
-### 2. **Provider Registry** (`internal/registry/registry.go`)
-- In-memory registry managing connected provider fleet (1,000+ concurrent providers)
-- Provider lifecycle: registration → attestation → heartbeat monitoring → eviction
-- Trust levels: none, self_signed, hardware (MDA + SecureBoot verified)
-- Intelligent request routing with scoring algorithm based on hardware specs, trust level, model cache state
-- Background eviction loop removes stale providers every 30 seconds
+2. **Provider Registry** (`internal/registry/registry.go`): In-memory fleet management tracking ~1,000 connected providers with their hardware specs, trust levels, and operational status. Includes request queue and round-robin routing.
 
-### 3. **Request Queue** (`internal/registry/queue.go`)
-- Multi-tier priority queue for handling provider capacity overflow
-- Per-model queuing with FIFO semantics and configurable timeouts
-- Automatic request distribution when providers become available
-- Queue depth monitoring for capacity planning
+3. **Consumer API Handler** (`internal/api/consumer.go`): OpenAI-compatible inference endpoints (`/v1/chat/completions`, `/v1/completions`) with request routing, cost estimation, and streaming response handling.
 
-### 4. **Attestation Engine** (`internal/attestation/`)
-- Hardware trust verification using Apple's MDA (Mobile Device Attestation)
-- SecureBoot and SIP (System Integrity Protection) verification
-- Challenge-response protocol for periodic provider re-verification
-- ACME device-attest-01 integration for SE key binding
+4. **Provider WebSocket Handler** (`internal/api/provider.go`): Manages provider lifecycle including registration, attestation verification, periodic challenges, and inference request/response relay.
 
-### 5. **Payment Ledger** (`internal/payments/payments.go`)
-- Double-entry accounting system tracking consumer balances and provider earnings
-- Micro-USD precision (6 decimal places) matching on-chain pathUSD representation
-- Atomic balance operations with PostgreSQL transaction isolation
-- Multi-payment method support: Stripe, Ethereum, Solana, Tempo blockchain
+5. **Attestation Verifier** (`internal/attestation/`): Cryptographic verification of Secure Enclave P-256 signatures and Apple MDA certificate chains to establish provider trust levels.
 
-### 6. **Billing Service** (`internal/billing/`)
-- Stripe Checkout integration for consumer deposits
-- Stripe Connect Express for provider bank/card withdrawals
-- Dynamic pricing with per-model custom rates
-- Referral system with configurable reward percentages
+6. **Billing Engine** (`internal/billing/billing.go`): Multi-rail payment processing supporting Stripe deposits and Connect Express payouts, with integrated referral system.
 
-### 7. **Store Interface** (`internal/store/interface.go`)
-- Abstracted persistence layer supporting PostgreSQL and in-memory backends
-- API keys, usage records, balance ledger, provider fleet state
-- Multi-instance coordinator support through shared PostgreSQL state
-- Automatic data pruning for memory-bound deployments
+7. **E2E Encryption** (`internal/e2e/e2e.go`): NaCl Box encryption for request/response confidentiality using X25519 keys from provider attestations.
 
-### 8. **Rate Limiting** (`internal/ratelimit/ratelimit.go`)
-- Per-account token bucket rate limiting on consumer endpoints
-- Separate financial-tier limits for balance-mutating operations
-- Configurable burst allowances and replenishment rates
-- Graceful degradation with Retry-After headers
+8. **Storage Layer** (`internal/store/`): Dual-backend storage with PostgreSQL for production and MemoryStore for development, managing API keys, usage tracking, balances, and provider fleet persistence.
 
-### 9. **Telemetry Emitter** (`internal/telemetry/`)
-- Structured event forwarding to Datadog Logs API
-- Internal metrics collection for fleet monitoring
-- Request tracing with correlation IDs
-- Panic recovery with stack trace capture
+9. **Rate Limiting** (`internal/ratelimit/`): Per-account token bucket limiting with separate tiers for inference endpoints (default: 5 RPS) and financial endpoints (0.2 RPS).
 
-### 10. **MDM Integration** (`internal/mdm/mdm.go`)
-- MicroMDM client for independent provider security verification
-- Apple Business Manager enrollment status checking
-- Device certificate chain validation
-- Late-arriving MDA certificate handling
+10. **Protocol Definitions** (`internal/protocol/`): Wire protocol message types for WebSocket communication including registration, heartbeats, attestation challenges, and inference requests/responses.
 
-### 11. **End-to-End Encryption** (`internal/e2e/`)
-- X25519 key derivation from BIP39 mnemonic seed
-- Request encryption: sender → coordinator → provider
-- Response encryption: provider → coordinator → sender
-- Hardware-bound session keys for provider communications
+11. **Telemetry System** (`internal/telemetry/`): Event collection and forwarding to Datadog with coordinator self-monitoring for errors, panics, and operational metrics.
 
-### 12. **Protocol Definitions** (`internal/protocol/`)
-- WebSocket message protocol for provider communication
-- OpenAI-compatible JSON schemas for consumer API
-- Usage reporting and capacity monitoring messages
-- Attestation challenge-response message formats
+12. **Payments Ledger** (`internal/payments/`): Double-entry accounting system tracking micro-USD balances with atomic operations for deposits, charges, and payouts.
 
 ## Data Flows
 
-### Consumer Request Flow
 ```mermaid
-sequenceDiagram
-    participant C as Consumer
-    participant API as API Server
-    participant Registry as Provider Registry
-    participant Queue as Request Queue
-    participant P as Provider
-    participant Store as Database
-
-    C->>API: POST /v1/chat/completions
-    API->>API: Authenticate & rate limit
-    API->>Store: Reserve balance (pre-flight debit)
-    API->>Registry: Find available provider
-    alt Provider available
-        Registry->>P: Forward request via WebSocket
-        P->>API: Stream response chunks
-        API->>C: Forward SSE chunks
-        P->>API: Usage info & completion
-        API->>Store: Record usage & adjust balance
-    else No provider available
-        API->>Queue: Queue request (90s timeout)
-        Queue->>Registry: Retry when provider becomes idle
-    end
+graph TD
+    A[Consumer] -->|HTTPS Request| B[HTTP Server]
+    B --> C[Auth Middleware]
+    C --> D[Rate Limiter]
+    D --> E[Consumer Handler]
+    E --> F[Provider Registry]
+    F --> G[Selected Provider]
+    G -->|WebSocket| H[Provider Agent]
+    H -->|Response Stream| G
+    G --> F
+    F --> E
+    E -->|SSE Stream| B
+    B --> A
+    
+    I[Provider Agent] -->|WebSocket Connect| J[Provider Handler]
+    J --> K[Attestation Verifier]
+    K --> L[Registry Registration]
+    L --> M[Challenge Loop]
+    
+    N[Stripe Webhook] --> O[Billing Service]
+    O --> P[Ledger]
+    P --> Q[Balance Update]
 ```
 
-### Provider Registration & Attestation Flow
-```mermaid
-sequenceDiagram
-    participant P as Provider
-    participant API as API Server
-    participant Registry as Provider Registry
-    participant Attestation as Attestation Engine
-    participant MDM as MicroMDM
-    participant Store as Database
+### Inference Request Flow
+1. **Consumer Request**: HTTP POST to `/v1/chat/completions` with API key authentication
+2. **Pre-flight**: Balance check, cost estimation, and rate limiting
+3. **Provider Selection**: Registry finds available providers matching model and trust requirements
+4. **E2E Encryption**: Request encrypted with provider's X25519 public key
+5. **WebSocket Dispatch**: Encrypted request sent to selected provider
+6. **Response Streaming**: Provider streams SSE chunks back through WebSocket
+7. **Post-processing**: Token usage metering, billing calculation, and response forwarding
 
-    P->>API: WebSocket connect + Register message
-    API->>Attestation: Verify hardware attestation
-    API->>MDM: Query device enrollment status
-    API->>Registry: Register with trust level
-    Registry->>Store: Persist provider record
-    
-    loop Every 5 minutes
-        API->>P: Send attestation challenge
-        P->>API: Challenge response + SIP status
-        API->>Attestation: Verify response
-        alt Challenge passes
-            API->>Registry: Update trust status
-        else Challenge fails
-            API->>Registry: Increment failure count
-            alt Too many failures
-                Registry->>Registry: Mark provider untrusted
-            end
-        end
-    end
-```
-
-### Payment Settlement Flow
-```mermaid
-sequenceDiagram
-    participant Consumer as Consumer
-    participant Stripe as Stripe Checkout
-    participant API as Coordinator API
-    participant Ledger as Payment Ledger
-    participant Provider as Provider
-    participant Connect as Stripe Connect
-
-    Consumer->>Stripe: Complete checkout session
-    Stripe->>API: Webhook: payment succeeded
-    API->>Ledger: Credit consumer balance
-    
-    Consumer->>API: Make inference request
-    API->>Ledger: Debit consumer (charge)
-    API->>Ledger: Credit provider (90% payout)
-    API->>Ledger: Credit platform (10% fee)
-    
-    Provider->>API: Request withdrawal
-    API->>Connect: Create Express payout
-    Connect->>API: Webhook: payout succeeded
-    API->>Ledger: Mark settlement complete
-```
+### Provider Registration Flow
+1. **WebSocket Connection**: Provider connects to `/ws/provider` endpoint
+2. **Registration Message**: Hardware specs, available models, and attestation blob
+3. **Attestation Verification**: Secure Enclave P-256 signature validation
+4. **Trust Level Assignment**: Hardware/self-signed/none based on verification result
+5. **Fleet Integration**: Provider added to registry with operational status tracking
+6. **Challenge Loop**: Periodic attestation challenges to verify continued liveness
 
 ## External Dependencies
 
-### Runtime Dependencies
+### External Libraries
 
-- **nhooyr.io/websocket** (1.8.17) [networking]: WebSocket library for provider connections. Handles binary message framing, connection lifecycle, and graceful shutdowns. Integrated throughout provider communication layer.
+- **nhooyr.io/websocket** (v1.8.17) [networking]: High-performance WebSocket library for provider connections. Used in provider handler and integration tests. Core to the real-time bidirectional communication architecture.
 
-- **jackc/pgx/v5** (5.8.0) [database]: PostgreSQL driver for production data persistence. Provides connection pooling, prepared statement caching, and transaction isolation. Used in `internal/store/postgres.go` for all database operations.
+- **github.com/jackc/pgx/v5** (v5.8.0) [database]: PostgreSQL driver for production data persistence. Powers the PostgresStore implementation with connection pooling and prepared statements. Imported in: `internal/store/postgres.go`.
 
-- **golang-jwt/jwt/v5** (5.3.1) [auth]: JWT token validation for Privy authentication. Validates consumer session tokens, extracts user claims, and enforces expiration policies. Integrated in `internal/auth/privy.go`.
+- **github.com/DataDog/datadog-go/v5** (v5.8.3) [monitoring]: DogStatsD client for metrics collection. Enables real-time operational visibility with counters, histograms, and gauges. Used in: `internal/datadog/datadog.go`.
 
-- **google/uuid** (1.6.0) [utility]: UUID generation for request correlation IDs, billing session tracking, and provider identification. Used across API handlers for request tracing.
+- **gopkg.in/DataDog/dd-trace-go.v1** (v1.74.8) [monitoring]: Datadog APM tracer for distributed tracing. Provides request correlation across the inference pipeline. Integrated in main.go startup and middleware.
 
-- **golang.org/x/crypto** (0.49.0) [crypto]: X25519 key exchange implementation for end-to-end encryption. Provides sender-to-coordinator and coordinator-to-provider encryption capabilities in `internal/e2e/`.
+- **github.com/golang-jwt/jwt/v5** (v5.3.1) [crypto]: JWT token parsing and validation for Privy authentication. Handles user session verification in auth middleware. Used in: `internal/auth/privy.go`.
 
-- **golang.org/x/time** (0.15.0) [rate-limiting]: Token bucket rate limiter implementation. Provides per-account request throttling on consumer endpoints and financial operations in `internal/ratelimit/`.
+- **golang.org/x/crypto** (v0.49.0) [crypto]: NaCl Box implementation for end-to-end encryption. Provides X25519 key exchange and XSalsa20-Poly1305 authenticated encryption. Critical for request confidentiality in E2E module.
 
-### Observability Dependencies
+- **golang.org/x/time** (v0.15.0) [networking]: Rate limiting primitives including token bucket algorithm. Implements per-account throttling for API endpoints. Used in: `internal/ratelimit/ratelimit.go`.
 
-- **DataDog/datadog-go/v5** (5.8.3) [monitoring]: DogStatsD metrics client for operational telemetry. Emits request counters, latency histograms, and fleet size gauges. Used in `internal/datadog/`.
+- **github.com/google/uuid** (v1.6.0) [utilities]: UUID generation for request IDs, provider IDs, and session tracking. Provides correlation identifiers across distributed components.
 
-- **gopkg.in/DataDog/dd-trace-go.v1** (1.74.8) [tracing]: Datadog APM tracer for distributed request tracing. Automatically correlates logs with traces and provides performance insights across the stack.
+### Internal Dependencies
 
-### Development Dependencies (go.mod `require` block includes test dependencies)
-
-- **stretchr/testify** (1.11.1) [testing]: Assertion library for unit and integration tests. Provides structured test assertions across all test files (`*_test.go`).
-
-All dependencies use specific version constraints to ensure reproducible builds and security. The coordinator prioritizes stability over cutting-edge features.
-
-## External Systems
-
-### Infrastructure Services
-
-- **PostgreSQL**: Primary data store for production deployments. Stores API keys, usage records, balance ledger, provider fleet state, and user accounts. Requires concurrent connection handling for multi-instance coordinator deployments.
-
-- **GCP Confidential VM (AMD SEV-SNP)**: Hardware-encrypted execution environment providing memory encryption and integrity protection. The coordinator's trust model depends on this hardware isolation.
-
-- **Stripe**: Payment processing infrastructure including Checkout for consumer deposits and Connect Express for provider withdrawals. Handles PCI compliance and international banking regulations.
-
-- **Datadog**: Observability platform receiving metrics via DogStatsD, logs via Logs API, and traces via APM agent. Provides alerting and dashboard capabilities for production monitoring.
-
-### Device Management Integration
-
-- **MicroMDM**: Mobile Device Management server for independent provider verification. Validates Apple Business Manager enrollment and device security policies outside of provider self-attestation.
-
-- **step-ca**: Certificate Authority for ACME device-attest-01 protocol. Issues client certificates bound to provider Secure Enclave keys, enabling hardware-verified authentication.
-
-### Blockchain Networks
-
-- **Tempo**: Primary blockchain for pathUSD payments and provider wallet settlements. Supports 6-decimal precision micro-USD transactions with low fees.
-
-- **Ethereum**: Alternative payment rail for EVM-compatible wallet deposits. Provides broader ecosystem compatibility for crypto-native users.
-
-- **Solana**: High-throughput blockchain option for rapid settlement and lower transaction costs. Used for provider payouts in high-frequency scenarios.
-
-## Component Interactions
-
-### HTTP API Consumers
-- **Console UI** (`console-ui/`): React frontend consuming coordinator REST API for user dashboard, provider management, and billing interfaces.
-- **Provider CLI** (`provider/`): Go binary that connects via WebSocket to register as inference provider and receive work assignments.
-- **SDK Clients**: Third-party applications using OpenAI-compatible endpoints for inference requests and balance management.
-
-### Shared Database Access
-- **Analytics Service** (`analytics/`): Read-only access to coordinator PostgreSQL for business intelligence and usage analytics without impacting coordinator performance.
-
-### External API Calls
-- **Privy Authentication API**: Real-time JWT token validation for user session management and email verification flows.
-- **Apple Business Manager API**: Device enrollment verification for provider trust levels (via MicroMDM proxy).
-- **Blockchain RPC Nodes**: Transaction broadcasting and confirmation monitoring for multi-chain payment settlement.
+The coordinator component is self-contained and does not depend on other components within the d-inference codebase. All dependencies are internal packages within the coordinator module itself.
 
 ## API Surface
 
-### Consumer Endpoints (OpenAI-compatible)
+### Consumer Endpoints (Authenticated)
+- **POST /v1/chat/completions**: OpenAI-compatible chat completion with streaming support
+- **POST /v1/responses**: Responses API format (auto-detected from request body)
+- **POST /v1/completions**: Legacy completion endpoint
+- **POST /v1/messages**: Anthropic Messages API compatibility
+- **GET /v1/models**: List available models with hardware requirements
 
-**Inference Endpoints:**
-- `POST /v1/chat/completions` - OpenAI chat completions with streaming support
-- `POST /v1/completions` - Legacy completions endpoint for older clients  
-- `POST /v1/messages` - Anthropic-compatible messages endpoint
-- `POST /v1/responses` - Responses API for SDK clients
-- `GET /v1/models` - List available models with provider counts and attestation status
+### Provider WebSocket
+- **GET /ws/provider**: WebSocket upgrade for provider agent connections
 
-**Payment & Account Management:**
-- `GET /v1/payments/balance` - Get current account balance in micro-USD
-- `GET /v1/payments/usage` - Historical usage records with token counts and costs
-- `POST /v1/billing/stripe/create-session` - Initiate Stripe Checkout deposit flow
-- `GET /v1/billing/wallet/balance` - Multi-chain wallet balance aggregation
+### Billing & Payments
+- **POST /v1/billing/stripe/create-session**: Stripe Checkout session creation
+- **POST /v1/billing/stripe/webhook**: Stripe payment confirmation webhook
+- **GET /v1/payments/balance**: Account balance inquiry
+- **GET /v1/payments/usage**: Usage history and cost breakdown
 
-**Authentication:**
-- `POST /v1/auth/keys` - Create new API key (Privy session required)
-- `DELETE /v1/auth/keys` - Revoke API key
-- `GET /v1/encryption-key` - Get coordinator's X25519 public key for E2E encryption
-
-### Provider Endpoints
-
-**WebSocket Connection:**
-- `GET /ws/provider` - Persistent WebSocket for provider communication
-- Binary protocol with Register, Heartbeat, InferenceRequest, Usage messages
-- Challenge-response attestation verification every 5 minutes
-
-**Device Authorization (RFC 8628-style):**
-- `POST /v1/device/code` - Generate device code for provider → account linking
-- `POST /v1/device/token` - Poll for user approval
-- `POST /v1/device/approve` - Approve device code (Privy session required)
-
-**Provider Analytics:**
-- `GET /v1/provider/earnings` - Per-node earnings by provider public key
-- `GET /v1/provider/node-earnings` - Public earnings for specific provider
-- `GET /v1/provider/account-earnings` - Account-aggregated provider earnings
-
-### Administrative Endpoints
-
-**Model Catalog Management:**
-- `GET /v1/admin/models` - List supported models
-- `POST /v1/admin/models` - Add/update supported model
-- `DELETE /v1/admin/models` - Remove model from catalog
-
-**Release Management:**
-- `POST /v1/releases` - Register new provider binary release (scoped key)
-- `GET /v1/releases/latest` - Get latest provider version for install.sh
-- `GET /v1/admin/releases` - List all releases (admin)
-- `DELETE /v1/admin/releases` - Deactivate release version
-
-**Platform Operations:**
-- `GET /v1/admin/metrics` - Internal metrics snapshot (JSON/Prometheus)
-- `POST /v1/admin/credit` - Grant non-withdrawable account credit
-- `POST /v1/admin/reward` - Grant withdrawable account reward
-- `GET /v1/stats` - Public platform statistics
+### Admin & Management
+- **GET /v1/admin/models**: Model catalog management
+- **POST /v1/admin/models**: Add/update supported models
+- **GET /v1/admin/metrics**: Operational metrics snapshot
+- **POST /v1/releases**: Provider binary version registration (GitHub Actions)
 
 ### Public Endpoints
+- **GET /install.sh**: Provider installation script with environment-specific URLs
+- **GET /v1/stats**: Network statistics and usage totals
+- **GET /v1/leaderboard**: Provider earnings leaderboard (pseudonymized)
+- **GET /health**: Health check endpoint
 
-**Network Information:**
-- `GET /v1/leaderboard` - Pseudonymized provider earnings rankings
-- `GET /v1/network/totals` - Aggregate network metrics (tokens, jobs, earnings)
-- `GET /v1/runtime/manifest` - Expected runtime component hashes
-- `GET /v1/providers/attestation` - Provider attestation verification data
+## External Systems
 
-**Installation & Setup:**
-- `GET /install.sh` - Provider installation script with environment-specific URLs
-- `GET /health` - Health check endpoint for load balancers
-- `GET /api/version` - Latest provider version check
+### Infrastructure Dependencies
+- **PostgreSQL Database**: Primary data persistence for production deployments with atomic balance operations and fleet state
+- **GCP Confidential VM**: AMD SEV-SNP hardware-encrypted memory for coordinator hosting
+- **Stripe Payments**: Credit card processing and Connect Express bank payouts
+- **Datadog**: APM tracing, metrics collection (DogStatsD), and log aggregation
+- **Cloudflare R2**: CDN for provider binary distribution and model weights
+- **Apple Business Manager**: MDA certificate verification for hardware trust (future)
+- **MicroMDM**: Device management integration for provider security verification
 
-All endpoints support CORS for console UI integration and return structured JSON responses with consistent error formats. Rate limiting is applied per-account with separate tiers for inference vs. financial operations.
+### Runtime Integrations
+- **ACME/step-ca**: TLS client certificate verification for Apple-attested Secure Enclave key binding
+- **Privy**: JWT-based user authentication and embedded wallet management
+- **Nginx**: TLS termination and client certificate extraction via headers
+
+## Component Interactions
+
+The coordinator acts as a **centralized orchestrator** with no direct calls to other components in the d-inference codebase. Instead, it:
+
+- **Receives Connections**: Provider agents connect via WebSocket from distributed hardware
+- **Serves Consumers**: HTTP clients make inference requests through OpenAI-compatible APIs  
+- **Integrates External Services**: Billing, monitoring, and certificate authorities via HTTP APIs
+- **Manages State**: Provider fleet, usage tracking, and financial ledger in PostgreSQL
+
+The design is **hub-centric** rather than peer-to-peer, with all communication flowing through the coordinator for trust verification, routing decisions, and billing coordination.

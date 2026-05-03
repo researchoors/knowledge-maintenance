@@ -1,247 +1,185 @@
 # Web Component Analysis
 
-## Overview
-
-The web component is a Next.js frontend application that provides the user interface for Darkbloom's decentralized AI inference platform. Built with TypeScript and React, it serves as both a consumer interface for AI chat interactions and a provider dashboard for hardware attestation management.
+The web component is a Next.js-based React frontend application that provides a comprehensive console interface for the Darkbloom decentralized AI inference platform. It implements end-to-end encrypted chat functionality, provider management, billing, and advanced hardware verification features.
 
 ## Architecture
 
-The application follows a **layered architecture** with clear separation of concerns:
+The application follows a **Next.js App Router architecture** with a clear separation between client and server components:
 
-- **Presentation Layer**: React components with Tailwind CSS styling
-- **State Management Layer**: Zustand for client-side state, localStorage for persistence  
-- **API Layer**: Custom abstraction over HTTP requests with encryption support
-- **Authentication Layer**: Privy-based email authentication with API key provisioning
-- **Security Layer**: End-to-end encryption using NaCl Box for coordinator communication
+- **Frontend Layer**: React components with TypeScript using the App Router pattern
+- **API Layer**: Next.js API routes that proxy requests to the Darkbloom coordinator
+- **State Management**: Zustand for client-side state with persistence
+- **Authentication**: Privy-based email authentication with API key provisioning
+- **Encryption**: Optional end-to-end encryption using X25519/NaCl box cryptography
 
-The app uses Next.js App Router with both client-side and server-side rendering, implementing a hybrid approach where sensitive operations happen client-side while static content is server-rendered.
+The architecture implements a security-focused design where all backend communication is proxied through Next.js API routes to avoid CORS issues and maintain consistent authentication headers.
 
 ## Key Components
 
-### 1. **Chat Interface (`src/app/page.tsx`)**
-- **Description**: Main chat interface for AI conversations
-- **Key Features**: Real-time streaming, trust verification badges, model selection
-- **Data Flow**: User input → encryption → coordinator API → streaming response → UI update
-- **Trust Integration**: Displays hardware attestation status and Secure Enclave verification
+### Core Application Structure
+- **AppShell**: Main application layout with sidebar navigation and toast notifications
+- **Layout**: Root layout with provider wrappers for theme, authentication, and telemetry
+- **Sidebar**: Navigation component with chat history and model selection
+- **TopBar**: Header component with user controls and model selector
 
-### 2. **Provider Dashboard (`src/app/providers/`)**
-- **Description**: Interface for hardware providers to monitor their nodes
-- **Key Features**: Real-time device status, earnings tracking, attestation warnings
-- **Security Focus**: Verifies Apple MDA certificates, monitors hardware integrity
-- **Metrics**: Token throughput, earnings, device health alerts
+### Chat System
+- **ChatMessage**: Renders individual messages with trust badges and performance metrics
+- **ChatInput**: Input component with streaming controls and authentication prompts
+- **VerificationPanel**: Advanced hardware verification UI with normal/technical modes
+- **TrustBadge**: Visual indicators for hardware attestation levels
 
-### 3. **Authentication System (`src/hooks/useAuth.ts`, `src/components/providers/PrivyClientProvider.tsx`)**
-- **Description**: Privy-based email authentication with API key management
-- **Key Features**: Automatic key provisioning, session management, logout cleanup
-- **Security**: Clears sensitive data on logout, handles key expiration events
+### Provider Dashboard
+- **ProviderDashboardContent**: Main dashboard for linked provider devices
+- **EarningsContent**: Provider earnings and payout management interface
+- **Billing System**: Credit purchasing, usage tracking, and Stripe integration
 
-### 4. **API Abstraction (`src/lib/api.ts`)**
-- **Description**: Centralized HTTP client with encryption and streaming support
-- **Key Features**: Model management, chat streaming, payment processing, provider metrics
-- **Encryption**: Optional NaCl Box encryption to coordinator with forward secrecy
+### Authentication & Security
+- **useAuth**: Custom hook managing Privy authentication and API key lifecycle
+- **PrivyClientProvider**: Authentication context provider with email-based login
+- **E2ELockIndicator**: Visual indicator for end-to-end encryption status
 
-### 5. **Certificate Verification (`src/lib/cert-verify.ts`)**
-- **Description**: Client-side X.509 certificate chain verification for Apple MDA
-- **Key Features**: WebCrypto-based signature verification, OID extraction
-- **Trust Chain**: Validates against Apple Enterprise Attestation Root CA
-
-### 6. **State Management (`src/lib/store.ts`)**
-- **Description**: Zustand-based global state with persistence
-- **Key Features**: Chat history, model selection, UI preferences
-- **Persistence**: localStorage with streaming state cleanup on reload
-
-### 7. **Encryption Layer (`src/lib/encryption.ts`)**
-- **Description**: End-to-end encryption for requests to coordinator
-- **Key Features**: X25519 ephemeral keys, NaCl Box sealing, SSE event decryption
-- **Security**: Forward secrecy, key rotation handling, tampering detection
-
-### 8. **App Shell (`src/components/AppShell.tsx`)**
-- **Description**: Layout wrapper with navigation and loading states
-- **Key Features**: Responsive sidebar, authentication routing, toast notifications
-- **Structure**: Conditional rendering based on auth state and current route
-
-### 9. **Billing Interface (`src/app/billing/`)**
-- **Description**: Stripe-integrated payment and withdrawal system
-- **Key Features**: Credit purchases, provider payouts, usage tracking
-- **Compliance**: Country restrictions, KYC requirements, fee calculations
-
-### 10. **API Routes (`src/app/api/`)**
-- **Description**: Next.js API routes that proxy requests to coordinator
-- **Key Features**: CORS handling, streaming passthrough, header forwarding
-- **Security**: API key validation, sealed request handling, error response sealing
-
-### 11. **Telemetry System (`src/components/TelemetryInitializer.tsx`, `src/lib/google-analytics.ts`)**
-- **Description**: Privacy-conscious analytics with user consent
-- **Key Features**: Consent management, sanitized event tracking, attribution parameters
-- **Privacy**: Opt-in basis, localStorage consent, cookie synchronization
-
-### 12. **Trust Badge (`src/components/TrustBadge.tsx`)**
-- **Description**: Visual indicator of hardware attestation status
-- **Key Features**: Multi-level trust display, Apple verification status
-- **Modes**: Normal and paranoid verification modes for different security requirements
+### Utility Libraries
+- **api.ts**: Core API client with streaming chat and encryption support
+- **encryption.ts**: X25519/NaCl box implementation for request/response encryption
+- **store.ts**: Zustand-based state management with chat persistence
+- **telemetry.ts**: Event tracking and error reporting system
 
 ## Data Flows
 
-### Primary Chat Flow
+### Chat Flow
 ```mermaid
 graph TD
     A[User Input] --> B[ChatInput Component]
-    B --> C[handleSend Function]
-    C --> D{Encryption Enabled?}
-    D -->|Yes| E[Seal Request with NaCl]
-    D -->|No| F[JSON Stringify]
-    E --> G[POST /api/chat]
-    F --> G
-    G --> H[Next.js API Route]
-    H --> I[Coordinator /v1/chat/completions]
-    I --> J[Streaming Response]
-    J --> K{Response Sealed?}
-    K -->|Yes| L[Unseal SSE Events]
-    K -->|No| M[Parse JSON]
-    L --> N[Update Chat State]
-    M --> N
-    N --> O[Render Chat Message]
+    B --> C[streamChat API Call]
+    C --> D[/api/chat Next.js Route]
+    D --> E[Coordinator /v1/chat/completions]
+    E --> F[Provider Hardware]
+    F --> G[Encrypted Response Stream]
+    G --> H[Trust Metadata Headers]
+    H --> I[ChatMessage Display]
+    I --> J[VerificationPanel]
 ```
 
 ### Authentication Flow
 ```mermaid
 graph TD
     A[User Login] --> B[Privy Email Auth]
-    B --> C[Get Access Token]
-    C --> D[POST /api/auth/keys]
-    D --> E[Coordinator Key Provision]
-    E --> F[Store API Key]
-    F --> G[Set apiKeyReady = true]
-    G --> H{Key Expired Event?}
-    H -->|Yes| I[Re-provision Key]
-    I --> F
-    H -->|No| J[Continue Operation]
+    B --> C[getAccessToken]
+    C --> D[/api/auth/keys Route]
+    D --> E[Coordinator Key Provisioning]
+    E --> F[localStorage API Key]
+    F --> G[Authenticated Requests]
 ```
 
-### Provider Attestation Verification
+### Encryption Flow
 ```mermaid
 graph TD
-    A[Provider Certificates] --> B[Parse DER Certificates]
-    B --> C[Verify Chain to Apple Root CA]
-    C --> D[Extract MDA OIDs]
-    D --> E[Validate Device Properties]
-    E --> F[Display Trust Level]
-    F --> G[Monitor Warnings]
-    G --> H{Critical Issues?}
-    H -->|Yes| I[Show Error States]
-    H -->|No| J[Continue Monitoring]
+    A[Enable Encryption] --> B[Fetch Coordinator Pubkey]
+    B --> C[Generate Ephemeral Keypair]
+    C --> D[NaCl Box Seal Request]
+    D --> E[Sealed HTTP Request]
+    E --> F[Coordinator Decrypt]
+    F --> G[Provider Processing]
+    G --> H[Sealed Response Stream]
+    H --> I[Client Unseal Events]
 ```
 
 ## External Dependencies
 
 ### Runtime Dependencies
 
-- **next** (^16.2.2) [web-framework]: React-based full-stack framework providing server-side rendering, API routes, and static generation. Used throughout the application for routing, API proxy endpoints, and build optimization. Main entry point in `src/app/layout.tsx`.
+- **next** (^16.2.2) [web-framework]: Core React framework with App Router for server-side rendering and API routes. Used throughout the application for routing, server components, and build optimization. Imported in: all component files, next.config.ts.
 
-- **react** (^19.2.4) [web-framework]: Core UI library for component-based user interface. Used across all components for state management, effects, and rendering. Primary usage in chat interface, provider dashboard, and authentication flows.
+- **react** (^19.2.4) [web-framework]: UI library for building component-based interfaces. Powers all frontend components and hooks. Imported in: all component files under src/.
 
-- **react-dom** (^19.2.4) [web-framework]: DOM-specific methods for React. Enables client-side hydration and DOM manipulation. Used by Next.js for rendering React components to the browser.
+- **react-dom** (^19.2.4) [web-framework]: React renderer for browser DOM. Handles component mounting and hydration in Next.js. Used automatically by Next.js runtime.
 
-- **@privy-io/react-auth** (^3.18.0) [authentication]: Email-based authentication provider with Web3 wallet support. Handles user login, session management, and access token generation. Integrated in `src/components/providers/PrivyClientProvider.tsx`.
+- **@privy-io/react-auth** (^3.18.0) [auth]: Authentication provider for web3-native email authentication. Manages user login/logout, session tokens, and identity verification. Imported in: src/components/providers/PrivyClientProvider.tsx, src/hooks/useAuth.ts.
 
-- **@privy-io/server-auth** (^1.32.5) [authentication]: Server-side authentication utilities for validating Privy tokens in API routes. Used in Next.js API endpoints like `src/app/api/auth/keys/route.ts` for secure token verification.
+- **zustand** (^5.0.12) [state]: Lightweight state management library with persistence middleware. Manages chat history, user preferences, and UI state across page reloads. Imported in: src/lib/store.ts, src/hooks/useToast.ts.
 
-- **zustand** (^5.0.12) [state-management]: Lightweight state management library for React. Manages global application state including chat history, model selection, and UI preferences. Core implementation in `src/lib/store.ts`.
+- **lucide-react** (^1.0.1) [ui]: Icon component library providing consistent SVG icons. Used throughout the UI for buttons, status indicators, and navigation. Imported in: most component files for icons.
 
-- **tweetnacl** (^1.0.3) [crypto]: Pure JavaScript NaCl cryptography library for end-to-end encryption. Implements X25519 key exchange and Box encryption for secure coordinator communication. Primary usage in `src/lib/encryption.ts`.
+- **tweetnacl** (^1.0.3) [crypto]: NaCl cryptography library for X25519 key exchange and XSalsa20-Poly1305 encryption. Implements end-to-end encryption for sensitive requests. Imported in: src/lib/encryption.ts.
 
-- **pkijs** (^3.4.0) [crypto]: JavaScript X.509 certificate manipulation library built on WebCrypto API. Used for client-side verification of Apple MDA certificates. Core implementation in `src/lib/cert-verify.ts`.
+- **react-markdown** (^10.1.0) [content]: Markdown rendering component for displaying formatted messages. Used in chat messages to render markdown content from AI responses. Imported in: src/components/ChatMessage.tsx.
 
-- **asn1js** (^3.0.7) [crypto]: ASN.1 decoder/encoder for parsing X.509 certificate structures. Works with pkijs for certificate verification. Used in `src/lib/cert-verify.ts` for DER parsing.
+- **remark-gfm** (^4.0.1) [content]: GitHub Flavored Markdown plugin for react-markdown. Adds support for tables, strikethrough, and other GitHub markdown extensions. Imported in: src/components/ChatMessage.tsx.
 
-- **lucide-react** (^1.0.1) [ui]: React icon library providing consistent SVG icons throughout the interface. Used across all components for buttons, status indicators, and navigation elements.
+- **asn1js** (^3.0.7) [crypto]: ASN.1 parser for X.509 certificate verification. Used in hardware attestation verification to parse Apple certificate chains. Imported in: src/lib/cert-verify.ts.
 
-- **react-markdown** (^10.1.0) [ui]: Markdown-to-React converter for rendering formatted text in chat messages. Supports syntax highlighting through rehype plugins. Used in `src/components/ChatMessage.tsx`.
+- **pkijs** (^3.4.0) [crypto]: PKI library for X.509 certificate chain validation. Implements Apple device attestation verification against Apple Root CA. Imported in: src/lib/cert-verify.ts.
 
-- **rehype-highlight** (^7.0.2) [ui]: Syntax highlighting plugin for react-markdown. Adds code block highlighting to chat responses. Integrated through markdown rendering pipeline.
-
-- **remark-gfm** (^4.0.1) [ui]: GitHub Flavored Markdown plugin adding tables, strikethrough, and task lists to markdown rendering. Enhances chat message formatting capabilities.
-
-- **@datadog/browser-rum** (^6.32.0) [monitoring]: Real User Monitoring for performance and error tracking. Provides client-side observability and debugging capabilities. Initialized in `src/components/DatadogRUM.tsx`.
+- **@datadog/browser-rum** (^6.32.0) [monitoring]: Real User Monitoring for performance tracking and error reporting. Provides detailed frontend analytics and error capture. Imported in: src/components/DatadogRUM.tsx.
 
 ### Development Dependencies
 
-- **typescript** (^5) [build-tool]: Static type checking for enhanced developer experience and runtime safety. Configured in `tsconfig.json` with strict mode enabled.
+- **typescript** (^5) [build-tool]: Type checking and compilation for TypeScript source files. Provides static type safety across the entire codebase. Used by: Next.js build system and IDE.
 
-- **eslint** (^9) [build-tool]: JavaScript/TypeScript linter with security and code quality rules. Configured with Next.js, security, and promise plugins in `eslint.config.mjs`.
+- **@types/node** (^20) [build-tool]: Node.js type definitions for server-side code. Required for Next.js API routes and server components. Used by: TypeScript compiler.
 
-- **tailwindcss** (^4) [build-tool]: Utility-first CSS framework for rapid UI development. Provides responsive design system and theming support.
+- **@types/react** (^19) [build-tool]: React type definitions for component props and hooks. Ensures type safety in React components. Used by: TypeScript compiler.
 
-- **vitest** (^4.1.2) [testing]: Fast unit test runner with Vite integration. Configured for component testing with jsdom environment in `vitest.config.ts`.
+- **eslint** (^9) [build-tool]: JavaScript/TypeScript linter with security and code quality rules. Enforces consistent code style and catches potential issues. Used by: next lint command.
 
-- **@testing-library/react** (^16.3.2) [testing]: React component testing utilities with user interaction simulation. Used across test files in `__tests__/` directory.
+- **eslint-config-next** (^16.2.2) [build-tool]: Next.js-specific ESLint configuration with React and accessibility rules. Provides framework-specific linting rules. Used by: ESLint configuration.
 
-- **@testing-library/jest-dom** (^6.9.1) [testing]: Custom Jest matchers for DOM elements. Provides semantic assertions for component testing.
+- **eslint-plugin-security** (^4.0.0) [build-tool]: Security-focused ESLint rules to prevent common vulnerabilities. Catches potential security issues in code. Used by: ESLint configuration.
 
-- **jsdom** (^29.0.1) [testing]: Pure JavaScript DOM implementation for Node.js testing environments. Enables browser-like testing without a real browser.
+- **eslint-plugin-sonarjs** (^4.0.2) [build-tool]: Code quality rules from SonarJS for bug detection and maintainability. Enforces code complexity and quality standards. Used by: ESLint configuration.
+
+- **vitest** (^4.1.2) [testing]: Fast unit testing framework with TypeScript support. Runs component and utility function tests. Used by: test files in __tests__ directory.
+
+- **@testing-library/react** (^16.3.2) [testing]: React testing utilities for component testing with user interaction simulation. Provides testing utilities for React components. Used by: component test files.
+
+- **@testing-library/jest-dom** (^6.9.1) [testing]: Custom Jest matchers for DOM assertions in tests. Extends expect with DOM-specific matchers. Used by: test setup and assertions.
+
+- **jsdom** (^29.0.1) [testing]: JavaScript DOM implementation for Node.js testing environment. Provides browser-like environment for component tests. Used by: Vitest configuration.
+
+- **@tailwindcss/postcss** (^4) [build-tool]: Tailwind CSS PostCSS integration for utility-first styling. Processes CSS with Tailwind utilities and custom properties. Used by: PostCSS configuration.
 
 ## API Surface
 
-### HTTP API Endpoints (Next.js API Routes)
+### Public Routes
+- **/** - Main chat interface with authentication
+- **/billing** - Credits, usage tracking, and Stripe payments
+- **/providers** - Provider dashboard and earnings management
+- **/settings** - User preferences and encryption settings
+- **/api-console** - API documentation and testing interface
+- **/earn** - Provider earnings and payout details
 
-- **GET /api/health**: Health check endpoint returning coordinator status and provider count
-- **POST /api/chat**: Streaming chat completions proxy to coordinator with encryption support  
-- **GET /api/models**: Available AI models listing from coordinator
-- **GET /api/encryption-key**: Coordinator's public key for end-to-end encryption
-- **POST /api/auth/keys**: API key provisioning using Privy authentication tokens
-- **GET /api/payments/balance**: User account balance and withdrawable amounts
-- **GET /api/payments/usage**: Detailed usage history with costs and token counts
-- **POST /api/payments/stripe/checkout**: Stripe payment session creation for credit purchases
-- **GET /api/payments/stripe/status**: Provider payout configuration status  
-- **POST /api/payments/stripe/onboard**: Stripe Connect Express onboarding for providers
-- **POST /api/payments/withdraw/stripe**: Provider withdrawal requests to Stripe
-- **GET /api/payments/stripe/withdrawals**: Provider withdrawal history
-- **POST /api/invite/redeem**: Invite code redemption for account credits
-- **GET /api/me/providers**: Provider device status and attestation information
-- **GET /api/me/summary**: User account summary with provider and consumer activity
-- **POST /api/telemetry**: Privacy-conscious analytics event tracking
-- **GET /api/pricing**: Model pricing information in USD per token
+### API Endpoints
+- **POST /api/chat** - Streaming chat completions with encryption support
+- **POST /api/auth/keys** - API key provisioning with Privy authentication
+- **GET /api/models** - Available model listing with attestation metadata
+- **GET /api/health** - System health check with provider count
+- **POST /api/payments/stripe/checkout** - Stripe payment session creation
+- **GET /api/payments/balance** - User credit balance and usage limits
+- **POST /api/invite/redeem** - Invite code redemption for credits
 
-### Client-Side Library Functions
-
-- **`streamChat(messages, model, callbacks, signal)`**: Core streaming chat function with encryption
-- **`fetchModels()`**: Retrieve available AI models with attestation status
-- **`fetchBalance()`**: Get current account balance and withdrawable amounts  
-- **`fetchUsage()`**: Retrieve detailed usage history
-- **`redeemInviteCode(code)`**: Redeem invite codes for account credits
-- **`isEncryptionEnabled()`**: Check if end-to-end encryption is enabled
-- **`verifyCertificateChain(certificates)`**: Client-side Apple MDA certificate verification
+### Component Props Interface
+- **ChatMessage**: `{ message: Message, onRetry?: () => void }`
+- **TrustBadge**: `{ trust: TrustMetadata, compact?: boolean }`
+- **VerificationPanel**: `{ trust: TrustMetadata }`
+- **UsageChart**: `{ usage: UsageEntry[], className?: string }`
 
 ## External Systems
 
-The web component integrates with several external services and infrastructure:
+The frontend integrates with several external services at runtime:
 
-### Identity and Authentication
-- **Privy**: Email-based authentication service providing user identity verification and session management through OAuth-like flows
-
-### Payment Processing  
-- **Stripe**: Credit card processing for consumer credits and provider payouts through Stripe Connect Express accounts with international support
-
-### Analytics and Monitoring
-- **Google Analytics 4**: Privacy-conscious usage analytics with user consent management and sanitized event tracking
-- **Datadog RUM**: Real user monitoring for performance tracking, error reporting, and user experience insights
-
-### Content Delivery
-- **Vercel/CDN**: Static asset hosting and global distribution for fonts, images, and compiled JavaScript bundles
+- **Darkbloom Coordinator** (api.darkbloom.dev): Primary backend API for chat completions, model listing, authentication, and billing. All requests proxied through Next.js API routes.
+- **Stripe Payments**: Credit card processing for credit purchases and provider payouts. Handles checkout sessions and Connect Express accounts.
+- **Apple Certificate Authority**: Hardware attestation verification using Apple's Root CA and MDA certificates for device trust verification.
+- **Privy Authentication**: Email-based authentication service providing user identity and session management.
+- **Datadog RUM**: Real user monitoring for performance tracking, error reporting, and user analytics.
+- **Google Analytics**: User behavior tracking and conversion funnel analysis for product insights.
 
 ## Component Interactions
 
-The web component communicates with other system components through several mechanisms:
+The web component serves as the primary user interface and does not directly call other components in the d-inference codebase. Instead, it communicates with:
 
-### HTTP API Calls
-- **Coordinator Service**: Primary backend integration for AI inference, model management, authentication, and payment processing through REST APIs and Server-Sent Events
-- **Provider Nodes**: Indirect interaction through coordinator for hardware attestation verification and trust level determination
+- **Coordinator Service**: HTTP API calls for all backend functionality including chat, billing, and provider management
+- **Provider Network**: Indirect interaction through the coordinator for AI inference requests
+- **Authentication Service**: Integration with Privy for user identity and the coordinator for API key management
 
-### Shared Infrastructure  
-- **PostgreSQL Database**: Shared with coordinator for user accounts, payment records, and provider attestation data (accessed via coordinator APIs)
-
-### External Service Integration
-- **Apple Certificate Authority**: Certificate chain verification against Apple Enterprise Attestation Root CA for provider hardware validation
-- **Blockchain Networks**: Future integration points for decentralized attestation and payment settlement (infrastructure prepared)
-
-The component operates as a client-side heavy application with server-side API proxying, maintaining security boundaries while providing rich interactive experiences for both AI consumers and hardware providers.
+The component implements a proxy architecture where all external API calls go through Next.js API routes to maintain security boundaries and consistent authentication headers.

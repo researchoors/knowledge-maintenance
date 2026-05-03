@@ -7,100 +7,100 @@
   "citations": [
     {
       "file_path": "coordinator/cmd/verify-attestation/main.go",
-      "start_line": 1,
-      "end_line": 8,
-      "claim": "Simple package structure importing only fmt, os, and internal attestation library",
-      "section": "Architecture"
-    },
-    {
-      "file_path": "coordinator/cmd/verify-attestation/main.go",
       "start_line": 10,
-      "end_line": 16,
-      "claim": "File reading from fixed path /tmp/eigeninference_attestation.json with error handling",
+      "end_line": 15,
+      "claim": "The component reads attestation data from a fixed file path and handles read errors",
       "section": "Key Components"
     },
     {
       "file_path": "coordinator/cmd/verify-attestation/main.go",
       "start_line": 17,
       "end_line": 22,
-      "claim": "JSON parsing and verification delegation to attestation.VerifyJSON",
-      "section": "Key Components"
+      "claim": "Uses attestation.VerifyJSON() to parse and verify the attestation blob",
+      "section": "Internal Dependencies"
     },
     {
       "file_path": "coordinator/cmd/verify-attestation/main.go",
       "start_line": 23,
-      "end_line": 26,
-      "claim": "Hardware identity extraction and display from verification result",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "coordinator/cmd/verify-attestation/main.go",
-      "start_line": 27,
-      "end_line": 34,
-      "claim": "Verification status display and exit code management",
-      "section": "Key Components"
-    },
-    {
-      "file_path": "coordinator/cmd/verify-attestation/main.go",
-      "start_line": 28,
-      "end_line": 29,
-      "claim": "Cross-language verification success message indicating Swift to Go validation",
+      "end_line": 25,
+      "claim": "Displays hardware information extracted from the attestation",
       "section": "API Surface"
     },
     {
       "file_path": "coordinator/cmd/verify-attestation/main.go",
-      "start_line": 11,
-      "end_line": 11,
-      "claim": "Fixed file path for attestation input at /tmp/eigeninference_attestation.json",
-      "section": "External Systems"
-    },
-    {
-      "file_path": "coordinator/cmd/verify-attestation/main.go",
-      "start_line": 14,
-      "end_line": 14,
-      "claim": "Exit code 1 for file read errors",
-      "section": "External Systems"
-    },
-    {
-      "file_path": "coordinator/cmd/verify-attestation/main.go",
-      "start_line": 20,
-      "end_line": 20,
-      "claim": "Exit code 1 for verification failures",
-      "section": "External Systems"
-    },
-    {
-      "file_path": "coordinator/cmd/verify-attestation/main.go",
-      "start_line": 32,
-      "end_line": 32,
-      "claim": "Exit code 1 for invalid attestations",
-      "section": "External Systems"
+      "start_line": 27,
+      "end_line": 33,
+      "claim": "Shows cross-language verification success message and exits with appropriate code",
+      "section": "API Surface"
     },
     {
       "file_path": "coordinator/internal/attestation/attestation.go",
       "start_line": 1,
       "end_line": 25,
-      "claim": "Attestation package provides cross-language verification for Secure Enclave signed blobs",
-      "section": "Internal Dependencies"
+      "claim": "The attestation package provides P-256 ECDSA signature verification with cross-language JSON compatibility",
+      "section": "Architecture"
     },
     {
       "file_path": "coordinator/internal/attestation/attestation.go",
       "start_line": 233,
       "end_line": 240,
-      "claim": "VerifyJSON function used by verify-attestation for attestation verification",
+      "claim": "VerifyJSON function provides the main entry point for attestation verification from raw JSON",
+      "section": "Internal Dependencies"
+    },
+    {
+      "file_path": "coordinator/internal/attestation/attestation.go",
+      "start_line": 46,
+      "end_line": 62,
+      "claim": "AttestationBlob struct contains hardware identity and security state fields in alphabetical order",
+      "section": "Internal Dependencies"
+    },
+    {
+      "file_path": "coordinator/internal/attestation/attestation.go",
+      "start_line": 93,
+      "end_line": 111,
+      "claim": "VerificationResult struct provides structured output for verification results",
       "section": "Internal Dependencies"
     },
     {
       "file_path": "coordinator/internal/attestation/attestation.go",
       "start_line": 127,
       "end_line": 131,
-      "claim": "Verification checks P-256 ECDSA signatures and security requirements",
+      "claim": "Verify function implements P-256 ECDSA signature verification with security policy checks",
+      "section": "Data Flows"
+    },
+    {
+      "file_path": "coordinator/internal/attestation/attestation.go",
+      "start_line": 209,
+      "end_line": 221,
+      "claim": "Security policy enforcement requires Secure Enclave, SIP, and Secure Boot to be enabled",
+      "section": "Key Components"
+    },
+    {
+      "file_path": "coordinator/internal/attestation/attestation.go",
+      "start_line": 251,
+      "end_line": 285,
+      "claim": "ParseP256PublicKey handles both 64-byte and 65-byte uncompressed point formats",
       "section": "Internal Dependencies"
+    },
+    {
+      "file_path": "coordinator/internal/attestation/attestation.go",
+      "start_line": 287,
+      "end_line": 327,
+      "claim": "marshalSortedJSON provides cross-language JSON compatibility with Swift's sorted key encoding",
+      "section": "Architecture"
     },
     {
       "file_path": "coordinator/go.mod",
       "start_line": 1,
-      "end_line": 4,
-      "claim": "Go module definition with Go 1.25.0 requirement",
+      "end_line": 3,
+      "claim": "Component is part of the coordinator Go module using Go 1.25.0",
+      "section": "External Dependencies"
+    },
+    {
+      "file_path": "coordinator/go.mod",
+      "start_line": 10,
+      "end_line": 10,
+      "claim": "Uses golang.org/x/crypto for extended cryptographic operations",
       "section": "External Dependencies"
     }
   ]
