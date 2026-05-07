@@ -1,7 +1,7 @@
 {
   "schema_version": "2.0.0",
-  "source_repo": "/private/tmp/flashlight-repos/d-inference",
-  "source_commit": "f7dab6fa994a",
+  "source_repo": "/tmp/flashlight-repos/d-inference",
+  "source_commit": "cf4c0efa4d5d0f754430053760d8970b395c334a",
   "nodes": {
     "components": {
       "analytics": {
@@ -60,10 +60,6 @@
             "version": "^3.18.0"
           },
           {
-            "name": "@privy-io/server-auth",
-            "version": "^1.32.5"
-          },
-          {
             "name": "asn1js",
             "version": "^3.0.7"
           },
@@ -92,10 +88,6 @@
             "version": "^10.1.0"
           },
           {
-            "name": "rehype-highlight",
-            "version": "^7.0.2"
-          },
-          {
             "name": "remark-gfm",
             "version": "^4.0.1"
           },
@@ -113,7 +105,7 @@
       },
       "decrypt-test": {
         "name": "decrypt-test",
-        "kind": "service",
+        "kind": "cli",
         "type": "rust-crate",
         "root_path": "coordinator/internal/e2e/testdata/decrypt",
         "description": "",
@@ -188,16 +180,8 @@
             "version": "0.8"
           },
           {
-            "name": "http-body-util",
-            "version": "0.1"
-          },
-          {
             "name": "anyhow",
             "version": "1"
-          },
-          {
-            "name": "thiserror",
-            "version": "2"
           },
           {
             "name": "async-trait",
@@ -224,10 +208,6 @@
             "version": "1"
           },
           {
-            "name": "backtrace",
-            "version": "0.3"
-          },
-          {
             "name": "crossterm",
             "version": "0.28"
           },
@@ -250,6 +230,18 @@
           {
             "name": "pyo3",
             "version": "0.24"
+          },
+          {
+            "name": "security-framework",
+            "version": "3"
+          },
+          {
+            "name": "security-framework-sys",
+            "version": "2"
+          },
+          {
+            "name": "core-foundation",
+            "version": "0.10"
           }
         ],
         "key_files": [],
@@ -336,8 +328,8 @@
     "analyzed_count": 0,
     "by_kind": {
       "library": 1,
-      "service": 5,
-      "cli": 1,
+      "service": 4,
+      "cli": 2,
       "frontend": 2
     },
     "by_edge_type": {
