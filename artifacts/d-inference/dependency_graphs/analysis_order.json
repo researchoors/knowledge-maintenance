@@ -1,25 +1,27 @@
 {
   "depth_levels": [
     [
-      "EigenInference",
       "EigenInferenceEnclave",
       "EigenInferenceEnclaveCLI",
+      "ProviderCore",
       "analytics",
       "coordinator",
-      "darkbloom",
       "decrypt-test",
       "web"
     ],
     [
-      "verify-attestation"
+      "DarkbloomEnclaveCLI",
+      "coordinator-verify-attestation",
+      "darkbloom",
+      "e2e"
     ]
   ],
-  "total_components": 12,
+  "total_components": 15,
   "level_count": 2,
   "by_kind": {
-    "library": 4,
-    "service": 5,
-    "cli": 1,
-    "frontend": 2
+    "library": 6,
+    "service": 4,
+    "cli": 4,
+    "frontend": 1
   }
 }

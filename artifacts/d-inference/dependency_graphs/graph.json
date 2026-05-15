@@ -1,7 +1,7 @@
 {
   "schema_version": "2.0.0",
-  "source_repo": "/private/tmp/flashlight-repos/d-inference",
-  "source_commit": "f7dab6fa994a",
+  "source_repo": "/tmp/flashlight-repos/d-inference",
+  "source_commit": "56b050b4480325561c3b90bc941792f67a37b9ea",
   "nodes": {
     "components": {
       "analytics": {
@@ -19,19 +19,30 @@
       },
       "coordinator": {
         "name": "coordinator",
-        "kind": "service",
+        "kind": "library",
         "type": "go-module",
-        "root_path": "coordinator/cmd/coordinator",
+        "root_path": "coordinator",
+        "description": "",
+        "internal_dependencies": [],
+        "external_dependencies": [],
+        "key_files": [],
+        "manifest_path": "go.mod"
+      },
+      "e2e": {
+        "name": "e2e",
+        "kind": "library",
+        "type": "go-module",
+        "root_path": "e2e",
         "description": "",
         "internal_dependencies": [
           "coordinator"
         ],
         "external_dependencies": [],
         "key_files": [],
-        "manifest_path": "coordinator/go.mod"
+        "manifest_path": "go.mod"
       },
-      "verify-attestation": {
-        "name": "verify-attestation",
+      "coordinator-verify-attestation": {
+        "name": "coordinator-verify-attestation",
         "kind": "service",
         "type": "go-module",
         "root_path": "coordinator/cmd/verify-attestation",
@@ -41,7 +52,7 @@
         ],
         "external_dependencies": [],
         "key_files": [],
-        "manifest_path": "coordinator/go.mod"
+        "manifest_path": "go.mod"
       },
       "web": {
         "name": "web",
@@ -58,10 +69,6 @@
           {
             "name": "@privy-io/react-auth",
             "version": "^3.18.0"
-          },
-          {
-            "name": "@privy-io/server-auth",
-            "version": "^1.32.5"
           },
           {
             "name": "asn1js",
@@ -92,10 +99,6 @@
             "version": "^10.1.0"
           },
           {
-            "name": "rehype-highlight",
-            "version": "^7.0.2"
-          },
-          {
             "name": "remark-gfm",
             "version": "^4.0.1"
           },
@@ -113,7 +116,7 @@
       },
       "decrypt-test": {
         "name": "decrypt-test",
-        "kind": "service",
+        "kind": "cli",
         "type": "rust-crate",
         "root_path": "coordinator/internal/e2e/testdata/decrypt",
         "description": "",
@@ -134,137 +137,15 @@
       "darkbloom": {
         "name": "darkbloom",
         "kind": "service",
-        "type": "rust-crate",
-        "root_path": "provider",
-        "description": "EigenInference provider agent for Apple Silicon Macs",
-        "internal_dependencies": [],
-        "external_dependencies": [
-          {
-            "name": "clap",
-            "version": "4"
-          },
-          {
-            "name": "tokio",
-            "version": "1"
-          },
-          {
-            "name": "tokio-util",
-            "version": "0.7"
-          },
-          {
-            "name": "serde",
-            "version": "1"
-          },
-          {
-            "name": "serde_json",
-            "version": "1"
-          },
-          {
-            "name": "toml",
-            "version": "0.8"
-          },
-          {
-            "name": "tracing",
-            "version": "0.1"
-          },
-          {
-            "name": "tracing-subscriber",
-            "version": "0.3"
-          },
-          {
-            "name": "reqwest",
-            "version": "0.12"
-          },
-          {
-            "name": "tokio-tungstenite",
-            "version": "0.26"
-          },
-          {
-            "name": "futures-util",
-            "version": "0.3"
-          },
-          {
-            "name": "axum",
-            "version": "0.8"
-          },
-          {
-            "name": "http-body-util",
-            "version": "0.1"
-          },
-          {
-            "name": "anyhow",
-            "version": "1"
-          },
-          {
-            "name": "thiserror",
-            "version": "2"
-          },
-          {
-            "name": "async-trait",
-            "version": "0.1"
-          },
-          {
-            "name": "uuid",
-            "version": "1"
-          },
-          {
-            "name": "libc",
-            "version": "0.2"
-          },
-          {
-            "name": "dirs",
-            "version": "6"
-          },
-          {
-            "name": "chrono",
-            "version": "0.4"
-          },
-          {
-            "name": "once_cell",
-            "version": "1"
-          },
-          {
-            "name": "backtrace",
-            "version": "0.3"
-          },
-          {
-            "name": "crossterm",
-            "version": "0.28"
-          },
-          {
-            "name": "crypto_box",
-            "version": "0.9"
-          },
-          {
-            "name": "base64",
-            "version": "0.22"
-          },
-          {
-            "name": "sha2",
-            "version": "0.10"
-          },
-          {
-            "name": "zeroize",
-            "version": "1"
-          },
-          {
-            "name": "pyo3",
-            "version": "0.24"
-          }
-        ],
-        "key_files": [],
-        "manifest_path": "provider/Cargo.toml"
-      },
-      "EigenInference": {
-        "name": "EigenInference",
-        "kind": "frontend",
         "type": "swift-package",
-        "root_path": "app/EigenInference/Sources/EigenInference",
+        "root_path": "provider-swift/Sources/darkbloom",
         "description": "",
-        "internal_dependencies": [],
+        "internal_dependencies": [
+          "ProviderCore"
+        ],
         "external_dependencies": [],
         "key_files": [],
-        "manifest_path": "app/EigenInference/Package.swift"
+        "manifest_path": "provider-swift/Package.swift"
       },
       "EigenInferenceEnclave": {
         "name": "EigenInferenceEnclave",
@@ -292,6 +173,30 @@
         "external_dependencies": [],
         "key_files": [],
         "manifest_path": "enclave/Package.swift"
+      },
+      "ProviderCore": {
+        "name": "ProviderCore",
+        "kind": "library",
+        "type": "swift-package",
+        "root_path": "provider-swift/Sources/ProviderCore",
+        "description": "",
+        "internal_dependencies": [],
+        "external_dependencies": [],
+        "key_files": [],
+        "manifest_path": "provider-swift/Package.swift"
+      },
+      "DarkbloomEnclaveCLI": {
+        "name": "DarkbloomEnclaveCLI",
+        "kind": "cli",
+        "type": "swift-package",
+        "root_path": "provider-swift",
+        "description": "",
+        "internal_dependencies": [
+          "ProviderCore"
+        ],
+        "external_dependencies": [],
+        "key_files": [],
+        "manifest_path": "provider-swift/Package.swift"
       }
     },
     "external_services": {}
@@ -303,13 +208,18 @@
       "type": "depends_on"
     },
     {
-      "source": "coordinator",
+      "source": "e2e",
       "target": "coordinator",
       "type": "depends_on"
     },
     {
-      "source": "verify-attestation",
+      "source": "coordinator-verify-attestation",
       "target": "coordinator",
+      "type": "depends_on"
+    },
+    {
+      "source": "darkbloom",
+      "target": "ProviderCore",
       "type": "depends_on"
     },
     {
@@ -326,22 +236,27 @@
       "source": "EigenInferenceEnclaveCLI",
       "target": "EigenInferenceEnclave",
       "type": "depends_on"
+    },
+    {
+      "source": "DarkbloomEnclaveCLI",
+      "target": "ProviderCore",
+      "type": "depends_on"
     }
   ],
   "analysis": {},
   "metadata": {
-    "component_count": 9,
+    "component_count": 11,
     "external_service_count": 0,
-    "edge_count": 6,
+    "edge_count": 8,
     "analyzed_count": 0,
     "by_kind": {
-      "library": 1,
-      "service": 5,
-      "cli": 1,
-      "frontend": 2
+      "library": 4,
+      "service": 3,
+      "cli": 3,
+      "frontend": 1
     },
     "by_edge_type": {
-      "depends_on": 6
+      "depends_on": 8
     }
   }
 }
